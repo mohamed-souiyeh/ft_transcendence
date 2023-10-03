@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM debian:latest
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
@@ -10,10 +10,11 @@ RUN apt update -y && apt upgrade -y && apt install -y $(cat basic_utils)
 
 RUN apt install -y $(cat pkgs)
 
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+# Installing Node
+SHELL ["/bin/bash", "--login", "-c"]
 
-ENV 
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
 
 RUN nvm install node
 
-RUN npm
+RUN npm install -g @nestjs/cli
