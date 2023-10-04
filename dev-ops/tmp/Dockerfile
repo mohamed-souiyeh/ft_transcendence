@@ -6,6 +6,8 @@ COPY ./pkgs /
 
 COPY ./basic_utils /
 
+COPY ./npm_pkgs /
+
 RUN apt update -y && apt upgrade -y && apt install -y $(cat basic_utils)
 
 RUN apt install -y $(cat pkgs)
@@ -17,4 +19,8 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | b
 
 RUN nvm install node
 
-RUN npm install -g @nestjs/cli
+RUN nvm install-latest-npm
+
+RUN npm install -g $(cat npm_pkgs | tr '\n' ' ')
+
+CMD ["bash"]
