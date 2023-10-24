@@ -19,4 +19,4 @@ RUN nvm install-latest-npm
 
 RUN npm install -g $(cat /utils/npm_pkgs | tr '\n' ' ')
 
-CMD ["bash"]
+CMD ["tail", "-F", "anything"]
