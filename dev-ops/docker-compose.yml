@@ -9,7 +9,7 @@ services:
       - "8080:8080"
       - "1337:1337"
     volumes:
-      - shared:/root/shared
+      - sharedv:/root/shared
     networks:
       - net
 
@@ -21,7 +21,7 @@ services:
       - "8081:8080"
       - "1338:1337"
     volumes:
-      - shared:/root/shared
+      - sharedv:/root/shared
     networks:
       - net
 
@@ -33,7 +33,7 @@ services:
       - "8082:8080"
       - "1339:1337"
     volumes:
-      - shared:/root/shared
+      - sharedv:/root/shared
     networks:
       - net
 
@@ -43,8 +43,8 @@ networks:
     driver: bridge
 
 volumes:
-  shared:
-    name: shared
+  sharedv:
+    name: sharedv
     driver: local
     driver_opts:
       type: none
