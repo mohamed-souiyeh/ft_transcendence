@@ -1,0 +1,7 @@
+@nestjs/cli
+typescript
+react
+react-dom
+socket.io
+socket.io-client
+

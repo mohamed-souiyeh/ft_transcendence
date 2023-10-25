@@ -1,11 +1,52 @@
-version : "3.5"
-
+version: "3.5"
 
 services:
-  tmp:
-    image: tmp
-    build: ./tmp/
-    container_name: tmp
+  back-end-dev:
+    image: back-end-dev
+    build: ./back-end-dev/
+    container_name: back-end-dev
     ports:
       - "8080:8080"
       - "1337:1337"
+    volumes:
+      - sharedv:/root/shared
+    networks:
+      - net
+
+  game-dev:
+    image: game-dev
+    build: ./game-dev/
+    container_name: game-dev
+    ports:
+      - "8081:8080"
+      - "1338:1337"
+    volumes:
+      - sharedv:/root/shared
+    networks:
+      - net
+
+  front-end-dev:
+    image: front-end-dev
+    build: ./front-end-dev/
+    container_name: front-end-dev
+    ports:
+      - "8082:8080"
+      - "1339:1337"
+    volumes:
+      - sharedv:/root/shared
+    networks:
+      - net
+
+networks:
+  net:
+    name: net
+    driver: bridge
+
+volumes:
+  sharedv:
+    name: sharedv
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "$PWD/.."
