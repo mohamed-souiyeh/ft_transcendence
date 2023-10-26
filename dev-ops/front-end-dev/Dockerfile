@@ -4,9 +4,7 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
 COPY ./utils /utils
 
-RUN apt update -y && apt upgrade -y && apt install -y $(cat /utils/basic_utils)
-
-RUN apt install -y $(cat /utils/pkgs)
+RUN apt update -y && apt upgrade -y && apt install -y $(cat /utils/basic_utils | tr '\r\n' ' ')
 
 # Installing Node
 SHELL ["/bin/bash", "--login", "-c"]
@@ -17,6 +15,6 @@ RUN nvm install node
 
 RUN nvm install-latest-npm
 
-RUN npm install -g $(cat /utils/npm_pkgs | tr '\n' ' ')
+RUN npm install -g $(cat /utils/npm_pkgs | tr '\n\r' ' ')
 
 CMD ["tail", "-F", "anything"]
