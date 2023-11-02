@@ -10,3 +10,5 @@ front-end:
 
 # deploy:
 # 	docker-compose -f ./dev-ops/docker-compose.yml up 
+
+.PHONY: game-dev back-end front-end
