@@ -5,14 +5,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import {serverModule} from './server/gameserver.module'
 import { join } from 'path';
 
-
 @Controller()
 export class gameController {
-  @Get()
-  mm()
-  {
-    return "ggg";
-  }
 }
 
 @Module({
@@ -21,7 +15,8 @@ export class gameController {
       rootPath: join(__dirname, '../../gamefrontend/build'),
     }),
     serverModule
-  ],
+  ]
+  // providers: [gameLogicServer]
   // controllers: [gameController],
 })
 class gameModule {}

@@ -18,7 +18,8 @@ function App()
 {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reff = useRef<Cube | null>(null);
-  const [score, setScore] = useState(0);
+  let [score1, setScore1] = useState(0);
+  let [score2, setScore2] = useState(0);
   const frameRef = useRef<number>(0);
 
   useEffect(() => 
@@ -89,11 +90,37 @@ function App()
     ball.vector3D.x =  first.vector3D.x - 0.05;
     ball.vector3D.y =  first.vector3D.y;
     ball.vector3D.z =  -0.02;
+    ball.speed = 0.009;
     ball.prevPositions.x = first.vector3D.x + 0.5;
     ball.prevPositions.y = first.vector3D.y + 0.5;
     ball.prevPositions.z = -0.01;
 
     document.addEventListener('keydown', (e) => {
+      if (e.code == 'Space')
+      {
+        if (!ballLaunched)
+        {
+              second.speed = 0.01;
+              first.speed = 0.01;
+              if (firstPlayerHasTheBall)
+              {
+                  ball.prevPositions.x = first.vector3D.x + 0.5;
+                  ball.prevPositions.y = first.vector3D.y + 0.5;
+              }
+              if (secondPlayerHasTheBall)
+              {
+                  ball.prevPositions.x = second.vector3D.x - 0.5;
+                  ball.prevPositions.y = second.vector3D.y - 0.5;
+              }
+              ball.velocityx =  ball.vector3D.x - ball.prevPositions.x;
+              ball.velocityy =  ball.vector3D.y - ball.prevPositions.y;
+              ball.prevPositions.x = ball.vector3D.x + 0.5;
+              ball.prevPositions.y = ball.vector3D.y + 0.5;
+              ballLaunched = true;
+              ball.speed = 0.009;
+            }
+            socket.emit('balllaunch', ballLaunched);
+          }
       if (e.code == 'KeyW')
       {
         socket.emit('right', 1);
@@ -125,43 +152,30 @@ function App()
 
     function renderGame(gl: WebGLRenderingContext | null)
     {
-      socket.on('left', (v:number)=>{first.velocityy = v;});
-	    socket.on('right', (v:number)=>{second.velocityy = v;});
+      setScore1((score1));
+      setScore2((score2));
+      socket.on('score', (v:number, v1:number) => {
+        score1 = v;
+        score2 = v1;
+      });
+      socket.on('left', (v:number)=>{first.vector3D.y = v;});
+	    socket.on('right', (v:number)=>{second.vector3D.y = v;});
+
       if (gl)
       {
         gl.clearColor(0.38, 0.0, 0.15, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.enable(gl.DEPTH_TEST);
 
-        if (!ballLaunched)
-        {
-          if (firstPlayerHasTheBall)
-          {
-            ball.vector3D.x =  first.vector3D.x - 0.05;
-            ball.vector3D.y =  first.vector3D.y;
-          }
-          if (secondPlayerHasTheBall)
-          {
-            ball.vector3D.x =  second.vector3D.x + 0.05;
-            ball.vector3D.y =  second.vector3D.y;
-          }
-        }
-        else
-        {
-        }
-        if (first.vector3D.y + first.speed * first.velocityy < terrain.height/10 - first.height/10
-          && first.vector3D.y + first.speed * first.velocityy > -terrain.height/10 + first.height/10)
-          first.vector3D.y += first.speed * first.velocityy;
-        if (second.vector3D.y + second.speed * second.velocityy < terrain.height/10 - second.height/10
-          && second.vector3D.y + second.speed * second.velocityy > -terrain.height/10 + second.height/10)
-          second.vector3D.y += second.speed * second.velocityy;
+        socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
+        socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
 
         terrain.renderEntity(gl, 36);
         terrain.setColor(gl, [0.17, 0.0, 0.16]);
         terrain.rotateX(gl, rad2Degree(0.004));
         terrain.rotateY(gl, rad2Degree(0.0));
         terrain.set3DMatrices(gl, projection, viewMatrix);
-        
+
         first.renderEntity(gl, 36);
         first.rotateX(gl, rad2Degree(0.004));
         first.rotateY(gl, rad2Degree(0.0));
@@ -191,7 +205,7 @@ function App()
   }, []);
 
   return (<div style={{textAlign:"center"}}>
-          <h1>{score}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{score}</h1>
+          <h1>{score1}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{score2}</h1>
           <canvas ref={canvasRef}
           /></div>);
 }
