@@ -15,6 +15,8 @@ RUN nvm install node
 
 RUN nvm install-latest-npm
 
-RUN npm install -g $(cat /utils/npm_pkgs | tr '\n\r' ' ')
+RUN npm install -g utils
 
-CMD ["tail", "-F", "anything"]
+WORKDIR /root/shared/transandance/front-end/
+
+CMD ["/bin/bash", "--login", "-c", "npm", "run", "dev"]
