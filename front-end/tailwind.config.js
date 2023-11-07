@@ -18,9 +18,11 @@ export default {
       },
       height: {
         'l-card-h': '26rem',
+        '13': '13px'
       },
       width: {
         'l-card-w': '20rem',
+        '13': '13px'
       }
     },
   },

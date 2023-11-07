@@ -4,6 +4,7 @@ import SingUp from "./pages/sing_up";
 import NotFound from "./pages/not_found";
 import Home from "./pages/home";
 import Profile from "./pages/profile";
+import UserProfile from "./pages/user";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/signup" element={<SingUp/>} />
           <Route path="/home" element={<Home/>}/>
           <Route path="/profile" element={<Profile/>} />
+          <Route path="/userprofile" element={<UserProfile/>} />
           <Route path="*" element={<NotFound/>} />
           {
 
