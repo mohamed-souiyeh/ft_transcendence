@@ -20,6 +20,8 @@ function App()
   const reff = useRef<Cube | null>(null);
   let [score1, setScore1] = useState(0);
   let [score2, setScore2] = useState(0);
+  let [gameState, setState] = useState('Looking for partner :(');
+  let foundMatch:boolean = false;
   const frameRef = useRef<number>(0);
 
   useEffect(() => 
@@ -74,7 +76,7 @@ function App()
     let first:Cube = new Cube(gl, 0.18, 1, 0.3);
     let second:Cube = new Cube(gl, 0.18, 1, 0.3);
     let ball:Cube = new Cube(gl, 0.2, 0.2, 0.5);
-
+    
     first.vector3D.x = 0.97;
     first.vector3D.y =  0.0;
     first.vector3D.z =  -0.02;
@@ -152,60 +154,72 @@ function App()
 
     function renderGame(gl: WebGLRenderingContext | null)
     {
-      setScore1((score1));
-      setScore2((score2));
-      socket.on('score', (v:number, v1:number) => {
-        score1 = v;
-        score2 = v1;
-      });
-      socket.on('left', (v:number)=>{first.vector3D.y = v;});
-	    socket.on('right', (v:number)=>{second.vector3D.y = v;});
+      socket.on('matchFound', (v:boolean)=>{foundMatch = v;});
 
-      if (gl)
+      if (!foundMatch)
+        setState((gameState) => gameState = 'Looking for partner :(');
+      else
+        setState((gameState) => gameState = score1 + '      |     ' +score2);
+    if (foundMatch)
       {
-        gl.clearColor(0.38, 0.0, 0.15, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        gl.enable(gl.DEPTH_TEST);
-
-        socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
-        socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
-
-        terrain.renderEntity(gl, 36);
-        terrain.setColor(gl, [0.17, 0.0, 0.16]);
-        terrain.rotateX(gl, rad2Degree(0.004));
-        terrain.rotateY(gl, rad2Degree(0.0));
-        terrain.set3DMatrices(gl, projection, viewMatrix);
-
-        first.renderEntity(gl, 36);
-        first.rotateX(gl, rad2Degree(0.004));
-        first.rotateY(gl, rad2Degree(0.0));
-        first.setColor(gl, [0.4, 0.6, 1.8]);
-        first.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
-        first.set3DMatrices(gl, projection, viewMatrix);
-        
-        second.renderEntity(gl, 36);
-        second.rotateX(gl, rad2Degree(0.004));
-        second.rotateY(gl, rad2Degree(0.0));
-        second.setColor(gl, [0.4, 0.6, 1.8]);
-        second.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
-        second.set3DMatrices(gl, projection, viewMatrix);
-
-        ball.renderEntity(gl, 36);
-        ball.rotateX(gl, rad2Degree(0.004));
-        ball.rotateY(gl, rad2Degree(0.0));
-        ball.setColor(gl, [1.0, 0.8, 0.1]);
-        ball.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
-        ball.set3DMatrices(gl, projection, viewMatrix);
-
-        frameRef.current = requestAnimationFrame(() => renderGame(gl));
+        setScore1((score1));
+        setScore2((score2));
+        socket.on('score', (v:number, v1:number) => {
+          score1 = v;
+          score2 = v1;
+        });
+        socket.on('left', (v:number)=>{first.vector3D.y = v;});
+        socket.on('right', (v:number)=>{second.vector3D.y = v;});
+  
+        if (gl)
+        {
+          gl.clearColor(0.38, 0.0, 0.15, 1.0);
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+          gl.enable(gl.DEPTH_TEST);
+  
+          socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
+          socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
+  
+          terrain.renderEntity(gl, 36);
+          terrain.setColor(gl, [0.17, 0.0, 0.16]);
+          terrain.rotateX(gl, rad2Degree(0.004));
+          terrain.rotateY(gl, rad2Degree(0.0));
+          terrain.set3DMatrices(gl, projection, viewMatrix);
+  
+          first.renderEntity(gl, 36);
+          first.rotateX(gl, rad2Degree(0.004));
+          first.rotateY(gl, rad2Degree(0.0));
+          first.setColor(gl, [0.4, 0.6, 1.8]);
+          first.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
+          first.set3DMatrices(gl, projection, viewMatrix);
+          
+          second.renderEntity(gl, 36);
+          second.rotateX(gl, rad2Degree(0.004));
+          second.rotateY(gl, rad2Degree(0.0));
+          second.setColor(gl, [0.4, 0.6, 1.8]);
+          second.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
+          second.set3DMatrices(gl, projection, viewMatrix);
+  
+          ball.renderEntity(gl, 36);
+          ball.rotateX(gl, rad2Degree(0.004));
+          ball.rotateY(gl, rad2Degree(0.0));
+          ball.setColor(gl, [1.0, 0.8, 0.1]);
+          ball.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
+          ball.set3DMatrices(gl, projection, viewMatrix);
+        }
       }
+    
+      console.log(foundMatch);
+      frameRef.current = requestAnimationFrame(() => renderGame(gl));
     }
 
     return () => cancelAnimationFrame(frameRef.current);
   }, []);
+  
+
 
   return (<div style={{textAlign:"center"}}>
-          <h1>{score1}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{score2}</h1>
+          <h1>{gameState}</h1>
           <canvas ref={canvasRef}
           /></div>);
 }

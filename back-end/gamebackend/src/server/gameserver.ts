@@ -1,6 +1,30 @@
 import {OnModuleInit, Injectable, Controller, Get} from '@nestjs/common'
-import { WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import {Server} from 'socket.io'
+import { SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import {Server, Socket} from 'socket.io'
+
+class room
+{
+    firstClient:Socket = null;
+    secondClient:Socket = null;
+    firstPaddlePos: number = 0;
+    secondPaddlePos: number = 0;
+    firstPaddleSpeed: number = 0.01;
+    secondPaddleSpeed: number = 0.01;
+    firstvelocity: number = 0;
+    secondvelocity: number = 0;
+    ballPosX: number = 0;
+    ballPosY: number = 0;
+    ballVelocityX:number = 0;
+    ballVelocityY:number = 0;
+    score1:number = 0;
+    score2:number = 0;
+    speed:number = 0.01;
+    ballLaunched: boolean = false;
+    firstPlayerHaveTheBall: boolean = true;
+    secondPlayerHaveTheBall: boolean = false;
+    foundMatch:boolean = false;
+    roomsName:string = null;
+};
 
 // Managing the sockets
 @WebSocketGateway()
@@ -8,146 +32,154 @@ export class gameServer implements OnModuleInit
 {
     @WebSocketServer()
     server : Server;
-    posx: number = 0;
-    posy: number = 0;
-    score1: number = 0;
-    score2: number = 0;
-    firstPaddlePos: number = 0;
-    secondPaddlePos: number = 0;
-    firstPaddleSpeed: number = 0.01;
-    secondPaddleSpeed: number = 0.01;
-    firstVelocity:number = 0;
-    secondVelocity:number = 0;
-    prevPositionsy: number = 0;
-    prevPositionsx: number = 0;
-    velocityy: number = 0;
-    velocityx: number = 0;
-    speed: number = 0;
-    firstSpeed: number = 0;
-    secondSpeed: number = 0;
-    ballLaunched: boolean = false;
-    firstPlayerHasTheBall: boolean = false;
-    secondPlayerHasTheBall: boolean = false;
+    clientsList: Socket[] = new Array();
+
+    clientCount:number = 0;
+    roomid:number = 0;
+    roomsList:room[] = new Array();
+    fv: number = 0;
+    sv: number = 0;
 
     onModuleInit()
     {
-        this.velocityx = 0.1;
-        this.velocityy = 0.1;
-        this.speed = 0.01;
-        let client1 = '0';
-        let client2 = '0';
+        let room_:room;
+        room_ = new room();
+
         this.server.on('connection', (socket) =>
         {
-            socket.on('balllaunch', (v) =>{
-                this.ballLaunched = v;
-            });
-
-            if (client1 == '0' && client2 == '0') {
-                client1 = socket.id;
-                this.firstPlayerHasTheBall = true;
-                this.secondPlayerHasTheBall = false;
-            }
-            else if (client1 != '0' && client2 == '0') {
-                client2 = socket.id;
-            }
-            if (client2 == socket.id) 
+            if (this.clientCount == 0)
+                room_.firstClient = socket;
+            if (this.clientCount == 1)
+                room_.secondClient = socket;
+            this.clientCount++;
+            this.clientCount %= 2;
+            if (this.clientCount == 0)
             {
-                socket.on('right', (v) => {
-                    this.secondVelocity = v;
-                });
+                room_.roomsName = 'room' + this.roomid;
+                this.roomid++;
+                room_.firstClient.join(room_.roomsName);
+                room_.secondClient.join(room_.roomsName);
+                room_.foundMatch = true;
+                this.roomsList.push(room_);
+                room_ = new room();
             }
-            if (client1 == socket.id) {
-                socket.on('left', (v) =>
-                {
-                    this.firstVelocity = v;
+            
+            for (let i:number = 0; i < this.roomsList.length; i++)
+            {
+                this.roomsList[i].firstClient.on('left', (v:number)=>{
+                    this.roomsList[i].firstvelocity = v;
                 });
+                this.roomsList[i].secondClient.on('right', (v:number)=>{
+                    this.roomsList[i].secondvelocity = v;
+                });
+                if (this.roomsList[i].firstPlayerHaveTheBall)
+                {
+                    this.roomsList[i].firstClient.on('balllaunch', (v:boolean)=>{
+                        this.roomsList[i].ballLaunched = v;
+                    });
+                }
+                if (this.roomsList[i].secondPlayerHaveTheBall)
+                {
+                    this.roomsList[i].secondClient.on('balllaunch', (v:boolean)=>{
+                        this.roomsList[i].ballLaunched = v;
+                    });
+                }
             }
         })
-        
         setInterval(() => {
             // Game Logic
-            this.server.emit('ballPosetion', this.firstPlayerHasTheBall, this.secondPlayerHasTheBall);
-            if (!this.ballLaunched)
+            for (var i:number = 0; i < this.roomsList.length; i++)
             {
-                if (this.firstPlayerHasTheBall)
+                if (this.roomsList[i].firstPaddlePos + this.roomsList[i].firstPaddleSpeed * this.roomsList[i].firstvelocity < 7/10 - 1/10
+                && this.roomsList[i].firstPaddlePos + this.roomsList[i].firstPaddleSpeed * this.roomsList[i].firstvelocity > -7/10 + 1/10)
+                    this.roomsList[i].firstPaddlePos += this.roomsList[i].firstPaddleSpeed * this.roomsList[i].firstvelocity;
+                    if (this.roomsList[i].secondPaddlePos + this.roomsList[i].secondPaddleSpeed * this.roomsList[i].secondvelocity < 7/10 - 1/10
+                    && this.roomsList[i].secondPaddlePos + this.roomsList[i].secondPaddleSpeed * this.roomsList[i].secondvelocity > -7/10 + 1/10)
+                        this.roomsList[i].secondPaddlePos += this.roomsList[i].secondPaddleSpeed * this.roomsList[i].secondvelocity;
+                if (!this.roomsList[i].ballLaunched)
                 {
-                    this.posx =  0.97 - 0.05;
-                    this.posy =  this.firstPaddlePos;
-                    this.velocityx = -1;
+                    if (this.roomsList[i].firstPlayerHaveTheBall)
+                    {
+                        this.roomsList[i].ballPosX =  0.97 - 0.05;
+                        this.roomsList[i].ballPosY =  this.roomsList[i].firstPaddlePos;
+                        this.roomsList[i].ballVelocityX = -1;
+                    }
+                    if (this.roomsList[i].secondPlayerHaveTheBall)
+                    {
+                        this.roomsList[i].ballPosX =  -0.97 + 0.05;
+                        this.roomsList[i].ballPosY =  this.roomsList[i].secondPaddlePos;
+                        this.roomsList[i].ballVelocityX = 1;
+                    }
                 }
-                if (this.secondPlayerHasTheBall)
+                else
                 {
-                    this.posx =  -0.97 + 0.05;
-                    this.posy =  this.secondPaddlePos;
-                    this.velocityx = 1;
-                }
+                    if (this.roomsList[i].ballPosX + 0.2/10 >= 0.97 && 
+                        this.roomsList[i].ballPosY - 0.2/10 <= this.roomsList[i].firstPaddlePos + 1/10 &&
+                        this.roomsList[i].ballPosY + 0.2/10 >= this.roomsList[i].firstPaddlePos - 1/10)
+                    {
+                        console.log('collisiooooon');
+                        this.roomsList[i].firstPlayerHaveTheBall = true;
+                        this.roomsList[i].secondPlayerHaveTheBall = false;
+                        this.roomsList[i].ballVelocityX = -1;
+                    }
+                    if (this.roomsList[i].ballPosX - 0.2/10 <= -0.97 && 
+                        this.roomsList[i].ballPosY - 0.2/10 <= this.roomsList[i].secondPaddlePos + 1/10 &&
+                        this.roomsList[i].ballPosY + 0.2/10 >= this.roomsList[i].secondPaddlePos - 1/10)
+                    {
+                        console.log('collisiooooon');
+                        this.roomsList[i].firstPlayerHaveTheBall = false;
+                        this.roomsList[i].secondPlayerHaveTheBall = true;
+                        this.roomsList[i].ballPosX += 0.0001;
+                        this.roomsList[i].ballVelocityX = 1;
+                    }
+                    if (this.roomsList[i].ballPosX >= 1)
+                    {
+                        this.roomsList[i].score1++;
+                        this.roomsList[i].firstPlayerHaveTheBall = false;
+                        this.roomsList[i].secondPlayerHaveTheBall = true;
+                        this.roomsList[i].ballLaunched = false;
+                        this.roomsList[i].secondPaddleSpeed =  0.01;
+                    }
+                    if (this.roomsList[i].ballPosX <= -1)
+                    {
+                        this.roomsList[i].score2++;
+                        this.roomsList[i].firstPlayerHaveTheBall = true;
+                        this.roomsList[i].secondPlayerHaveTheBall = false;
+                        this.roomsList[i].ballLaunched = false;
+                        this.roomsList[i].secondPaddleSpeed =  0.01;
+                    }
+                    if (this.roomsList[i].ballPosY >= 7/10)
+                    {
+                            this.roomsList[i].ballPosY = 7/10;
+                            this.roomsList[i].ballVelocityY = -1;
+                        }
+                        if (this.roomsList[i].ballPosY <= -7/10)
+                        {
+                            this.roomsList[i].ballPosY = -7/10;
+                            this.roomsList[i].ballVelocityY = 1;
+                        }
+                    }
+                if (this.roomsList[i].firstPaddlePos + this.roomsList[i].firstPaddleSpeed * this.roomsList[i].firstvelocity < 7/10 - 1/10
+                && this.roomsList[i].firstPaddlePos + this.roomsList[i].firstPaddleSpeed * this.roomsList[i].firstvelocity > -7/10 + 1/10)
+                    this.roomsList[i].firstPaddlePos += this.roomsList[i].firstPaddleSpeed * this.roomsList[i].firstvelocity;
+                    if (this.roomsList[i].secondPaddlePos + this.roomsList[i].secondPaddleSpeed * this.roomsList[i].secondvelocity < 7/10 - 1/10
+                    && this.roomsList[i].secondPaddlePos + this.roomsList[i].secondPaddleSpeed * this.roomsList[i].secondvelocity > -7/10 + 1/10)
+                    this.roomsList[i].secondPaddlePos += this.roomsList[i].secondPaddleSpeed * this.roomsList[i].secondvelocity;
+    
+    
+                this.roomsList[i].ballPosX += (this.roomsList[i].speed * this.roomsList[i].ballVelocityX);
+                this.roomsList[i].ballPosY += (this.roomsList[i].speed * this.roomsList[i].ballVelocityY);
+    
+                this.server.to("room"+i).emit('ballPosX', (this.roomsList[i].ballPosX));
+                this.server.to("room"+i).emit('ballPosY', (this.roomsList[i].ballPosY));
+                this.server.to("room"+i).emit('score', this.roomsList[i].score1, this.roomsList[i].score2);
+                this.server.to("room"+i).emit('left', this.roomsList[i].firstPaddlePos);
+                this.server.to("room"+i).emit('right', this.roomsList[i].secondPaddlePos);
+                this.server.to("room"+i).emit('matchFound', true);
             }
-            else
-            {
-                if (this.posx + 0.2/10 >= 0.97 && 
-                    this.posy - 0.2/10 <= this.firstPaddlePos + 1/10 &&
-                    this.posy + 0.2/10 >= this.firstPaddlePos - 1/10)
-                {
-                    console.log('collisiooooon');
-                    this.firstPlayerHasTheBall = true;
-                    this.secondPlayerHasTheBall = false;
-                    this.velocityx = -1;
-                }
-                if (this.posx - 0.2/10 <= -0.97 && 
-                    this.posy - 0.2/10 <= this.secondPaddlePos + 1/10 &&
-                    this.posy + 0.2/10 >= this.secondPaddlePos - 1/10)
-                {
-                    console.log('collisiooooon');
-                    this.firstPlayerHasTheBall = false;
-                    this.secondPlayerHasTheBall = true;
-                    this.posx += 0.0001;
-                    this.velocityx = 1;
-                }
-                if (this.posx >= 1)
-                {
-                    this.score1++;
-                    this.firstPlayerHasTheBall = false;
-                    this.secondPlayerHasTheBall = true;
-                    this.ballLaunched = false;
-                    this.secondSpeed =  0.01;
-                    this.firstSpeed =  0.01;
-                }
-                if (this.posx <= -1)
-                {
-                    this.score2++;
-                    this.firstPlayerHasTheBall = true;
-                    this.secondPlayerHasTheBall = false;
-                    this.ballLaunched = false;
-                    this.secondSpeed =  0.01;
-                    this.firstSpeed =  0.01;
-                }
-                if (this.posy >= 7/10)
-                {
-                    this.posy = 7/10;
-                    this.velocityy = -1;
-                }
-                if (this.posy <= -7/10)
-                {
-                    this.posy = -7/10;
-                    this.velocityy = 1;
-                }
-            }
-            if (this.firstPaddlePos + this.firstPaddleSpeed * this.firstVelocity < 7/10 - 1/10
-            && this.firstPaddlePos + this.firstPaddleSpeed * this.firstVelocity > -7/10 + 1/10)
-                this.firstPaddlePos += this.firstPaddleSpeed * this.firstVelocity;
-                if (this.secondPaddlePos + this.secondPaddleSpeed * this.secondVelocity < 7/10 - 1/10
-                && this.secondPaddlePos + this.secondPaddleSpeed * this.secondVelocity > -7/10 + 1/10)
-                this.secondPaddlePos += this.secondPaddleSpeed * this.secondVelocity;
+                // Game Logic
+                // this.server.to("room0").emit('ballPosetion', this.roomsList[i].firstPlayerHaveTheBall, this.roomsList[i].secondPlayerHaveTheBall);
                 
-            this.server.emit('right', this.secondPaddlePos);
-            this.server.emit('left', this.firstPaddlePos);
-
-            this.posx += (this.speed * this.velocityx);
-            this.posy += (this.speed * this.velocityy);
-
-            this.server.emit('ballPosX', (this.posx));
-            this.server.emit('ballPosY', (this.posy));
-            this.server.emit('score', this.score1, this.score2);
-        }, 1000 / 60);
+            }, 1000 / 60);
+        }
     }
-}
