@@ -18,8 +18,8 @@ services:
     build: ./game-dev/
     container_name: game-dev
     ports:
-      - "8081:8080"
-      - "1338:1337"
+      - "8081:8081"
+      - "1338:1338"
     volumes:
       - sharedv:/root/shared
     networks:
@@ -30,8 +30,8 @@ services:
     build: ./front-end-dev/
     container_name: front-end-dev
     ports:
-      - "8082:8080"
-      - "1339:1337"
+      - "8082:8082"
+      - "1339:1339"
     volumes:
       - sharedv:/root/shared
     networks:
