@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import {io} from 'socket.io-client'
 import {Cube} from './cube'
 
-import './index.css';
+import '../game.css';
 
 function rad2Degree(angle:number) : number
 {
@@ -14,7 +14,7 @@ const socket = io();
 
 let gl:WebGLRenderingContext | null;
 
-function App() 
+function Game() 
 {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reff = useRef<Cube | null>(null);
@@ -156,11 +156,11 @@ function App()
     {
       socket.on('matchFound', (v:boolean)=>{foundMatch = v;});
 
-      if (!foundMatch)
-        setState((gameState) => gameState = 'Looking for partner :(');
-      else
+     // if (!foundMatch)
+      //  setState((gameState) => gameState = 'Looking for partner :(');
+      //else
         setState((gameState) => gameState = score1 + '      |     ' +score2);
-    if (foundMatch)
+    //if (foundMatch)
       {
         setScore1((score1));
         setScore2((score2));
@@ -173,7 +173,7 @@ function App()
   
         if (gl)
         {
-          gl.clearColor(0.38, 0.0, 0.15, 1.0);
+          gl.clearColor(0.31, 0.22, 0.35, 1.0);
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           gl.enable(gl.DEPTH_TEST);
   
@@ -203,7 +203,7 @@ function App()
           ball.renderEntity(gl, 36);
           ball.rotateX(gl, rad2Degree(0.004));
           ball.rotateY(gl, rad2Degree(0.0));
-          ball.setColor(gl, [1.0, 0.8, 0.1]);
+          ball.setColor(gl, [1.0, 0.0, 1.1]);
           ball.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
           ball.set3DMatrices(gl, projection, viewMatrix);
         }
@@ -228,8 +228,4 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+export default Game
