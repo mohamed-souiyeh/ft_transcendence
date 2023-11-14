@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import {io} from 'socket.io-client'
 import {Cube} from './cube'
 
-import '../game.css';
+import './game.css';
 
 function rad2Degree(angle:number) : number
 {
