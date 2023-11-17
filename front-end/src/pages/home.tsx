@@ -3,6 +3,7 @@ import SideBar from "./components/sidebar";
 import hi from "../assets/hi.svg"
 import bot from "../assets/bot.png";
 import controllers  from "../assets/controllers.png";
+import Ranked from "./components/ranked";
 
 function Home () {
   return (
@@ -48,16 +49,22 @@ function Home () {
         </div>
 
 
-        <div className="bg-purple-sh-2 h-[100%]  w-[850px] rounded-t-3xl  overflow-auto">
-          <div className="fixed w-[830px] flex place-content-evenly bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl p-4" >
+        <div className="bg-purple-sh-2 h-[100%]  w-[850px] rounded-t-3xl overflow-auto">
+          <div className="sticky top-0 w-[830px] flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-28 py-4 z-0" >
             <p className="text-xl text-purple text-opacity-50">Player</p>
             <p className="text-xl text-purple text-opacity-50">Matches</p>
             <p className="text-xl text-purple text-opacity-50">Rank</p>
           </div>
-          <p className="mt-14 text-purple-tone-1 text-3xl text-opacity-60"> Top players: </p>
-          <p className="mt-12 text-purple-tone-1 text-3xl text-opacity-60"> Top players: </p>
-          <p className="mt-12 text-purple-tone-1 text-3xl text-opacity-60"> Top players: </p>
-          <p className="mt-12 text-purple-tone-1 text-3xl text-opacity-60"> Top players: </p>
+          <Ranked/>
+          <Ranked/>
+          <Ranked/>
+          <Ranked/>
+          <Ranked/>
+          <Ranked/>
+          <Ranked/>
+          <Ranked/>
+          <Ranked/>
+          <Ranked/>
                {/* we need some data in here, top players and their amount, so we could loop on them, put their names and number of matches they played and render them using a an element i will code later */}
         </div>
 

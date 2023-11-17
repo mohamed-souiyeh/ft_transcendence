@@ -6,7 +6,7 @@ function SideBar () {
   const [openModal, setOpenModal] = useState(false);
   return(
     <>
-      <div className="bg-purple-sh-2 w-14 h-48 rounded-r-[22px] left-0 inset-y-1/3 absolute grid place-content-center "> 
+      <div className="bg-purple-sh-2 w-14 h-48 rounded-r-[22px] left-0 inset-y-1/3 absolute grid place-content-center z-20"> 
 
         <Link  to="/home"> 
           <div className='py-1'>
