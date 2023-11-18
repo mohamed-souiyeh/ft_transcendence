@@ -13,18 +13,6 @@ services:
     networks:
       - net
 
-  game-dev:
-    image: game-dev
-    build: ./game-dev/
-    container_name: game-dev
-    ports:
-      - "8081:8081"
-      - "1338:1338"
-    volumes:
-      - sharedv:/root/shared
-    networks:
-      - net
-
   front-end-dev:
     image: front-end-dev
     build: ./front-end-dev/
