@@ -4,7 +4,7 @@ function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
   if (!open) return null
   return (
     <>
-      <div onClick={onClose} className="w-screen h-screen absolute grid place-content-center">
+      <div onClick={onClose} className="w-screen h-screen absolute grid place-content-center z-50">
         <div onClick={ (e) => {e.stopPropagation()}} className="h-[500px] w-[400px] bg-purple-tone-2 backdrop-blur-md bg-opacity-10 rounded-[64px]">
           <div className="pt-16 pb-5 grid place-content-center">
             <img src={Logo} />
