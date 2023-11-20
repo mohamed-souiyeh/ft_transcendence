@@ -2,7 +2,7 @@
 
 source ~/.bashrc
 
-cd /root/shared/transandance/front-end/
+cd /root/shared/transandance/back-end/
 
 nvm install node
 
@@ -10,4 +10,4 @@ nvm install-latest-npm
 
 npm install
 
-nest start
+npm run start

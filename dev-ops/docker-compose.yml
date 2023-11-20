@@ -1,7 +1,21 @@
-version: "3.5"
-
 services:
+  front-end-dev:
+    env_file: ../back-end/.env
+    image: front-end-dev
+    build: ./front-end-dev/
+    container_name: front-end-dev
+    ports:
+      - "1339:1339"
+      - "8082:8082"
+    volumes:
+      - sharedv:/root/shared
+    depends_on:
+      - back-end-dev
+    networks:
+      - front-end-network
+
   back-end-dev:
+    env_file: ../back-end/.env
     image: back-end-dev
     build: ./back-end-dev/
     container_name: back-end-dev
@@ -10,25 +24,32 @@ services:
       - "1337:1337"
     volumes:
       - sharedv:/root/shared
+    depends_on:
+      - postgres
     networks:
-      - net
+      - back-end-network
+      - front-end-network
 
-  front-end-dev:
-    image: front-end-dev
-    build: ./front-end-dev/
-    container_name: front-end-dev
-    ports:
-      - "8082:8082"
-      - "1339:1339"
+  postgres:
+    image: postgres
+    restart: always
+    env_file: ../back-end/.env
     volumes:
-      - sharedv:/root/shared
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     networks:
-      - net
+      - back-end-network
+
 
 networks:
-  net:
-    name: net
+  back-end-network:
     driver: bridge
+    name: back-end-network
+  front-end-network:
+    driver: bridge
+    name: front-end-network
+
 
 volumes:
   sharedv:
@@ -38,3 +59,10 @@ volumes:
       type: none
       o: bind
       device: "$PWD/.."
+  postgres:
+    name: postgres
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "$PWD/dev-ops/volumes/database"
