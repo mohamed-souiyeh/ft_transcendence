@@ -4,10 +4,12 @@ source ~/.bashrc
 
 cd /root/shared/transandance/back-end/
 
-nvm install node
+nvm install --lts node $NODE_VERSION
 
 nvm install-latest-npm
 
-npm install
+npm install --include=dev
 
-npm run start
+npm run dev
+
+# tail -F anything
