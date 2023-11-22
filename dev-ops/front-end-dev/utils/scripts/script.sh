@@ -8,6 +8,6 @@ nvm install --lts node $NODE_VERSION
 
 nvm install-latest-npm
 
-npm install -g
+npm install
 
 npm run dev
