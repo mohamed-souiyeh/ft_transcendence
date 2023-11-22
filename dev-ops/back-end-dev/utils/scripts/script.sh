@@ -8,8 +8,8 @@ nvm install --lts node $NODE_VERSION
 
 nvm install-latest-npm
 
-npm install --include=dev
+npm install
 
-npm run dev
+npm run start:dev
 
 # tail -F anything
