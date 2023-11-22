@@ -13,7 +13,6 @@ database: volumes
 
 volumes:
 	@mkdir -p ./dev-ops/volumes/database
-	@sudo chmod 777 ./dev-ops/volumes/database
 
 down:
 	@docker compose -f ./dev-ops/docker-compose.yml down
