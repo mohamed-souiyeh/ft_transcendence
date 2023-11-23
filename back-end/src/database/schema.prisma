@@ -14,6 +14,28 @@ datasource db {
 
 model User {
   id  Int @id @default(autoincrement())
+  username            String   @unique
+  passwordHash        String // hachi password 9bal mat storih
+  salt                String //hadi salt labghina nzido dekchi dyal securité :p o ala3ib
+  score               Int // inthe first time score must be 0
+  email               String?   @unique  // not naisscary we can remove it 
+  name                String? 
+  photo               String? // assuming this field will store the file path to user's photo
+//photo               bytes? (blob)
 
+  senderfriends             Users_friends[] @relation("senderForFriendship")
+  receiver                  Users_friends[] @relation("recieverForFriendship")
+}
+
+model Users_friends {
+  //id       Int    @id @default(autoincrement())
+  userId   Int
+  friendId Int
+  state    String // friends or enemies :p
+  date     DateTime   @default(now())
+  user_sender       User   @relation("senderForFriendship", fields: [userId], references: [id])
+  friend_receiver   User   @relation("recieverForFriendship" ,fields: [friendId], references: [id])
+
+  @@id([userId, friendId])
 }
 
