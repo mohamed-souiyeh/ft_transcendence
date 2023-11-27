@@ -1,7 +1,7 @@
 
 # Client side (the front end):
 
-***The user experience is designed in the following order:***
+## ***The user experience is designed in the following order:***
 
 ***When the user first creates an account:***
 
