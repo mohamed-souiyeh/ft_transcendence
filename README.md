@@ -26,3 +26,7 @@
               ---> See the score
         
    Note: The search bar, home page button, profile page button, log out button, notifications, are available on all pages
+
+## The used technologies for the front and how the front can be connected with the backend
+ The front end is made with React and runs on its own port, so when the backend (which is made with nestjs) is running on another port, we will need a way to connect them both to process the clients http requests and send them to the server to get a response, this is where Axios library comes in handy, it facilitate this process by simply specifying to the client socket which port it wants to listen to and the connection is then established.
+    
