@@ -1,12 +1,12 @@
 
 # Client side (the front end):
 
-The user experience is designed in the following order:
+***The user experience is designed in the following order:***
 
-    When the user first creates an account:
+    ***When the user first creates an account:***
         Welcome page ->  Sign in page -> User profile creation page -> User home page
 
-    When the user is browsing the application:
+    ***When the user is browsing the application:***
         User home page -> Select a game to play, with other players or bot
             |
             ---> See other players rank
