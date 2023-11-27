@@ -1,5 +1,5 @@
 
-# [#1589F0]Client side (the front end):
+# Client side (the front end):
 
 ## ***The user experience is designed in the following order:***
 
