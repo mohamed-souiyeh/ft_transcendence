@@ -1,5 +1,4 @@
-
-[#1589F0]
+$${\color{blue}Blue}$$
 # Client side (the front end):
 
 ## ***The user experience is designed in the following order:***
