@@ -1,2 +1,3 @@
 dev-ops/volumes/database
-.env
+back-end/.env
+back-end/src/purplerain
