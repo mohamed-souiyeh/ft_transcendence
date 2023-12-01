@@ -25,6 +25,9 @@ model User {
 
   senderfriends             Users_friends[] @relation("senderForFriendship")
   receiver                  Users_friends[] @relation("recieverForFriendship")
+  conversations             Group_conversation[]
+  messages                  Message[]
+  matches                   Game_participant[]
 }
 
 model Users_friends {
@@ -36,6 +39,72 @@ model Users_friends {
   user_sender       User   @relation("senderForFriendship", fields: [userId], references: [id])
   friend_receiver   User   @relation("recieverForFriendship" ,fields: [friendId], references: [id])
 
+  
+
   @@id([userId, friendId])
 }
+
+
+model Conversation{
+
+  id      Int @id @default(autoincrement())
+  title   String
+
+  participants  Group_conversation[]
+  messages      Message[]
+}
+
+model Group_conversation {
+ 
+  userId          Int
+  conversationId  Int
+
+  user  User @relation(fields: [userId], references: [id])
+  conversation  Conversation @relation(fields: [conversationId], references: [id])
+  @@id([userId, conversationId])
+  
+}
+
+model Message {
+  id            Int     @id @default(autoincrement()) // chaque message contient un id wtf !!
+  content       String
+  senderId      Int
+  conversationId Int
+  time            DateTime  @default(now())
+
+
+  sender          User          @relation(fields: [senderId], references: [id])
+  conversation    Conversation  @relation(fields: [conversationId], references: [id])
+
+}
+
+
+
+
+model Match { // pong_game table
+
+  id            Int     @id @default(autoincrement()) // chaque message contient un id wtf !!
+  start_time    DateTime 
+  end_time      DateTime
+
+  players       Game_participant[]
+}  
+
+
+
+model Game_participant {
+
+  playerId    Int
+  matchId     Int
+  isWinner    Boolean    @default(false)
+  // Add other fields as needed
+
+  player      User     @relation(fields: [playerId], references: [id])
+  match       Match      @relation(fields: [matchId], references: [id])
+
+  @@id([playerId, matchId])
+}
+
+
+
 
