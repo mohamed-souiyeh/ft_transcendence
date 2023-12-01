@@ -1,7 +1,11 @@
 import React , {useRef, useEffect, useState} from 'react';
 import ReactDOM from 'react-dom/client';
-import {io} from 'socket.io-client'
-import {Cube} from './cube'
+import axios from 'axios';
+import SideBar from "./components/sidebar";
+import NavBar from "./components/navbar";
+import Profile from "./components/userProfileIcone";
+import {io} from 'socket.io-client';
+import {Cube} from './cube';
 
 import './game.css';
 
@@ -10,7 +14,7 @@ function rad2Degree(angle:number) : number
 	return angle * 180/Math.PI;
 }
 
-const socket = io();
+const socket = io('http://localhost:1337');
 
 let gl:WebGLRenderingContext | null;
 
@@ -26,18 +30,21 @@ function Game()
 
   useEffect(() => 
   {
+    axios.get('http://localhost:1337')
+         .then(()=>console.log('test'))
+         .catch(error => console.log(error));
     if (canvasRef.current) 
     {
       gl = canvasRef.current.getContext("webgl");
 
       if (gl) 
       {
-        gl.canvas.width = 900;
+        gl.canvas.width = 800;
         gl.canvas.height = 400;
-        frameRef.current = requestAnimationFrame(() => renderGame(gl));
+        frameRef.current = 
+        requestAnimationFrame(() => renderGame(gl));
       }
     }
-    
     if (!gl)
     {
       return;
@@ -48,29 +55,6 @@ function Game()
         w = gl.canvas.width;
         h = gl.canvas.height;
     }
-    let ar = w/h;
-    let fov = rad2Degree(45.0);
-    let n = 0.1;
-    let f = 1000.0;
-    let t = Math.tan(fov/2) * n;
-    let r = t * ar;
-    let len = f-n;
-
-    let projection:number[] = 
-    [
-      2*n/r,  0.0,       0.0,  0.0,
-      0.0, 2*n/t,         0.0,  0.0,
-      0.0,  0.0,  -(f+n)/len, -1.0,
-      0.0,  0.0,(-2*f*n)/len,  1.0
-    ];
-
-    let viewMatrix:number[] = 
-    [
-      1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0,-3, 0,
-      0, 0, 0, 1
-    ];
 
     let terrain:Cube = new Cube(gl, 9.8, 7, 1);
     let first:Cube = new Cube(gl, 0.18, 1, 0.3);
@@ -154,13 +138,44 @@ function Game()
 
     function renderGame(gl: WebGLRenderingContext | null)
     {
+      let ar = w/h;
+      console.log("W: " + w);
+      console.log("H: " + h);
+      let fov = rad2Degree(70);
+      let n = 0.1;
+      let f = 1000.0;
+      let t = Math.tan(fov/2) * n;
+      let r = t * ar;
+      let len = f-n;
+  
+      let projection:number[] = 
+      [
+        2*n/r,  0.0,       0.0,  0.0,
+        0.0, 2*n/t,         0.0,  0.0,
+        0.0,  0.0,  -(f+n)/len, -1,
+        0.0,  0.0, (-2*f*n)/len, 1.0
+      ];
+
+      let viewMatrix:number[] = 
+      [
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0,-3, 0,
+        0, 0, 0, 1
+      ];
       socket.on('matchFound', (v:boolean)=>{foundMatch = v;});
 
-     // if (!foundMatch)
-      //  setState((gameState) => gameState = 'Looking for partner :(');
-      //else
+      // if (gl)
+      // {
+      //   gl.canvas.width = window.innerWidth - 900;
+      //   gl.canvas.height = window.innerHeight - 400;
+
+      // }
+      if (!foundMatch)
+       setState((gameState) => gameState = 'Looking for partner :(');
+      else
         setState((gameState) => gameState = score1 + '      |     ' +score2);
-    //if (foundMatch)
+      if (foundMatch)
       {
         setScore1((score1));
         setScore2((score2));
@@ -173,7 +188,7 @@ function Game()
   
         if (gl)
         {
-          gl.clearColor(0.31, 0.22, 0.35, 1.0);
+          gl.clearColor(0.35, 0.22, 0.35, 1.0);
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           gl.enable(gl.DEPTH_TEST);
   
@@ -184,27 +199,28 @@ function Game()
           terrain.setColor(gl, [0.17, 0.0, 0.16]);
           terrain.rotateX(gl, rad2Degree(0.004));
           terrain.rotateY(gl, rad2Degree(0.0));
+          terrain.setLightSource(gl, [0.0, 0.0, -0.6], [1.0, 1.0, 1.0]);
           terrain.set3DMatrices(gl, projection, viewMatrix);
   
           first.renderEntity(gl, 36);
           first.rotateX(gl, rad2Degree(0.004));
           first.rotateY(gl, rad2Degree(0.0));
-          first.setColor(gl, [0.4, 0.6, 1.8]);
+          first.setColor(gl, [0.7, 0.6, 1.8]);
           first.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
           first.set3DMatrices(gl, projection, viewMatrix);
           
           second.renderEntity(gl, 36);
           second.rotateX(gl, rad2Degree(0.004));
           second.rotateY(gl, rad2Degree(0.0));
-          second.setColor(gl, [0.4, 0.6, 1.8]);
+          second.setColor(gl, [0.7, 0.6, 1.8]);
           second.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
           second.set3DMatrices(gl, projection, viewMatrix);
   
           ball.renderEntity(gl, 36);
           ball.rotateX(gl, rad2Degree(0.004));
           ball.rotateY(gl, rad2Degree(0.0));
-          ball.setColor(gl, [1.0, 0.0, 1.1]);
-          ball.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
+          ball.setColor(gl, [0.8, 0.1, 0.8]);
+          ball.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 2.0, 1.0]);
           ball.set3DMatrices(gl, projection, viewMatrix);
         }
       }
@@ -213,15 +229,32 @@ function Game()
       frameRef.current = requestAnimationFrame(() => renderGame(gl));
     }
 
+    const handle = () =>
+    {
+      if (gl)
+      {
+        gl.canvas.width = 800;
+        gl.canvas.height = 400;
+      }
+    };
+
+    window.addEventListener("resize", handle);
     return () => cancelAnimationFrame(frameRef.current);
   }, []);
-  
 
-
-  return (<div style={{textAlign:"center"}}>
-          <h1>{gameState}</h1>
-          <canvas ref={canvasRef}
-          /></div>);
+  return (<div style={{textAlign:"center",
+                      font:"status-bar",
+                      height: "100%"}}>
+          {/* {<SideBar/>} */}
+          {<Profile score = {score1} score2={score2} />}
+          {/* <h1>{gameState}</h1> */}
+          <canvas style={{right:"300px",
+                          width: "100%",
+                          height: "100%"}} 
+          ref={canvasRef}
+          /></div>
+          
+          );
 }
 
 const root = ReactDOM.createRoot(
