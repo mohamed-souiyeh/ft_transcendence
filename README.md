@@ -47,7 +47,8 @@ So basically that's what an endpoint is.
  - After entering the credentials the user is then redirected to another ***endpoint*** to receive those informations.
  - After that comes the check if the user is already in the database or not, if he is not well, he will be added obviously, if he is then we just return the Json Web Token that contains the user informations (the JWT will be explained in a moment)
    
-
+    
+  ![endpointauth](https://github.com/mohamed-souiyeh/transandance/assets/54768823/529ea6b5-ec9e-428e-b6ef-f555a0932b59)
 
     
 
