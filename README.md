@@ -37,8 +37,9 @@
 # The backend
   ## Authentication and authorization:
   Before the user can access the platform he needs to be authenticated, which means he should pass through a process to prove that the user he is who he claims to be for security reasons, we are using the Google API and 42 API to handle that, so let's talk about the google API first.
-      ### Google API:
+  ### Google API:
             Let's briefly talk about what exactly an endpoint is, it is known that the basic relationship between a server and a client is summirized in a request for a certain data and a response to serve the data the client requested, so what an endpoint is its just a place where a server get specefic requests of resource from a client and serves specefic responses from that endpoint, let's say for example there is a hungry person(client) who wants to request a pan 🍳 and an egg 🥚 from a kitchen(server), the server(kitchen) have two endpoints for those different resources, the fridge endpoint where the egg exist and the prep area where the pan exist, which means if he requested the resource from the wrong endpoint he won't get what he wants, endpoints are really usefull to organize resources, i mean imagine having everything put in one place in the kitchen lol.
+            
   ![endpoint drawio](https://github.com/mohamed-souiyeh/transandance/assets/54768823/f6273f80-bce9-45e6-83eb-178fc9f65f73)
 So basically that's what an endpoint is.
 
