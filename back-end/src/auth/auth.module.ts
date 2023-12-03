@@ -3,23 +3,24 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { GoogleStrategy } from './google/google.strategy';
 import { UsersModule } from 'src/users/users.module';
-import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './jwt/jwt.strategy';
-import { config } from 'dotenv';
+import { ftStrategy } from './42/42.strategy';
+import { JwtAuthModule } from './jwt/jwt-auth.module';
+// import { config } from 'dotenv';
 
-config();
+// config({
+//   encoding: 'latin1',
+//   debug: true,
+//   override: false,
+// });
 
 @Module({
   imports: [
     UsersModule,
-    PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1d' },
-    }),
+    PassportModule.register({ session: false}),
+    JwtAuthModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, JwtStrategy],
+  providers: [AuthService, GoogleStrategy, ftStrategy],
 })
 export class AuthModule {}

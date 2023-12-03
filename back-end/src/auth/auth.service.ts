@@ -1,28 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-
+import { JwtAuthService } from './jwt/jwt.service';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {
-  }
-  
+  constructor(private jwtAuthService: JwtAuthService) {}
+
   hello(req) {
-    
-    return `hello world! from user ${req.user.email}.`;
+    console.log(req);
+    return `hello world! from user ${req.user.email}\nof id ${req.user.userId}.`;
   }
 
-  googleLogin(req) {
+
+  addTokenToCookie(res: Response, accessToken: string): void {
+    res.cookie('jwt', accessToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: true,
+    });
+  }
+
+  googleLogin(req: Request, res: Response) {
     if (!req.user) {
       return 'No user from google';
     }
 
-    const payload = { email: req.user.email, sub: req.user.id };
+    const { accessToken } = this.jwtAuthService.login(req.user);
 
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    this.addTokenToCookie(res, accessToken);
+
+    return req.user;
   }
 
+  ftLogin(req: Request, res: Response) {
+    if (!req.user) {
+      return 'No user from 42';
+    }
 
+    const { accessToken } = this.jwtAuthService.login(req.user);
+
+    this.addTokenToCookie(res, accessToken);
+
+    return req.user;
+  }
 }

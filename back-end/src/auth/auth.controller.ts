@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GoogleAuthGuard } from './google/google-auth.guard';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
+import { ftAuthGuard } from './42/42-auth.guard';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -17,16 +19,26 @@ export class AuthController {
   @Get('google')
   @UseGuards(GoogleAuthGuard)
   async googleAuth(@Req() req) {}
-  
 
   @Get('gredirect')
   @UseGuards(GoogleAuthGuard)
-  googleAuthRedirect(@Req() req) {
-    return this.authService.googleLogin(req);
+  googleAuthRedirect(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.googleLogin(req, res);
   }
 
+  @Get('42')
+  @UseGuards(ftAuthGuard)
+  async ftAuth(@Req() req) {}
+
   @Get('42redirect')
-  ftAuthRedirect(@Req() req) {
-    
+  @UseGuards(ftAuthGuard)
+  ftAuthRedirect(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.ftLogin(req, res);
   }
 }

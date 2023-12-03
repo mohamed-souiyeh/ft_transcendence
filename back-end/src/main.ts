@@ -5,27 +5,25 @@ import { NestFactory } from '@nestjs/core';
 // import { serverModule } from './server/gameserver.module';
 // import { join } from 'path';
 import { AppModule } from './app.module';
-
-
-// @Controller()
-// export class gameController {}
-
-// @Module({
-//   imports: [
-//     ServeStaticModule.forRoot({
-//       rootPath: join(__dirname, '../../front-end/gamefrontend/build'),
-//     }),
-//     serverModule,
-//   ],
-//   // providers: [gameLogicServer]
-//   // controllers: [gameController],
-// })
-// class gameModule {}
+import { httpsOptions } from './https.options';
+import cookieParser from 'cookie-parser';
+import { config } from 'dotenv';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions,
+  });
 
+  app.use(cookieParser());
+  
   await app.listen(1337);
 }
 
+config({
+  encoding: 'latin1',
+  debug: false,
+  override: false,
+}); 
+
+// console.log(process.env);
 bootstrap();
