@@ -25,14 +25,30 @@ function Game()
   let [score1, setScore1] = useState(0);
   let [score2, setScore2] = useState(0);
   let [gameState, setState] = useState('Looking for partner :(');
+  let [profileImage, setImage] = useState('');
   let foundMatch:boolean = false;
   const frameRef = useRef<number>(0);
 
   useEffect(() => 
   {
-    axios.get('http://localhost:1337')
-         .then(()=>console.log('test'))
-         .catch(error => console.log(error));
+    const imageProfile = 
+    axios.get('https://cdn.intra.42.fr/users/fa0c85ecf99eadafbf2aa7888b612b8a/smounir.jpg', 
+    {
+      responseType: "arraybuffer"
+    }).then((res)=>
+    {
+      const base64 = btoa(
+        new Uint8Array(res.data).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ''
+        )
+      )
+      setImage(base64);
+      console.log("Success")
+    }).catch((e)=>
+    {
+      console.log("Error " + e)
+    });
     if (canvasRef.current) 
     {
       gl = canvasRef.current.getContext("webgl");
@@ -106,7 +122,7 @@ function Game()
               ball.speed = 0.009;
             }
             socket.emit('balllaunch', ballLaunched);
-          }
+        }
       if (e.code == 'KeyW')
       {
         socket.emit('right', 1);
@@ -139,8 +155,6 @@ function Game()
     function renderGame(gl: WebGLRenderingContext | null)
     {
       let ar = w/h;
-      console.log("W: " + w);
-      console.log("H: " + h);
       let fov = rad2Degree(70);
       let n = 0.1;
       let f = 1000.0;
@@ -175,6 +189,7 @@ function Game()
        setState((gameState) => gameState = 'Looking for partner :(');
       else
         setState((gameState) => gameState = score1 + '      |     ' +score2);
+      socket.emit('playing');
       if (foundMatch)
       {
         setScore1((score1));
@@ -194,7 +209,7 @@ function Game()
   
           socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
           socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
-  
+          socket.on('balllaunched', (v:boolean)=>{ballLaunched=v;});
           terrain.renderEntity(gl, 36);
           terrain.setColor(gl, [0.17, 0.0, 0.16]);
           terrain.rotateX(gl, rad2Degree(0.004));
@@ -225,7 +240,6 @@ function Game()
         }
       }
     
-      console.log(foundMatch);
       frameRef.current = requestAnimationFrame(() => renderGame(gl));
     }
 
@@ -242,18 +256,22 @@ function Game()
     return () => cancelAnimationFrame(frameRef.current);
   }, []);
 
-  return (<div style={{textAlign:"center",
+  return (<div> 
+          <div></div>
+          <div style={{textAlign:"center",
                       font:"status-bar",
                       height: "100%"}}>
-          {/* {<SideBar/>} */}
-          {<Profile score = {score1} score2={score2} />}
-          {/* <h1>{gameState}</h1> */}
+          {/* <h1>{gameState}</h1>s */}
+          {<Profile score = {score1}
+                    score2= {score2}
+                    picSrc="https://cdn.intra.42.fr/users/fa0c85ecf99eadafbf2aa7888b612b8a/smounir.jpg"
+                    picSrc2="https://cdn.intra.42.fr/users/7a035c468003e0971d7ca71378cfb0bb/msouiyeh.jpg"/>}
           <canvas style={{right:"300px",
                           width: "100%",
                           height: "100%"}} 
-          ref={canvasRef}
+            ref={canvasRef}
           /></div>
-          
+          </div>
           );
 }
 
