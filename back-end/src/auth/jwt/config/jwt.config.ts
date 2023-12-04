@@ -7,7 +7,7 @@
 // });
 
 export const jwt_expire_time = {
-  expiresIn: 900,
+  expiresIn: 60 * 60 * 12, // available for 12hrs
 };
 
 
