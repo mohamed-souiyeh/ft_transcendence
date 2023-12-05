@@ -1,4 +1,3 @@
-
 game-dev: volumes front-end
 
 back-end: volumes
@@ -16,6 +15,7 @@ volumes:
 
 down:
 	@docker compose -f ./dev-ops/docker-compose.yml down
+
 
 # deploy:
 # 	docker-compose -f ./dev-ops/docker-compose.yml up 
