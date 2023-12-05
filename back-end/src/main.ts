@@ -21,10 +21,12 @@ export class gameController {
 })
 class gameModule {}
 
+// creation de la fonction 
 async function bootstrap() {
-  const app = await NestFactory.create(gameModule);
+  const app = await NestFactory.create(gameModule);  // creation d'une application nest en utilisant nest factory : 
   
-  await app.listen(1338);
+  await app.listen(1338); // node utilise plus souvent 3000
 }
 
+// lencement de la fonction bootstrap 
 bootstrap();
