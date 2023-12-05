@@ -1,7 +1,7 @@
 game-dev: volumes front-end
 
 back-end: volumes
-	@docker compose -f ./dev-ops/docker-compose.yml up -d  back-end-dev
+	@doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d  back-end-dev
 
 front-end: volumes
 	@docker compose -f ./dev-ops/docker-compose.yml up -d front-end-dev
