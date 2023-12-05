@@ -50,7 +50,7 @@ function Home () {
 
 
         <div className=" h-[100%]  w-[850px] rounded-t-xl overflow-hidden">
-          <div className="bg-purple-sh-2 h-[100%]  w-[850px] rounded-t-xl overflow-auto scrollbar-thin scrollbar-rounded-3xl scrollbar-thumb-purple-sh-1">
+          <div className="bg-purple-sh-2 h-[100%]  w-[850px] rounded-t-xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1">
             <div className="sticky top-0 w-[830px] flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-28 py-4 z-0" >
               <p className="text-xl text-purple text-opacity-50">Player</p>
               <p className="text-xl text-purple text-opacity-50">Matches</p>

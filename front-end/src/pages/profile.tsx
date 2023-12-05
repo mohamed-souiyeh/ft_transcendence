@@ -56,31 +56,75 @@ function Profile () {
         </div>
 
 
-        <div className="flex overflow-auto mt-16">
+        <div className="flex  overflow-hidden mt-16">
 
-          <div className="grid justify-center">
-            <div className="bg-purple-sh-2 h-[100%]  w-[500px] rounded-t-3xl overflow-auto ">
-              <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
-                <p className="text-xl text-purple-tone-2 text-opacity-50">Matchs History:</p>
+          <div className="grid justify-center mx-4">
+            <div className="h-[100%]  w-[500px] rounded-t-3xl overflow-hidden">
+              <div className="bg-purple-sh-2 h-[100%]  w-[500px] rounded-t-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1 ">
+                <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
+                  <p className="text-xl text-purple-tone-2 text-opacity-50">Matchs History:</p>
+                </div>
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+                {/* we need a component for opponents, that will show their name, image, and score from that match*/}
               </div>
-              <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-              <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-              <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-              <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-              <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-              <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-              {/* we need a component for opponents, that will show their name, image, and score from that match*/}
             </div>
           </div>
 
           <div className="grid justify-center">
-            <div className="bg-purple-sh-2 h-[100%]  w-[350px] rounded-t-3xl overflow-auto ml-3">
-              <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivements:</p>
+            <div className="h-[100%]  w-[350px] rounded-t-3xl overflow-hidden">
+              <div className="bg-purple-sh-2 h-[100%]  w-[350px] rounded-t-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1">
+                <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
+                  <p className="text-xl text-purple-tone-2 text-opacity-50">acheivements:</p>
+                </div>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
               </div>
-              <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-              <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-              <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
             </div>
           </div>
 
