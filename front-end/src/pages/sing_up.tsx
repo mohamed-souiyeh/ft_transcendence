@@ -1,5 +1,5 @@
 
-import logo from '../assets/Group.svg'
+import logo from '../assets/Logo.svg'
 import google from '../assets/google.svg'
 import intra from '../assets/42.svg'
 

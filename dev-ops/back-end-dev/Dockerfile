@@ -11,10 +11,8 @@ SHELL ["/bin/bash", "--login", "-c"]
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
 
-RUN nvm install node
+RUN cat /utils/scripts/script.sh | tr '\r' ' ' > /utils/scripts/script1.sh
 
-RUN nvm install-latest-npm
+RUN cat /utils/scripts/script1.sh > /utils/scripts/script.sh
 
-RUN npm install -g $(cat /utils/npm_pkgs | tr '\n\r' ' ')
-
-CMD ["tail", "-F", "anything"]
+CMD ["bash", "/utils/scripts/script.sh"]
