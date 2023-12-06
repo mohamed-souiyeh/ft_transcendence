@@ -27,6 +27,45 @@ export class Cube
 
     constructor(gl:WebGLRenderingContext | null, width:number, height:number, depth:number)
     { 
+      const normals:number[] = 
+        [
+            0.0,  0.0,   -1.0,
+            0.0,  0.0,   -1.0,
+            0.0,  0.0,   -1.0,
+            0.0,  0.0,   -1.0,
+            0.0,  0.0,   -1.0,
+            0.0,  0.0,   -1.0,
+            0.0,  0.0,    1.0,
+            0.0,  0.0,    1.0,
+            0.0,  0.0,    1.0,
+            0.0,  0.0,    1.0,
+            0.0,  0.0,    1.0,
+            0.0,  0.0,    1.0,
+            -1.0,   0.0,   0.0,
+            -1.0,   0.0,   0.0,
+            -1.0,   0.0,   0.0,
+            -1.0,   0.0,   0.0,
+            -1.0,   0.0,   0.0,
+            -1.0,   0.0,   0.0,
+            1.0,   0.0,   0.0,
+            1.0,   0.0,   0.0,
+            1.0,   0.0,   0.0,
+            1.0,   0.0,   0.0,
+            1.0,   0.0,   0.0,
+            1.0,   0.0,   0.0,
+            0.0,  -1.0,    0.0,
+            0.0,  -1.0,    0.0,
+            0.0,  -1.0,    0.0,
+            0.0,  -1.0,    0.0,
+            0.0,  -1.0,    0.0,
+            0.0,  -1.0,    0.0,
+            0.0,  1.0,    0.0,
+            0.0,  1.0,    0.0,
+            0.0,  1.0,    0.0,
+            0.0,  1.0,    0.0,
+            0.0,  1.0,    0.0,
+            0.0,  1.0,    0.0
+        ];
       const vertecies:number[] = 
       [
             -0.1, -0.1, -0.01,
@@ -151,7 +190,7 @@ export class Cube
       "vec3 lightDirection = normalize(lightpos - ppos);" +
       "vec3 diffuse = max(vec3(dot(normal,lightDirection)), 0.0) * lightColor;" +
       "vec3 finalColor = (diffuse + ambient) * color;" +
-      "gl_FragColor = vec4(color, 1.0);" +
+      "gl_FragColor = vec4(finalColor, 1.0);" +
       "}";
 
       if (gl)
@@ -169,6 +208,11 @@ export class Cube
         const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)!;
         gl.shaderSource(fragmentShader, this.fragementShaderSource);
         gl.compileShader(fragmentShader);
+
+        this.normalsBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.normalsBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+
 
         this.shaderProgram = gl.createProgram()!;
         gl.attachShader(this.shaderProgram, vertexShader);
@@ -234,9 +278,11 @@ export class Cube
       {
         gl.useProgram(this.shaderProgram);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        
         gl.enableVertexAttribArray(0);
         gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.normalsBuffer);
+        gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(1);
         
         gl.drawArrays(gl.TRIANGLES, 0, 36);
 			}

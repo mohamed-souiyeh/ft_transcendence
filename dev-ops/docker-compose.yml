@@ -2,6 +2,7 @@ services:
   front-end-dev:
     env_file: ../back-end/.env
     image: front-end-dev
+    restart: always
     build: ./front-end-dev/
     container_name: front-end-dev
     ports:
@@ -17,6 +18,7 @@ services:
   back-end-dev:
     env_file: ../back-end/.env
     image: back-end-dev
+    restart: always
     build: ./back-end-dev/
     container_name: back-end-dev
     ports:

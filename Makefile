@@ -1,4 +1,3 @@
-
 game-dev: volumes front-end
 
 back-end: volumes
@@ -13,10 +12,12 @@ database: volumes
 
 volumes:
 	@mkdir -p ./dev-ops/volumes/database
-	@chmod 777 ./dev-ops/volumes/database
 
 down:
 	@docker compose -f ./dev-ops/docker-compose.yml down
+
+clean: down
+	@docker system prune -af
 
 # deploy:
 # 	docker-compose -f ./dev-ops/docker-compose.yml up 
