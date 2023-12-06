@@ -16,6 +16,8 @@ volumes:
 down:
 	@docker compose -f ./dev-ops/docker-compose.yml down
 
+clean: down
+	@docker system prune -af
 
 # deploy:
 # 	docker-compose -f ./dev-ops/docker-compose.yml up 
