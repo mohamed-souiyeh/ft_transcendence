@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpRedirectResponse, Injectable } from '@nestjs/common';
 import { JwtAuthService } from './jwt/jwt.service';
 import { Request, Response } from 'express';
 
@@ -29,7 +29,12 @@ export class AuthService {
 
     this.addTokenToCookie(res, accessToken);
 
-    return req.user;
+    const redirect: HttpRedirectResponse = {
+      // use env vars here
+      url: 'http://localhost:8082/home',
+      statusCode: 302,
+    };
+    return redirect;
   }
 
   ftLogin(req: Request, res: Response) {
@@ -41,6 +46,11 @@ export class AuthService {
 
     this.addTokenToCookie(res, accessToken);
 
-    return req.user;
+    const redirect: HttpRedirectResponse = {
+      // use env vars here
+      url: 'http://localhost:8082/home',
+      statusCode: 302,
+    };
+    return redirect;
   }
 }

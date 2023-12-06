@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GoogleAuthGuard } from './google/google-auth.guard';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
@@ -22,6 +22,7 @@ export class AuthController {
 
   @Get('gredirect')
   @UseGuards(GoogleAuthGuard)
+  @Redirect()
   googleAuthRedirect(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -35,6 +36,7 @@ export class AuthController {
 
   @Get('42redirect')
   @UseGuards(ftAuthGuard)
+  @Redirect()
   ftAuthRedirect(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,

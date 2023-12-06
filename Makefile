@@ -4,11 +4,11 @@ back-end: volumes
 	@doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d  back-end-dev
 
 front-end: volumes
-	@docker compose -f ./dev-ops/docker-compose.yml up -d front-end-dev
+	@doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d front-end-dev
 
 
 database: volumes
-	@docker compose -f ./dev-ops/docker-compose.yml up -d postgres
+	@doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d postgres
 
 volumes:
 	@mkdir -p ./dev-ops/volumes/database
@@ -16,10 +16,7 @@ volumes:
 down:
 	@docker compose -f ./dev-ops/docker-compose.yml down
 
-rm_vols:
-	@docker volume rm -f $$(docker volume ls -q)
-
-clean: down rm_vols
+clean: down
 	@docker system prune -af
 
 # deploy:
