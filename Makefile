@@ -16,10 +16,7 @@ volumes:
 down:
 	@docker compose -f ./dev-ops/docker-compose.yml down
 
-rm_vols:
-	@docker volume rm -f $$(docker volume ls -q)
-
-clean: down rm_vols
+clean: down
 	@docker system prune -af
 
 # deploy:
