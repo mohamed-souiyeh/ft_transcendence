@@ -10,7 +10,12 @@ config({
   override: false,
 });
 
-export type JwtPayload = { sub: number; email: string };
+export type JwtPayload = {
+  sub: number;
+  email: string;
+  TFAisenabled: boolean;
+  TFAauthenticated?: boolean;
+};
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
@@ -23,15 +28,19 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
       }
       return token;
     };
-    
+
     super({
       jwtFromRequest: extractJwtFromCookie,
       ignoreExpiration: false,
-      secretOrKey: process.env["JWT_SECRET"],
+      secretOrKey: process.env['JWT_SECRET'],
     });
   }
 
   async validate(payload: JwtPayload) {
-    return { userId: payload.sub, email: payload.email };
+    return {
+      userId: payload.sub,
+      email: payload.email,
+      TFAisenabled: payload.TFAisenabled,
+    };
   }
 }

@@ -11,9 +11,8 @@ export class AuthService {
     return `hello world! from user ${req.user.email}\nof id ${req.user.userId}.`;
   }
 
-
-  addTokenToCookie(res: Response, accessToken: string): void {
-    res.cookie('jwt', accessToken, {
+  addTokenToCookie(res: Response, accessToken: string, key: string): void {
+    res.cookie(key, accessToken, {
       httpOnly: true,
       sameSite: 'strict',
       secure: true,
@@ -25,9 +24,9 @@ export class AuthService {
       return 'No user from google';
     }
 
-    const { accessToken } = this.jwtAuthService.login(req.user);
+    const { accessToken } = this.jwtAuthService.getJwtAcessToken(req.user);
 
-    this.addTokenToCookie(res, accessToken);
+    this.addTokenToCookie(res, accessToken, 'jwt');
 
     const redirect: HttpRedirectResponse = {
       // use env vars here
@@ -42,9 +41,9 @@ export class AuthService {
       return 'No user from 42';
     }
 
-    const { accessToken } = this.jwtAuthService.login(req.user);
+    const { accessToken } = this.jwtAuthService.getJwtAcessToken(req.user);
 
-    this.addTokenToCookie(res, accessToken);
+    this.addTokenToCookie(res, accessToken, 'jwt');
 
     const redirect: HttpRedirectResponse = {
       // use env vars here

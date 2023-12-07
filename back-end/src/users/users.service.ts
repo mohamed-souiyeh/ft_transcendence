@@ -3,10 +3,12 @@
 import { Injectable } from '@nestjs/common';
 
 export type User = {
-  id:       number;
+  id: number;
   provider: string;
   username: string;
-  email:    string;
+  email: string;
+  TFAisenabled: boolean;
+  TFAsecret?: string;
 };
 
 @Injectable()
@@ -17,13 +19,14 @@ export class UsersService {
       provider: 'myass',
       username: 'trandandan',
       email: 'trandandan1337@gmail.com',
+      TFAisenabled: false,
+      TFAsecret: 'secret',
     },
   ];
 
   async finduser(email: string): Promise<User | null> {
     const user: User = this.users.find((user) => user.email === email);
-    if (typeof user === "undefined")
-      return null;
+    if (typeof user === 'undefined') return null;
     return user;
   }
 
