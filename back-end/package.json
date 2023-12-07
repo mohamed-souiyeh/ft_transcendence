@@ -32,11 +32,6 @@
     "@nestjs/serve-static": "^4.0.0",
     "@nestjs/swagger": "^7.1.16",
     "@nestjs/websockets": "^10.2.7",
-<<<<<<< HEAD
-    "@prisma/client": "^5.7.0",
-    "@types/bcrypt": "^5.0.2",
-    "bcrypt": "^5.1.1",
-=======
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.3.1",
     "passport": "^0.6.0",
@@ -44,7 +39,6 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
->>>>>>> 12a886373f5b49122fcf4b50797e4f23997cb864
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.0"
