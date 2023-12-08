@@ -1,6 +1,5 @@
 services:
   front-end-dev:
-    env_file: ../back-end/.env
     image: front-end-dev
     restart: always
     build: ./front-end-dev/
@@ -16,7 +15,6 @@ services:
       - front-end-network
 
   back-end-dev:
-    env_file: ../back-end/.env
     image: back-end-dev
     restart: always
     build: ./back-end-dev/
@@ -31,11 +29,27 @@ services:
     networks:
       - back-end-network
       - front-end-network
+    environment:
+      - DATABASE_URL
+      - FT_APP_ID
+      - FT_APP_SECRET
+      - FT_REDIRECT_URI
+      - GOOGLE_CLIENT_ID
+      - GOOGLE_REDIRECT_URI
+      - GOOGLE_SECRET
+      - JWT_SECRET
+      - NODE_VERSION
+      - POSTGRES_HOST
+      - POSTGRES_NAME
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_USER
+      - PRIVATE_KEY_PATH
+      - PUBLIC_CERT_PATH
 
   postgres:
     image: postgres
     restart: always
-    env_file: ../back-end/.env
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
