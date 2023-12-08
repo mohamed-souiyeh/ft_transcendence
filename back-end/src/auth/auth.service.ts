@@ -1,55 +1,119 @@
-import { HttpRedirectResponse, Injectable } from '@nestjs/common';
+import { HttpRedirectResponse, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtAuthService } from './jwt/jwt.service';
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { UsersService } from 'src/users/users.service';
+import { IRequestWithUser } from './Interfaces/IRequestWithUser';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtAuthService: JwtAuthService) {}
+  constructor(private jwtAuthService: JwtAuthService, private userService: UsersService) {}
 
   hello(req) {
-    console.log(req);
-    return `hello world! from user ${req.user.email}\nof id ${req.user.userId}.`;
+    return `hello world! from user ${req.user.email}\nof id ${req.user.id}.`;
   }
 
-  addTokenToCookie(res: Response, accessToken: string, key: string): void {
-    res.cookie(key, accessToken, {
+  async addTokenToCookie(res: Response, Token: string, key: string) {
+    res.cookie(key, Token, {
       httpOnly: true,
       sameSite: 'strict',
       secure: true,
     });
   }
 
-  googleLogin(req: Request, res: Response) {
+
+  async refresh(req: IRequestWithUser, res: Response) {
+    if (!req.user) {
+      return 'No user from refresh';
+    }
+
+    //NOTE - get user from db
+    const user = await this.userService.findUserById(req.user.id);
+
+    console.log('user in refresh =>', user);
+    //NOTE - check if refresh token is valid
+    if (!user || user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]) {
+      throw new UnauthorizedException();
+    }
+
+    //NOTE - get signed tokens
+    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user);
+    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user);
+
+    //NOTE - add tokens to cookies
+    await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
+    await this.addTokenToCookie(res, refreshToken, process.env.REFRESH_TOKEN_KEY);
+    
+    //NOTE - add refresh token to db
+    await this.userService.replaceRefreshToken(req.user.id, refreshToken);
+
+    return 'refreshed tokens';
+  }
+
+  async googleLogin(req: IRequestWithUser, res: Response) {
     if (!req.user) {
       return 'No user from google';
     }
 
-    const { accessToken } = this.jwtAuthService.getJwtAcessToken(req.user);
+    //NOTE - get signed tokens
+    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user);
+    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user);
 
-    this.addTokenToCookie(res, accessToken, 'jwt');
-
+    //NOTE - add tokens to cookies
+    await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
+    await this.addTokenToCookie(res, refreshToken, process.env.REFRESH_TOKEN_KEY);
+    
+    //NOTE - add refresh token to db
+    await this.userService.replaceRefreshToken(req.user.id, refreshToken);
+    
+    //NOTE - redirect to home page
     const redirect: HttpRedirectResponse = {
       // use env vars here
-      url: 'http://localhost:8082/home',
+      url: process.env.HOME_URL,
       statusCode: 302,
     };
-    return redirect;
+    return 'redirecting to home page...';
   }
 
-  ftLogin(req: Request, res: Response) {
+  async ftLogin(req: IRequestWithUser, res: Response) {
     if (!req.user) {
       return 'No user from 42';
     }
 
-    const { accessToken } = this.jwtAuthService.getJwtAcessToken(req.user);
+    //NOTE - get signed tokens
+    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user);
+    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user);
 
-    this.addTokenToCookie(res, accessToken, 'jwt');
+    //NOTE - add tokens to cookies
+    await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
+    await this.addTokenToCookie(res, refreshToken, process.env.REFRESH_TOKEN_KEY);
+    
+    //NOTE - add refresh token to db
+    await this.userService.replaceRefreshToken(req.user.id, refreshToken);
 
+    //NOTE - redirect to home page
     const redirect: HttpRedirectResponse = {
       // use env vars here
-      url: 'http://localhost:8082/home',
+      url: process.env.HOME_URL,
       statusCode: 302,
     };
-    return redirect;
+    return 'redirecting to home page...';
+  }
+
+  async logout(req: IRequestWithUser, res: Response) {
+
+    //reset cookies
+    await this.addTokenToCookie(res, '', process.env.ACCESS_TOKEN_KEY);
+    await this.addTokenToCookie(res, '', process.env.REFRESH_TOKEN_KEY);
+    
+    //reset refresh token in db
+    await this.userService.replaceRefreshToken(req.user.id, null);
+
+    //NOTE - redirect to login page
+    const redirect: HttpRedirectResponse = {
+      // use env vars here
+      url: process.env.LOGIN_URL,
+      statusCode: 302,
+    };
+    return 'redirecting to login page...';
   }
 }

@@ -4,7 +4,10 @@ import { AuthService } from './auth.service';
 import { GoogleAuthGuard } from './google/google-auth.guard';
 import { JwtAuthGuard } from './jwt/guard/jwt-auth.guard';
 import { ftAuthGuard } from './42/42-auth.guard';
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { IRequestWithUser } from './Interfaces/IRequestWithUser';
+import JwtRefreshGuard from './jwt/guard/jwt-refresh-guard';
+import { use } from 'passport';
 
 @Controller('auth')
 export class AuthController {
@@ -12,8 +15,17 @@ export class AuthController {
 
   @Get('hello')
   @UseGuards(JwtAuthGuard)
-  hello(@Req() req: Request) {
+  hello(@Req() req: IRequestWithUser) {
     return this.authService.hello(req);
+  }
+
+  @Get('refresh')
+  @UseGuards(JwtRefreshGuard)
+  async refresh(
+    @Req() req: IRequestWithUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.refresh(req, res);
   }
 
   @Get('google')
@@ -22,9 +34,9 @@ export class AuthController {
 
   @Get('gredirect')
   @UseGuards(GoogleAuthGuard)
-  @Redirect()
-  googleAuthRedirect(
-    @Req() req: Request,
+  // @Redirect()
+  async googleAuthRedirect(
+    @Req() req: IRequestWithUser,
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.authService.googleLogin(req, res);
@@ -36,11 +48,20 @@ export class AuthController {
 
   @Get('42redirect')
   @UseGuards(ftAuthGuard)
-  @Redirect()
-  ftAuthRedirect(
-    @Req() req: Request,
+  // @Redirect()
+  async ftAuthRedirect(
+    @Req() req: IRequestWithUser,
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.authService.ftLogin(req, res);
+  }
+
+  @Get('logout')
+  @UseGuards(JwtAuthGuard)
+  async logout(
+    @Req() req: IRequestWithUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.logout(req, res);
   }
 }

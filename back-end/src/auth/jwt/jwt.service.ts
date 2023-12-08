@@ -1,35 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './strategy/jwt.strategy';
-import { jwt_refresh_sign_options, jwt_sign_options } from './config/jwt.config';
-// import { User } from 'src/users/users.service';
+import {
+  jwt_refresh_sign_options,
+  jwt_sign_options,
+} from './config/jwt.config';
+import { UserDto } from '../User_DTO/User.dto';
 
 @Injectable()
 export class JwtAuthService {
   constructor(private jwtService: JwtService) {}
 
-  getJwtAcessToken(user) {
-    
+  async getJwtAcessToken(user: UserDto) {
     const payload: JwtPayload = {
+      id: user.id,
       email: user.email,
-      sub: user.id,
       TFAisenabled: user.TFAisenabled,
     };
 
-    return {
-      accessToken: this.jwtService.sign(payload, jwt_sign_options),
-    };
+    const accessToken = await this.jwtService.signAsync(
+      payload,
+      jwt_sign_options,
+    );
+
+    return accessToken;
   }
 
-  getJwtRefreshToken(user) {
+  async getJwtRefreshToken(user: UserDto) {
     const payload: JwtPayload = {
+      id: user.id,
       email: user.email,
-      sub: user.id,
       TFAisenabled: user.TFAisenabled,
     };
 
-    return {
-      refreshToken: this.jwtService.sign(payload, jwt_refresh_sign_options),
-    };
+    const refreshToken = await this.jwtService.signAsync(
+      payload,
+      jwt_refresh_sign_options,
+    );
+    return refreshToken;
   }
 }

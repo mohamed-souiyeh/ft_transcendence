@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { config } from 'dotenv';
+import { Request } from 'express';
+import { UsersService } from 'src/users/users.service';
+import { UserDto } from 'src/auth/User_DTO/User.dto';
 
 config({
   encoding: 'latin1',
@@ -11,7 +14,7 @@ config({
 });
 
 export type JwtPayload = {
-  sub: number;
+  id: number;
   email: string;
   TFAisenabled: boolean;
   TFAauthenticated?: boolean;
@@ -19,28 +22,40 @@ export type JwtPayload = {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
-  constructor() {
+  constructor(private userService: UsersService) {
     const extractJwtFromCookie = (req) => {
       let token = null;
 
       if (req && req.cookies) {
-        token = req.cookies['jwt'];
+        token = req.cookies[process.env.ACCESS_TOKEN_KEY];
       }
       return token;
     };
 
     super({
       jwtFromRequest: extractJwtFromCookie,
-      ignoreExpiration: false,
       secretOrKey: process.env['JWT_SECRET'],
+      passReqToCallback: true,
+      ignoreExpiration: false,
     });
   }
 
-  async validate(payload: JwtPayload) {
-    return {
-      userId: payload.sub,
+  async validate(req: Request, payload: JwtPayload) {
+    const refreshTokenIsValid = await this.userService.validatRefreshToken(payload.id, req.cookies[process.env.REFRESH_TOKEN_KEY])
+    
+    //NOTE - check if refresh token is valid
+    if (!refreshTokenIsValid) throw new UnauthorizedException();
+
+    const user: UserDto = {
+      id: payload.id,
+      provider: null,
+      username: null,
       email: payload.email,
+      activeRefreshToken: req.cookies[process.env.REFRESH_TOKEN_KEY],
       TFAisenabled: payload.TFAisenabled,
+      TFAsecret: null,
     };
+
+    return user;
   }
 }
