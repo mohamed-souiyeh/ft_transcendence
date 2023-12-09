@@ -6,6 +6,8 @@ import Home from "./pages/home";
 import Profile from "./pages/profile";
 import UserProfile from "./pages/user";
 import Game from "./pages/game";
+import FinishProfile from "./pages/finishprofile";
+import LandingPage from "./pages/landingpage";
 
 function App() {
   return (
@@ -18,14 +20,11 @@ function App() {
           <Route path="/profile" element={<Profile/>} />
           <Route path="/userprofile" element={<UserProfile/>} />
           <Route path="*" element={<NotFound/>} />
-         <Route path="/game" element={<Game/>} />
-          {
-
-            /*
-             *  
-             *   <Route path="/userprofile" element={<UserProfile/>} /> an id should be added later, or smth to keep each profile special or the nickname..
-             */
-          }
+          <Route path="/game" element={<Game/>} />
+          <Route path="/finishprofile" element={<FinishProfile/>} />
+          <Route path="/" element={<LandingPage/>} />
+          <Route path="/userprofile" element={<UserProfile/>} /> 
+             
         </Routes>
       </BrowserRouter>
     </>
