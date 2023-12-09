@@ -3,7 +3,9 @@ import {
   Body,
   Controller,
   HttpCode,
+  HttpRedirectResponse,
   Post,
+  Redirect,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -21,15 +23,6 @@ import { UpdateUsernameDTO, UploadDTO } from './uploadDTO/uploadDTO';
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
-
-  // @UseGuards(JwtAuthGuard)
-  // @Post('username')
-  // async updateUserUsername(
-  //   @Req() req: IRequestWithUser,
-  //   @Body('username') username: string,
-  // ) {
-  //   return this.userService.updateUserUsername(req.user.id, username);
-  // }
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
@@ -64,6 +57,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('update')
+  @Redirect()
   @FormDataRequest(uploadConfig)
   async test(@Req() req: IRequestWithUser, @Body() data: UploadDTO) {
     if (data.avatar === undefined || data.username === undefined)
@@ -71,6 +65,13 @@ export class UsersController {
 
     await this.userService.updateUserUsername(req.user.id, data.username);
     await this.userService.updateAvatar(req.user.id, data.avatar);
-    return { message: 'uploaded successfully' };
+
+    //NOTE - redirect to login page
+    const redirect: HttpRedirectResponse = {
+      // use env vars here
+      url: process.env.LOGIN_URL,
+      statusCode: 302,
+    };
+    return redirect;
   }
 }
