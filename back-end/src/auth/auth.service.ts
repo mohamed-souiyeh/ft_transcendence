@@ -16,7 +16,7 @@ export class AuthService {
     res.cookie(key, Token, {
       httpOnly: true,
       sameSite: 'strict',
-      secure: true,
+      // secure: true,
     });
   }
 

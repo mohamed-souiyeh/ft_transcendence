@@ -2,12 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { UserDto } from 'src/auth/User_DTO/User.dto';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UsersService {
+  i: number = 1;
   private readonly users: UserDto[] = [
     {
-      id: 1,
+      id: this.i++,
       provider: 'myass',
       username: 'trandandan',
       email: 'trandandan1337@gmail.com',
@@ -15,13 +17,27 @@ export class UsersService {
       TFAisenabled: false,
       TFAsecret: 'secret',
     },
+    {
+      id: this.i++,
+      provider: 'myass',
+      username: 'mohamed',
+      email: 'msouiyeh@gmail.com',
+      activeRefreshToken: null,
+      TFAisenabled: false,
+      TFAsecret: 'secret',
+    }
   ];
 
   async addUser(user: UserDto): Promise<any> {
+    
+    user.id = this.i++;
+    user.username =
+      'user' + this.i + crypto.randomBytes(5).toString('base64');
+    
+    console.log('user =>', user);
     this.users.push(user);
-    user.id = 5;
-    // console.log("new users database: ");
-    // console.log(this.users);
+    user.id = this.i++;
+
   }
 
   async findUserByEmail(email: string): Promise<UserDto | null> {

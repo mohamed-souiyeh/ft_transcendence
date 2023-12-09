@@ -5,14 +5,12 @@ import { NestFactory } from '@nestjs/core';
 // import { serverModule } from './server/gameserver.module';
 // import { join } from 'path';
 import { AppModule } from './app.module';
-import { httpsOptions } from './https.options';
+// import { httpsOptions } from './https.options';
 import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    httpsOptions,
-  });
+  const app = await NestFactory.create(AppModule);
 
   app.enableCors({
     origin: true,
