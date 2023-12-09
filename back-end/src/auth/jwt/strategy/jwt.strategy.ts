@@ -44,7 +44,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
     const refreshTokenIsValid = await this.userService.validatRefreshToken(payload.id, req.cookies[process.env.REFRESH_TOKEN_KEY])
     
     //NOTE - check if refresh token is valid
-    if (!refreshTokenIsValid) throw new UnauthorizedException();
+    if (!refreshTokenIsValid) {
+      await this.userService.replaceRefreshToken(payload.id, null);
+      throw new UnauthorizedException();
+    } 
 
     const user: UserDto = {
       id: payload.id,

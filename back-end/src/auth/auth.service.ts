@@ -32,6 +32,8 @@ export class AuthService {
     console.log('user in refresh =>', user);
     //NOTE - check if refresh token is valid
     if (!user || user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]) {
+      if (user) 
+        await this.userService.replaceRefreshToken(req.user.id, null);
       throw new UnauthorizedException();
     }
 
