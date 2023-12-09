@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
 import { UsersService } from 'src/users/users.service';
-import { UserDto } from '../User_DTO/User.dto';
+import { UserDto } from '../../users/User_DTO/User.dto';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -28,26 +28,32 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       id: null,
       provider: 'google',
       username: profile._json.name,
+      profilePicture: process.env.DEFAULT_AVATAR,
       email: profile._json.email,
       activeRefreshToken: null,
+      redirectUrl: null,
       TFAisenabled: false,
       TFAsecret: null,
     };
 
-    let found_user: UserDto = await this.usersService.findUserByEmail(user.email);
+    let found_user: UserDto = await this.usersService.findUserByEmail(
+      user.email,
+    );
 
     if (!found_user) {
       this.usersService.addUser(user);
+      //NOTE - when u make sure that the db doesnt add any thing to the user use the one u already have instead of fetching it again
+      found_user = await this.usersService.findUserByEmail(user.email);
+      found_user.redirectUrl = process.env.SETUP_URL;
     }
 
-    //NOTE - when u make sure that the db doesnt add any thing to the user use the one u already have instead of fetching it again
-    found_user = await this.usersService.findUserByEmail(user.email);
+    found_user.redirectUrl = process.env.HOME_URL;
 
     if (found_user.TFAisenabled) {
       //NOTE - if TFA is enabled, then we need to do something here
       //NOTE - that i still dont know
     }
 
-    return user;
+    return found_user;
   }
 }

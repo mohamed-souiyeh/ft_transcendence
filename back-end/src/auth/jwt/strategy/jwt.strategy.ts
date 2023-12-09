@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
@@ -5,7 +6,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { config } from 'dotenv';
 import { Request } from 'express';
 import { UsersService } from 'src/users/users.service';
-import { UserDto } from 'src/auth/User_DTO/User.dto';
+import { UserDto } from 'src/users/User_DTO/User.dto';
+
 
 config({
   encoding: 'latin1',
@@ -26,6 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
     const extractJwtFromCookie = (req) => {
       let token = null;
 
+      console.log('jwt strategy req.cookies =>', req.cookies);
       if (req && req.cookies) {
         token = req.cookies[process.env.ACCESS_TOKEN_KEY];
       }
@@ -41,10 +44,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
   }
 
   async validate(req: Request, payload: JwtPayload) {
+    console.log('jwt strategy payload =>', payload);
     const refreshTokenIsValid = await this.userService.validatRefreshToken(payload.id, req.cookies[process.env.REFRESH_TOKEN_KEY])
     
     //NOTE - check if refresh token is valid
+    //FIXME - uncoment it
     if (!refreshTokenIsValid) {
+      console.log('refresh token is not valid');
       await this.userService.replaceRefreshToken(payload.id, null);
       throw new UnauthorizedException();
     } 
@@ -53,8 +59,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
       id: payload.id,
       provider: null,
       username: null,
+      profilePicture: null,
       email: payload.email,
       activeRefreshToken: req.cookies[process.env.REFRESH_TOKEN_KEY],
+      redirectUrl: null,
       TFAisenabled: payload.TFAisenabled,
       TFAsecret: null,
     };

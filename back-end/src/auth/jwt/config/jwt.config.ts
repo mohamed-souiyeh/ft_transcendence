@@ -8,6 +8,7 @@ import { JwtSignOptions } from "@nestjs/jwt";
 //   override: false,
 // });
 
+//FIXME - dont leave it like this
 export const jwt_sign_options: JwtSignOptions = {
   secret: process.env['JWT_SECRET'],
   expiresIn: 60 * 1, // available for 5mins

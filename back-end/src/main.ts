@@ -8,6 +8,7 @@ import { AppModule } from './app.module';
 // import { httpsOptions } from './https.options';
 import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,6 +20,7 @@ async function bootstrap() {
   });
   
   app.use(cookieParser());
+  app.useGlobalPipes(new ValidationPipe());
   
   await app.listen(1337);
 }

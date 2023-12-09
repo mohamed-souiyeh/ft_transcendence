@@ -7,7 +7,6 @@ import { ftAuthGuard } from './42/42-auth.guard';
 import { Response } from 'express';
 import { IRequestWithUser } from './Interfaces/IRequestWithUser';
 import JwtRefreshGuard from './jwt/guard/jwt-refresh-guard';
-import { use } from 'passport';
 
 @Controller('auth')
 export class AuthController {
@@ -34,7 +33,7 @@ export class AuthController {
 
   @Get('gredirect')
   @UseGuards(GoogleAuthGuard)
-  // @Redirect()
+  @Redirect()
   async googleAuthRedirect(
     @Req() req: IRequestWithUser,
     @Res({ passthrough: true }) res: Response,
@@ -48,7 +47,7 @@ export class AuthController {
 
   @Get('42redirect')
   @UseGuards(ftAuthGuard)
-  // @Redirect()
+  @Redirect()
   async ftAuthRedirect(
     @Req() req: IRequestWithUser,
     @Res({ passthrough: true }) res: Response,

@@ -5,7 +5,7 @@ import {
   jwt_refresh_sign_options,
   jwt_sign_options,
 } from './config/jwt.config';
-import { UserDto } from '../User_DTO/User.dto';
+import { UserDto } from '../../users/User_DTO/User.dto';
 
 @Injectable()
 export class JwtAuthService {

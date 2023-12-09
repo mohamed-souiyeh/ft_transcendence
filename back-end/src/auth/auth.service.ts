@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { HttpRedirectResponse, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtAuthService } from './jwt/jwt.service';
 import { Response } from 'express';
@@ -20,7 +21,6 @@ export class AuthService {
     });
   }
 
-
   async refresh(req: IRequestWithUser, res: Response) {
     if (!req.user) {
       return 'No user from refresh';
@@ -29,7 +29,6 @@ export class AuthService {
     //NOTE - get user from db
     const user = await this.userService.findUserById(req.user.id);
 
-    console.log('user in refresh =>', user);
     //NOTE - check if refresh token is valid
     if (!user || user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]) {
       if (user) 
@@ -70,10 +69,11 @@ export class AuthService {
     //NOTE - redirect to home page
     const redirect: HttpRedirectResponse = {
       // use env vars here
-      url: process.env.HOME_URL,
+      url: req.user.redirectUrl,
       statusCode: 302,
     };
-    return 'redirecting to home page...';
+    //FIXME - redirect to home page
+    return redirect;
   }
 
   async ftLogin(req: IRequestWithUser, res: Response) {
@@ -95,10 +95,11 @@ export class AuthService {
     //NOTE - redirect to home page
     const redirect: HttpRedirectResponse = {
       // use env vars here
-      url: process.env.HOME_URL,
+      url: req.user.redirectUrl,
       statusCode: 302,
     };
-    return 'redirecting to home page...';
+    //FIXME - redirect to home page
+    return redirect;
   }
 
   async logout(req: IRequestWithUser, res: Response) {
@@ -116,6 +117,7 @@ export class AuthService {
       url: process.env.LOGIN_URL,
       statusCode: 302,
     };
-    return 'redirecting to login page...';
+    //FIXME - redirect to login page
+    return redirect;
   }
 }

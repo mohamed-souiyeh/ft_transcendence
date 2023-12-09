@@ -3,8 +3,8 @@ import { Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtPayload } from './jwt.strategy';
-import { UserDto } from 'src/auth/User_DTO/User.dto';
 import { UsersService } from 'src/users/users.service';
+import { UserDto } from 'src/users/User_DTO/User.dto';
 
 @Injectable()
 export class JwtRefreshTokenStrategy extends PassportStrategy(
@@ -44,13 +44,15 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
       id: payload.id,
       provider: null,
       username: null,
+      profilePicture: null,
       email: payload.email,
       activeRefreshToken: refreshToken,
+      redirectUrl: null,
       TFAisenabled: payload.TFAisenabled,
       TFAsecret: null,
     };
     
-    console.log('user dto in refresh strategy =>', user);
+    console.log('refresh strategy user dto => ', user);
     return user;
   }
 }
