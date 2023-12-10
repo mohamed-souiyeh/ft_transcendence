@@ -7,7 +7,10 @@ import { IRequestWithUser } from './Interfaces/IRequestWithUser';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtAuthService: JwtAuthService, private userService: UsersService) {}
+  constructor(
+    private jwtAuthService: JwtAuthService,
+    private userService: UsersService,
+  ) {}
 
   hello(req) {
     return `hello world! from user ${req.user.email}\nof id ${req.user.id}.`;
@@ -30,9 +33,11 @@ export class AuthService {
     const user = await this.userService.findUserById(req.user.id);
 
     //NOTE - check if refresh token is valid
-    if (!user || user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]) {
-      if (user) 
-        await this.userService.replaceRefreshToken(req.user.id, null);
+    if (
+      !user ||
+      user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]
+    ) {
+      if (user) await this.userService.replaceRefreshToken(req.user.id, null);
       throw new UnauthorizedException();
     }
 
@@ -42,8 +47,12 @@ export class AuthService {
 
     //NOTE - add tokens to cookies
     await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
-    await this.addTokenToCookie(res, refreshToken, process.env.REFRESH_TOKEN_KEY);
-    
+    await this.addTokenToCookie(
+      res,
+      refreshToken,
+      process.env.REFRESH_TOKEN_KEY,
+    );
+
     //NOTE - add refresh token to db
     await this.userService.replaceRefreshToken(req.user.id, refreshToken);
 
@@ -61,11 +70,15 @@ export class AuthService {
 
     //NOTE - add tokens to cookies
     await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
-    await this.addTokenToCookie(res, refreshToken, process.env.REFRESH_TOKEN_KEY);
-    
+    await this.addTokenToCookie(
+      res,
+      refreshToken,
+      process.env.REFRESH_TOKEN_KEY,
+    );
+
     //NOTE - add refresh token to db
     await this.userService.replaceRefreshToken(req.user.id, refreshToken);
-    
+
     //NOTE - redirect to home page
     const redirect: HttpRedirectResponse = {
       // use env vars here
@@ -76,6 +89,10 @@ export class AuthService {
     return redirect;
   }
 
+  //FIXME - use req.res instead of res: Response because the latter puts
+  // nestjs in express specific mode and prevents the serialization
+  // interceptor from working properly
+  //LINK - https://wanago.io/2020/06/08/api-nestjs-serializing-response-interceptors/
   async ftLogin(req: IRequestWithUser, res: Response) {
     if (!req.user) {
       return 'No user from 42';
@@ -87,8 +104,12 @@ export class AuthService {
 
     //NOTE - add tokens to cookies
     await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
-    await this.addTokenToCookie(res, refreshToken, process.env.REFRESH_TOKEN_KEY);
-    
+    await this.addTokenToCookie(
+      res,
+      refreshToken,
+      process.env.REFRESH_TOKEN_KEY,
+    );
+
     //NOTE - add refresh token to db
     await this.userService.replaceRefreshToken(req.user.id, refreshToken);
 
@@ -103,11 +124,10 @@ export class AuthService {
   }
 
   async logout(req: IRequestWithUser, res: Response) {
-
     //reset cookies
     await this.addTokenToCookie(res, '', process.env.ACCESS_TOKEN_KEY);
     await this.addTokenToCookie(res, '', process.env.REFRESH_TOKEN_KEY);
-    
+
     //reset refresh token in db
     await this.userService.replaceRefreshToken(req.user.id, null);
 

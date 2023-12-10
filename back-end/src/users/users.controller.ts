@@ -17,7 +17,7 @@ import {
   avatarUpdateConfig,
   uploadConfig,
   usernameUpdateConfig,
-} from './FormDataInterceptorConfig.ts/UploadConfig';
+} from './FormDataInterceptorConfig/UploadConfig';
 import { UpdateUsernameDTO, UploadDTO } from './uploadDTO/uploadDTO';
 
 @Controller('users')
@@ -36,7 +36,7 @@ export class UsersController {
       throw new BadRequestException('no avatar provided');
 
     await this.userService.updateAvatar(req.user.id, data.avatar);
-    return { message: 'avatar updated successfully'};
+    return { message: 'avatar updated successfully' };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -49,7 +49,7 @@ export class UsersController {
   ) {
     if (data.username === undefined)
       throw new BadRequestException('no username provided');
-    
+
     await this.userService.updateUserUsername(req.user.id, data.username);
     return { message: 'username updated successfully' };
   }

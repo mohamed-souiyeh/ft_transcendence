@@ -7,6 +7,7 @@ import { config } from 'dotenv';
 import { Request } from 'express';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from 'src/users/User_DTO/User.dto';
+import { JwtPayload } from '../JwtPayloadDto/JwtPayloadDto';
 
 
 config({
@@ -14,13 +15,6 @@ config({
   debug: false,
   override: false,
 });
-
-export type JwtPayload = {
-  id: number;
-  email: string;
-  TFAisenabled: boolean;
-  TFAauthenticated?: boolean;
-};
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
@@ -49,11 +43,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
     
     //NOTE - check if refresh token is valid
     //FIXME - uncoment it
-    if (!refreshTokenIsValid) {
-      console.log('refresh token is not valid');
-      await this.userService.replaceRefreshToken(payload.id, null);
-      throw new UnauthorizedException();
-    } 
+    // if (!refreshTokenIsValid) {
+    //   console.log('refresh token is not valid');
+    //   await this.userService.replaceRefreshToken(payload.id, null);
+    //   throw new UnauthorizedException();
+    // } 
 
     const user: UserDto = {
       id: payload.id,

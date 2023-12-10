@@ -13,7 +13,7 @@ export const uploadConfig = {
 export const usernameUpdateConfig = {
   limits: {
     fields: 1,
-    fileSize: 1024 * 1024 * 5, // this is 1MB
+    fieldsize: 13,
     files: 0,
   },
 };
