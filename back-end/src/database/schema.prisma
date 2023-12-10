@@ -24,7 +24,7 @@ model User {
   email               String?   @unique  // not naisscary we can remove it 
   name                String? 
   photo               String? // assuming this field will store the file path to user's photo
-//photo               bytes? (blob)
+ // photo               Bytes?
 
   senderfriends             Users_friends[] @relation("senderForFriendship")
   receiver                  Users_friends[] @relation("recieverForFriendship")
