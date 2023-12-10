@@ -3,7 +3,7 @@
 // prisma/seed.ts
 
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+
 
 // initialize Prisma Client
 const prisma = new PrismaClient();
@@ -14,7 +14,7 @@ async function main() {
     where: { username: 'Alice' },
     update: {},
     create: {
-      passwordHash: await bcrypt.hash('password456', 10),
+      passwordHash: 'password456',
       salt: '123',
       username: 'Alice',
       email: 'alice@example.com',
@@ -27,7 +27,7 @@ async function main() {
     where: { username: 'bob' },
     update: {},
     create: {
-      passwordHash: await bcrypt.hash('passwo56', 10),
+      passwordHash: 'passwo56',
       salt: '123',
       score: 80,
       username: 'bob',
