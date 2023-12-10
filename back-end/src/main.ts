@@ -5,15 +5,20 @@ import { NestFactory } from '@nestjs/core';
 // import { serverModule } from './server/gameserver.module';
 // import { join } from 'path';
 import { AppModule } from './app.module';
-import { httpsOptions } from './https.options';
+// import { httpsOptions } from './https.options';
 import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
+
+
+const swaggerOptions: SwaggerDocumentOptions = {
+  
+};
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    httpsOptions,
-  });
+  const app = await NestFactory.create(AppModule);
 
   /*jojos part for swaager*/
   const config = new DocumentBuilder()
@@ -42,7 +47,19 @@ async function bootstrap() {
   });
   
   app.use(cookieParser());
+  app.useGlobalPipes(new ValidationPipe());
   
+
+  //NOTE - swagger config
+  const config = new DocumentBuilder()
+    .setTitle('purple rain API')
+    .setDescription('an API description')
+    .setVersion('1.0')
+    .addTag('purple')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(1337);
 }
 
