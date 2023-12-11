@@ -28,5 +28,6 @@ export const ConfigModuleOptions = {
     PRIVATE_KEY_PATH: joi.string().required(),
     PUBLIC_CERT_PATH: joi.string().required(),
     TFA_URL: joi.string().required(),
+    SETUP_URL: joi.string().required(),
   }),
 };

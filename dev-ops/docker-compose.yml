@@ -52,6 +52,9 @@ services:
       - TWO_FACTOR_AUTHENTICATION_APP_NAME
       - HOME_URL
       - LOGIN_URL
+      - SETUP_URL
+      - TFA_URL
+      - DEFAULT_AVATAR
 
   postgres:
     image: postgres
