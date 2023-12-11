@@ -1,18 +1,28 @@
 import NavBar from "./components/navbar";
 import SideBar from "./components/sidebar";
+import Popup from "./components/twofa";
 import  img  from "../assets/taha.jpg";
 import trophy from "../assets/trophy.png";
 import star from "../assets/star.png";
 import games from "../assets/controller.png"
+import { Switch, ConfigProvider } from "antd";
+import { useState } from "react";
+
+
+
 
 function Profile () {
+  const [switchValue, setSwitchValue] = useState(false);
+  const [prompt, setPrompt] = useState(false)
+
   return(
     <>
       <div className="w-screen h-screen grid justify-center">
         <SideBar/>
         <NavBar/>
 
-        <div className="bg-purple bg-opacity-20 backdrop-blur-lg border-[1px] border-purple/20 h-64 mt-20 mb-16 rounded-3xl flex">
+        {prompt && <Popup switchValue={switchValue} setSwitchValue={setSwitchValue} prompt={prompt} setPrompt={setPrompt}/>}
+        <div className="bg-purple bg-opacity-10 backdrop-blur-lg border-[1px] border-purple/20 h-64 mt-20 mb-16 rounded-3xl flex">
           <div className="grid place-content-center">
             <div className="bg-purple-sh-2 m-12 rounded-full h-48 w-48 grid place-content-center ">
               <img className="rounded-full h-44 w-44" src={img} />
@@ -22,11 +32,31 @@ function Profile () {
             <p className="text-2xl m-2"> Nickname </p>
             <p className="text-2xl m-2"> Current level </p>
             <p className="text-2xl m-2"> Rank on server </p>
+            <p className="text-2xl m-2"> 2fa state </p>
           </div>
           <div className=" m-6 grid place-content-center">
             <p className="text-2xl m-2">:  Potatoo</p>
             <p className="text-2xl m-2">:  20</p>
             <p className="text-2xl m-2">:  05</p>
+            <div className="flex ">
+              <p className="text-2xl m-2">:  </p>
+              <div className="pt-3">
+                <ConfigProvider theme={{ token: { colorPrimary: '#8176AF',  }, }} >
+                  <Switch className="bg-purple-sh-1" checkedChildren="On" unCheckedChildren='Off' 
+                    defaultChecked={false} //default here should be based on what's on the database.
+                    checked={switchValue}
+                    onChange={() => setPrompt(true)}
+                  />
+                </ConfigProvider>
+                {
+                  //here, we should show the popup if the switch was clicked.
+                  //based on the popup buttons, either just hide the pop(No is clicked) or confirm the state changing (yes clicked), to change the state, switchValue will change to !switchValue
+                  //in other words, popup component will take 'switchValue' and setSwitchValue to change in the case of clicking on yes.
+                }
+
+
+              </div>
+            </div>
           </div>
         </div>
 
