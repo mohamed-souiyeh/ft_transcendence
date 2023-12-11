@@ -50,7 +50,7 @@ So basically that's what an endpoint is.
     
   ![endpointauth](https://github.com/mohamed-souiyeh/transandance/assets/54768823/529ea6b5-ec9e-428e-b6ef-f555a0932b59)
 
-    
+  What the hell is a Json Web Token (yeah acronyms are unhealthy) ?? It simply like a ticket given to user to let him be authorized to access the resources of a server, it doesn't guarentee that the one who have it is the one who claims to be, and there is NO WAY to prevent it 100% from been stolen(which is not good news for the original user if that happens), to put it in simple terms, authentication gives you authorization but it doesn't go the other way around unfortunetly, the used approach to prevent it from been stolen is to give the token an expiration date which when it does happen (when it expires) the user hits an endpoint to get a refresh token that let him have another access token, note that this operation happens without the user knowing anything about it, it minimizes the risk of been hacked, but it doesn't prevent it completely. (Shout out to [Souyieh](https://github.com/mohamed-souiyeh) for trying to solve a world wide problem and hitting a dead end after hours of madness)
 
 # The game:
   The game have a front end and a back end, what the games needs to manage is the players request to the server to specify which paddle to move and where, this is done easily by using the socket.io library, the process of doing a simple multiplier is as the following:
