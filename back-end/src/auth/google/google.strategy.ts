@@ -46,13 +46,16 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       found_user = await this.usersService.findUserByEmail(user.email);
       found_user.redirectUrl = process.env.SETUP_URL;
     }
-
-    found_user.redirectUrl = process.env.HOME_URL;
+    else
+      found_user.redirectUrl = process.env.HOME_URL;
 
     if (found_user.TFAisenabled) {
       //NOTE - if TFA is enabled, then we need to do something here
       //NOTE - that i still dont know
+      found_user.redirectUrl = process.env.TFA_URL;
     }
+
+    console.log('google strategy found user =>', found_user);
 
     return found_user;
   }

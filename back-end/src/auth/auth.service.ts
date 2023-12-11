@@ -7,7 +7,10 @@ import { IRequestWithUser } from './Interfaces/IRequestWithUser';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtAuthService: JwtAuthService, private userService: UsersService) {}
+  constructor(
+    private jwtAuthService: JwtAuthService,
+    private userService: UsersService,
+  ) {}
 
   hello(req) {
     return `hello world! from user ${req.user.email}\nof id ${req.user.id}.`;
@@ -30,24 +33,31 @@ export class AuthService {
     const user = await this.userService.findUserById(req.user.id);
 
     //NOTE - check if refresh token is valid
-    if (!user || user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]) {
-      if (user) 
-        await this.userService.replaceRefreshToken(req.user.id, null);
+    //FIXME - uncomment it
+    if (
+      !user ||
+      user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]
+    ) {
+      if (user) await this.userService.replaceRefreshToken(user.id, null);
       throw new UnauthorizedException();
     }
 
     //NOTE - get signed tokens
-    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user);
-    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user);
+    const accessToken = await this.jwtAuthService.getJwtAcessToken(user, true);
+    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(user, true);
 
     //NOTE - add tokens to cookies
     await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
-    await this.addTokenToCookie(res, refreshToken, process.env.REFRESH_TOKEN_KEY);
-    
-    //NOTE - add refresh token to db
-    await this.userService.replaceRefreshToken(req.user.id, refreshToken);
+    await this.addTokenToCookie(
+      res,
+      refreshToken,
+      process.env.REFRESH_TOKEN_KEY,
+    );
 
-    return 'refreshed tokens';
+    //NOTE - add refresh token to db
+    await this.userService.replaceRefreshToken(user.id, refreshToken);
+
+    return { message: 'refreshed tokens successfully'};
   }
 
   async googleLogin(req: IRequestWithUser, res: Response) {
@@ -56,39 +66,50 @@ export class AuthService {
     }
 
     //NOTE - get signed tokens
-    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user);
-    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user);
+    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user, false);
+    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user, false);
 
     //NOTE - add tokens to cookies
     await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
-    await this.addTokenToCookie(res, refreshToken, process.env.REFRESH_TOKEN_KEY);
-    
+    await this.addTokenToCookie(
+      res,
+      refreshToken,
+      process.env.REFRESH_TOKEN_KEY,
+    );
+
     //NOTE - add refresh token to db
     await this.userService.replaceRefreshToken(req.user.id, refreshToken);
-    
+
     //NOTE - redirect to home page
     const redirect: HttpRedirectResponse = {
       // use env vars here
       url: req.user.redirectUrl,
       statusCode: 302,
     };
-    //FIXME - redirect to home page
     return redirect;
   }
 
+  //FIXME - use req.res instead of res: Response because the latter puts
+  // nestjs in express specific mode and prevents the serialization
+  // interceptor from working properly
+  //LINK - https://wanago.io/2020/06/08/api-nestjs-serializing-response-interceptors/
   async ftLogin(req: IRequestWithUser, res: Response) {
     if (!req.user) {
       return 'No user from 42';
     }
 
     //NOTE - get signed tokens
-    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user);
-    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user);
+    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user, false);
+    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user, false);
 
     //NOTE - add tokens to cookies
     await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
-    await this.addTokenToCookie(res, refreshToken, process.env.REFRESH_TOKEN_KEY);
-    
+    await this.addTokenToCookie(
+      res,
+      refreshToken,
+      process.env.REFRESH_TOKEN_KEY,
+    );
+
     //NOTE - add refresh token to db
     await this.userService.replaceRefreshToken(req.user.id, refreshToken);
 
@@ -98,16 +119,14 @@ export class AuthService {
       url: req.user.redirectUrl,
       statusCode: 302,
     };
-    //FIXME - redirect to home page
     return redirect;
   }
 
   async logout(req: IRequestWithUser, res: Response) {
-
     //reset cookies
     await this.addTokenToCookie(res, '', process.env.ACCESS_TOKEN_KEY);
     await this.addTokenToCookie(res, '', process.env.REFRESH_TOKEN_KEY);
-    
+
     //reset refresh token in db
     await this.userService.replaceRefreshToken(req.user.id, null);
 

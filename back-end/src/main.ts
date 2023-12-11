@@ -8,14 +8,13 @@ import { AppModule } from './app.module';
 // import { httpsOptions } from './https.options';
 import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 
-const swaggerOptions: SwaggerDocumentOptions = {
+// const swaggerOptions: SwaggerDocumentOptions = {
   
-};
+// };
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -51,14 +50,14 @@ async function bootstrap() {
   
 
   //NOTE - swagger config
-  const config = new DocumentBuilder()
-    .setTitle('purple rain API')
-    .setDescription('an API description')
-    .setVersion('1.0')
-    .addTag('purple')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  // const config = new DocumentBuilder()
+  //   .setTitle('purple rain API')
+  //   .setDescription('an API description')
+  //   .setVersion('1.0')
+  //   .addTag('purple')
+  //   .build();
+  // const document = SwaggerModule.createDocument(app, config);
+  // SwaggerModule.setup('api', app, document);
 
   await app.listen(1337);
 }

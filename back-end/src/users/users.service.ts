@@ -5,6 +5,10 @@ import { UserDto } from 'src/users/User_DTO/User.dto';
 import * as crypto from 'crypto';
 import { MemoryStoredFile } from 'nestjs-form-data';
 
+
+//FIXME - dont forget to handle the error thrown by the postgresql database
+//LINK - https://www.postgresql.org/docs/9.3/errcodes-appendix.html
+
 @Injectable()
 export class UsersService {
   i: number = 1;
@@ -33,6 +37,7 @@ export class UsersService {
       username: 'mohamed',
       profilePicture: process.env.DEFAULT_AVATAR,
       email: 'msouiyeh@gmail.com',
+      //FIXME - this needs to be hashed for security reasons
       activeRefreshToken: null,
       redirectUrl: null,
       TFAisenabled: false,
@@ -40,6 +45,25 @@ export class UsersService {
     },
   ];
 
+  async turnOff2FA(id: number) {
+    const user: UserDto = await this.findUserById(id);
+
+    user.TFAisenabled = false;
+  }
+
+  async turnOn2FA(id: number) {
+    const user: UserDto = await this.findUserById(id);
+
+    user.TFAisenabled = true;
+  }
+
+  async set2FAscret(email: string, secret: string): Promise<any> {
+      const user: UserDto | null = await this.findUserByEmail(email);
+
+      if (!user) return null;
+
+      user.TFAsecret = secret;
+  }
 
   async updateAvatar(id: number, avatar: any): Promise<any> {
     const user: UserDto | null = await this.findUserById(id);
@@ -128,10 +152,12 @@ export class UsersService {
   async replaceRefreshToken(
     id: number,
     refreshToken: string | null,
-  ): Promise<any> {
+  ): Promise<boolean | null> {
     const user: UserDto = this.users.find((user) => user.id === id);
     if (typeof user === 'undefined') return null;
     user.activeRefreshToken = refreshToken;
+
+    return true;
   }
 
   async validatRefreshToken(

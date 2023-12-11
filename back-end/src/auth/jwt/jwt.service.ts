@@ -1,21 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './strategy/jwt.strategy';
 import {
   jwt_refresh_sign_options,
   jwt_sign_options,
 } from './config/jwt.config';
 import { UserDto } from '../../users/User_DTO/User.dto';
+import { JwtPayload } from './JwtPayloadDto/JwtPayloadDto';
 
 @Injectable()
 export class JwtAuthService {
   constructor(private jwtService: JwtService) {}
 
-  async getJwtAcessToken(user: UserDto) {
+  async getJwtAcessToken(user: UserDto, TFAauthenticated: boolean = false) {
+    
+    
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,
       TFAisenabled: user.TFAisenabled,
+      TFAauthenticated: TFAauthenticated,
     };
 
     const accessToken = await this.jwtService.signAsync(
@@ -26,11 +29,12 @@ export class JwtAuthService {
     return accessToken;
   }
 
-  async getJwtRefreshToken(user: UserDto) {
+  async getJwtRefreshToken(user: UserDto, TFAauthenticated: boolean = false) {
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,
       TFAisenabled: user.TFAisenabled,
+      TFAauthenticated: TFAauthenticated,
     };
 
     const refreshToken = await this.jwtService.signAsync(
