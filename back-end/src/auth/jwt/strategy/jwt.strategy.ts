@@ -3,18 +3,18 @@
 import { Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { config } from 'dotenv';
+// import { config } from 'dotenv';
 import { Request } from 'express';
 import { UsersService } from 'src/users/users.service';
 import { UserDto } from 'src/users/User_DTO/User.dto';
 import { JwtPayload } from '../JwtPayloadDto/JwtPayloadDto';
 
 
-config({
-  encoding: 'latin1',
-  debug: false,
-  override: false,
-});
+// config({
+//   encoding: 'latin1',
+//   debug: false,
+//   override: false,
+// });
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
@@ -43,12 +43,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
     
     //NOTE - check if refresh token is valid
     //FIXME - uncoment it
-    // if (!refreshTokenIsValid) {
-    //   console.log('refresh token is not valid');
-    //   await this.userService.replaceRefreshToken(payload.id, null);
-    //   throw new UnauthorizedException();
-    // } 
+    if (!refreshTokenIsValid) {
+      console.log('refresh token is not valid');
+      await this.userService.replaceRefreshToken(payload.id, null);
+      throw new UnauthorizedException();
+    } 
 
+    if (payload.TFAisenabled && !payload.TFAauthenticated) {
+      console.log('TFA is enabled but not authenticated');
+      throw new UnauthorizedException();
+    }
+    
     const user: UserDto = {
       id: payload.id,
       provider: null,

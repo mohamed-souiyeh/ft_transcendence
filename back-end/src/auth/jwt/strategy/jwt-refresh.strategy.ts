@@ -40,6 +40,10 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
       throw new UnauthorizedException();
     }
 
+    if (payload.TFAisenabled && !payload.TFAauthenticated) {
+      throw new UnauthorizedException();
+    }
+    
     const user: UserDto = {
       id: payload.id,
       provider: null,

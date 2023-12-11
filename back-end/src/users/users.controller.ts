@@ -59,7 +59,7 @@ export class UsersController {
   @Post('update')
   @Redirect()
   @FormDataRequest(uploadConfig)
-  async test(@Req() req: IRequestWithUser, @Body() data: UploadDTO) {
+  async updateUserData(@Req() req: IRequestWithUser, @Body() data: UploadDTO) {
     if (data.avatar === undefined || data.username === undefined)
       throw new BadRequestException('no avatar or username provided');
 
@@ -69,7 +69,7 @@ export class UsersController {
     //NOTE - redirect to login page
     const redirect: HttpRedirectResponse = {
       // use env vars here
-      url: process.env.LOGIN_URL,
+      url: process.env.HOME_URL,
       statusCode: 302,
     };
     return redirect;

@@ -11,7 +11,7 @@ import { JwtSignOptions } from "@nestjs/jwt";
 //FIXME - dont leave it like this
 export const jwt_sign_options: JwtSignOptions = {
   secret: process.env['JWT_SECRET'],
-  expiresIn: 60 * 1, // available for 5mins
+  expiresIn: 60 * 100000000000000, // available for 5mins
 };
 
 export const jwt_refresh_sign_options: JwtSignOptions = {

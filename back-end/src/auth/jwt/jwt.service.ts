@@ -12,6 +12,8 @@ export class JwtAuthService {
   constructor(private jwtService: JwtService) {}
 
   async getJwtAcessToken(user: UserDto, TFAauthenticated: boolean = false) {
+    
+    
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,

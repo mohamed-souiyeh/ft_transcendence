@@ -33,17 +33,18 @@ export class AuthService {
     const user = await this.userService.findUserById(req.user.id);
 
     //NOTE - check if refresh token is valid
+    //FIXME - uncomment it
     if (
       !user ||
       user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]
     ) {
-      if (user) await this.userService.replaceRefreshToken(req.user.id, null);
+      if (user) await this.userService.replaceRefreshToken(user.id, null);
       throw new UnauthorizedException();
     }
 
     //NOTE - get signed tokens
-    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user);
-    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user);
+    const accessToken = await this.jwtAuthService.getJwtAcessToken(user, true);
+    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(user, true);
 
     //NOTE - add tokens to cookies
     await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
@@ -54,9 +55,9 @@ export class AuthService {
     );
 
     //NOTE - add refresh token to db
-    await this.userService.replaceRefreshToken(req.user.id, refreshToken);
+    await this.userService.replaceRefreshToken(user.id, refreshToken);
 
-    return 'refreshed tokens';
+    return { message: 'refreshed tokens successfully'};
   }
 
   async googleLogin(req: IRequestWithUser, res: Response) {
@@ -65,8 +66,8 @@ export class AuthService {
     }
 
     //NOTE - get signed tokens
-    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user);
-    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user);
+    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user, false);
+    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user, false);
 
     //NOTE - add tokens to cookies
     await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
@@ -85,7 +86,6 @@ export class AuthService {
       url: req.user.redirectUrl,
       statusCode: 302,
     };
-    //FIXME - redirect to home page
     return redirect;
   }
 
@@ -99,8 +99,8 @@ export class AuthService {
     }
 
     //NOTE - get signed tokens
-    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user);
-    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user);
+    const accessToken = await this.jwtAuthService.getJwtAcessToken(req.user, false);
+    const refreshToken = await this.jwtAuthService.getJwtRefreshToken(req.user, false);
 
     //NOTE - add tokens to cookies
     await this.addTokenToCookie(res, accessToken, process.env.ACCESS_TOKEN_KEY);
@@ -119,7 +119,6 @@ export class AuthService {
       url: req.user.redirectUrl,
       statusCode: 302,
     };
-    //FIXME - redirect to home page
     return redirect;
   }
 
