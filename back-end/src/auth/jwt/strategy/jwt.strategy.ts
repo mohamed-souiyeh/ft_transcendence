@@ -42,7 +42,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
     const refreshTokenIsValid = await this.userService.validatRefreshToken(payload.id, req.cookies[process.env.REFRESH_TOKEN_KEY])
     
     //NOTE - check if refresh token is valid
-    //FIXME - uncoment it
     if (!refreshTokenIsValid) {
       console.log('refresh token is not valid');
       await this.userService.replaceRefreshToken(payload.id, null);

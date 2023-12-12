@@ -8,13 +8,14 @@ import { JwtSignOptions } from "@nestjs/jwt";
 //   override: false,
 // });
 
-//FIXME - dont leave it like this
+
 export const jwt_sign_options: JwtSignOptions = {
   secret: process.env['JWT_SECRET'],
-  expiresIn: 60 * 100000000000000, // available for 5mins
+  //FIXME - make it back to normal
+  expiresIn: 60 * 3, // available for 3 mins
 };
 
 export const jwt_refresh_sign_options: JwtSignOptions = {
   secret: process.env['JWT_REFRESH_SECRET'],
-  expiresIn: '1d', // available for 7days
+  expiresIn: '1d', // available for 1 day
 };

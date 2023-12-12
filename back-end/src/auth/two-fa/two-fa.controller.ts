@@ -5,14 +5,12 @@ import {
   HttpCode,
   Post,
   Req,
-  Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { TwoFaService } from './two-fa.service';
 import { JwtAuthGuard } from '../jwt/guard/jwt-auth.guard';
 import { IRequestWithUser } from '../Interfaces/IRequestWithUser';
-import { Response } from 'express';
 import { TFA_FormConfig } from './2FA_FormConfig/2FA_FormConfig';
 import { TFACodeDTO } from './uploadCodeDTO/TFACodeDTO';
 import { FormDataRequest } from 'nestjs-form-data';
@@ -32,13 +30,12 @@ export class TwoFaController {
   @Get('generate')
   async generate2FASecretAndOTPurl(
     @Req() req: IRequestWithUser,
-    @Res() res: Response,
   ) {
     const { otpauthUrl } = await this.twoFaService.generate2FASecretAndOTPurl(
       req.user.email,
     );
 
-    return this.twoFaService.streamQrCod(res, otpauthUrl);
+    return this.twoFaService.streamQrCod(req.res, otpauthUrl);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -47,7 +44,6 @@ export class TwoFaController {
   @FormDataRequest(TFA_FormConfig)
   async activate2FA(
     @Req() req: IRequestWithUser,
-    @Res({ passthrough: true }) res: Response,
     @Body() code: TFACodeDTO,
   ) {
     const isVerified =
@@ -61,7 +57,7 @@ export class TwoFaController {
     if (!isVerified) throw new UnauthorizedException('code is not valid');
 
     await this.twoFaService.turnOn2FA(req.user.id);
-    await this.authService.refresh(req, res);
+    await this.authService.refresh(req);
     console.log(
       'the user after 2FA activation => ',
       await this.usersService.findUserById(req.user.id),
@@ -75,7 +71,6 @@ export class TwoFaController {
   @FormDataRequest(TFA_FormConfig)
   async verify2FA(
     @Req() req: IRequestWithUser,
-    @Res({ passthrough: true }) res: Response,
     @Body() code: TFACodeDTO,
   ) {
     const isVerified =
@@ -86,7 +81,7 @@ export class TwoFaController {
 
     if (!isVerified) throw new UnauthorizedException('code is not valid');
 
-    await this.authService.refresh(req, res);
+    await this.authService.refresh(req);
     return { message: 'code is valid' };
   }
 }
