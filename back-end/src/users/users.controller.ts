@@ -56,8 +56,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  @Post('update')
-  @Redirect()
+  @Post('update') 
   @FormDataRequest(uploadConfig)
   async updateUserData(@Req() req: IRequestWithUser, @Body() data: UploadDTO) {
     if (data.avatar === undefined || data.username === undefined)
@@ -66,12 +65,6 @@ export class UsersController {
     await this.userService.updateUserUsername(req.user.id, data.username);
     await this.userService.updateAvatar(req.user.id, data.avatar);
 
-    //NOTE - redirect to login page
-    const redirect: HttpRedirectResponse = {
-      // use env vars here
-      url: process.env.HOME_URL,
-      statusCode: 302,
-    };
-    return redirect;
+    return true;
   }
 }

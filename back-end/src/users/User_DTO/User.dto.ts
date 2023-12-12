@@ -14,8 +14,6 @@ export class UserDto {
 
   //NOTE - we need to hash this for securety reasons
   activeRefreshToken: string | null;
-  
-  redirectUrl: string | null;
 
   TFAisenabled: boolean | null;
   TFAsecret: string | null;
