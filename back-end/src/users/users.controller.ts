@@ -1,13 +1,14 @@
 import {
   BadRequestException,
   Body,
+  ClassSerializerInterceptor,
   Controller,
+  Get,
   HttpCode,
-  HttpRedirectResponse,
   Post,
-  Redirect,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
@@ -19,14 +20,16 @@ import {
   usernameUpdateConfig,
 } from './FormDataInterceptorConfig/UploadConfig';
 import { UpdateUsernameDTO, UploadDTO } from './uploadDTO/uploadDTO';
+import { UserDto } from './User_DTO/User.dto';
 
 @Controller('users')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private userService: UsersService) {}
 
-  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('update/avatar')
+  @UseGuards(JwtAuthGuard)
   @FormDataRequest(avatarUpdateConfig)
   async updateUserAvatar(
     @Req() req: IRequestWithUser,
@@ -39,9 +42,9 @@ export class UsersController {
     return { message: 'avatar updated successfully' };
   }
 
-  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('update/username')
+  @UseGuards(JwtAuthGuard)
   @FormDataRequest(usernameUpdateConfig)
   async updateUserUsername(
     @Req() req: IRequestWithUser,
@@ -54,9 +57,9 @@ export class UsersController {
     return { message: 'username updated successfully' };
   }
 
-  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('update') 
+  @UseGuards(JwtAuthGuard)
   @FormDataRequest(uploadConfig)
   async updateUserData(@Req() req: IRequestWithUser, @Body() data: UploadDTO) {
     if (data.avatar === undefined || data.username === undefined)
@@ -67,4 +70,14 @@ export class UsersController {
 
     return true;
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('whoami')
+  async whoAmI(@Req() req: IRequestWithUser) {
+    const user: UserDto = await this.userService.findUserById(req.user.id);
+
+    
+    return new UserDto(user);
+  }
+
 }

@@ -120,7 +120,7 @@ export class UsersService {
     user.id = this.i++;
     user.username = 'user' + this.i + crypto.randomBytes(5).toString('base64');
 
-    console.log('user =>', user);
+    // console.log('user =>', user);
     this.users.push(user);
     user.id = this.i++;
   }
