@@ -19,6 +19,10 @@
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
     "paths": {
+      "include": [
+        // other include patterns...
+        "src/users/FormDataInterceptorConfig/avatarConfig.ts"
+      ],
       "@nestjs/common": ["./packages/common"],
       "@nestjs/common/*": ["./packages/common/*"],
       "@nestjs/core": ["./packages/core"],

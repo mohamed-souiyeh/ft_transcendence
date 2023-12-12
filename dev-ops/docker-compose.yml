@@ -46,6 +46,15 @@ services:
       - POSTGRES_USER
       - PRIVATE_KEY_PATH
       - PUBLIC_CERT_PATH
+      - JWT_REFRESH_SECRET
+      - REFRESH_TOKEN_KEY
+      - ACCESS_TOKEN_KEY
+      - TWO_FACTOR_AUTHENTICATION_APP_NAME
+      - HOME_URL
+      - LOGIN_URL
+      - SETUP_URL
+      - TFA_URL
+      - DEFAULT_AVATAR
 
   postgres:
     image: postgres

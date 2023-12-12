@@ -2,15 +2,16 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
-import { User, UsersService } from 'src/users/users.service';
+import { UsersService } from 'src/users/users.service';
+import { UserDto } from '../../users/User_DTO/User.dto';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private readonly usersService: UsersService) {
     super({
-      clientID: process.env["GOOGLE_CLIENT_ID"],
-      clientSecret: process.env["GOOGLE_SECRET"],
-      callbackURL: process.env["GOOGLE_REDIRECT_URI"],
+      clientID: process.env['GOOGLE_CLIENT_ID'],
+      clientSecret: process.env['GOOGLE_SECRET'],
+      callbackURL: process.env['GOOGLE_REDIRECT_URI'],
       scope: ['email', 'profile'],
     });
   }
@@ -22,22 +23,40 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   ): Promise<any> {
     //FIXME - look for the case of the profile returned by google is empty
     // const { id, name, emails } = profile;
-    
 
-    const user: User = {
-      id: profile._json.sub,
-      provider: "google",
+    const user: UserDto = {
+      id: null,
+      provider: 'google',
       username: profile._json.name,
+      profilePicture: process.env.DEFAULT_AVATAR,
       email: profile._json.email,
+      activeRefreshToken: null,
+      redirectUrl: null,
+      TFAisenabled: false,
+      TFAsecret: null,
     };
 
-
-    const found_user = await this.usersService.finduser(user.email);
+    let found_user: UserDto = await this.usersService.findUserByEmail(
+      user.email,
+    );
 
     if (!found_user) {
-      this.usersService.adduser(user);
-
+      this.usersService.addUser(user);
+      //NOTE - when u make sure that the db doesnt add any thing to the user use the one u already have instead of fetching it again
+      found_user = await this.usersService.findUserByEmail(user.email);
+      found_user.redirectUrl = process.env.SETUP_URL;
     }
-    return user;
+    else
+      found_user.redirectUrl = process.env.HOME_URL;
+
+    if (found_user.TFAisenabled) {
+      //NOTE - if TFA is enabled, then we need to do something here
+      //NOTE - that i still dont know
+      found_user.redirectUrl = process.env.TFA_URL;
+    }
+
+    console.log('google strategy found user =>', found_user);
+
+    return found_user;
   }
 }

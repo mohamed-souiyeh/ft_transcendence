@@ -1,18 +1,17 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { jwt_expire_time } from './config/jwt.config';
 import { JwtAuthService } from './jwt.service';
-import { JwtStrategy } from './jwt.strategy';
-
+import { JwtStrategy } from './strategy/jwt.strategy';
+import { JwtRefreshTokenStrategy } from './strategy/jwt-refresh.strategy';
+import { UsersModule } from 'src/users/users.module';
+import { Jwt2FAStrategy } from './strategy/jwt-2FAauth.strategy';
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: process.env['JWT_SECRET'],
-      signOptions: jwt_expire_time,
-    }),
+    JwtModule.register({}),
+    UsersModule,
   ],
-  providers: [JwtStrategy, JwtAuthService],
-  exports: [JwtModule, JwtAuthService]
+  providers: [JwtStrategy, JwtAuthService, JwtRefreshTokenStrategy, Jwt2FAStrategy],
+  exports: [JwtModule, JwtAuthService],
 })
 export class JwtAuthModule {}
