@@ -1,6 +1,7 @@
 #our ignores
 /src/purplerain
 .env
+database-prisma-experements
 
 # compiled output
 /dist

@@ -7,7 +7,9 @@ export class UserDto {
   id: number | null; //
   provider: string | null;
   username: string | null; //
-  profilePicture: string | null; // served
+
+  @Exclude()
+    profilePicture: string | null; // served
 
   //NOTE - this needs to be unique
   @IsEmail()
