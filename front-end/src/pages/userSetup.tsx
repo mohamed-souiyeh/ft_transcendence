@@ -2,6 +2,7 @@ import { useState , useRef} from "react";
 import  pic from "../assets/taha.jpg"
 import { apiGlobal } from "./interceptor";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Welcome()
 {
@@ -74,31 +75,31 @@ function Setup()
 	const change = (event) =>
 	{
 		setProfilePic(event.target.files[0]);
+		// apiGlobal.interceptors.response.use(
+		// 	response => response,
+		// 	async error => {
+		// 		const status = error.response ?.status;
+		// 		if (status === 401) {
+		// 			console.log("hoooo");
+		// 			await apiGlobal.get("/auth/refresh",
+		// 			{
+		// 				withCredentials: true
+		// 			})
+		// 			return apiGlobal(error.config);
+		// 		}
+		// 		return Promise.reject(error);
+		// 	}
+		// );
 	};
 
-	apiGlobal.interceptors.response.use(
-		response => response,
-		async error => {
-			const status = error.response ?.status;
-			if (status === 401) {
-				console.log("hoooo");
-				await apiGlobal.get("/auth/refresh",
-				{
-					withCredentials: true
-				})
-				return apiGlobal(error.config);
-			}
-			return Promise.reject(error);
-		}
-	);
 
 	const changeBoth = () =>
 	{
 		formdata.set("username", userName);
 		formdata.set("avatar", srcImg);
 
-		apiGlobal.
-			post("/users/update", formdata,
+		axios.
+			post("http://localhost:1337/users/update", formdata,
 			{
 				withCredentials: true
 			}).
@@ -114,7 +115,7 @@ function Setup()
 			.
 			catch((e)=>{
 				
-				setUsername(e.response.data.message);
+				setUsername(e.response);
 			}
 		);
 	}
