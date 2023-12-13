@@ -8,6 +8,7 @@ import UserProfile from "./pages/user";
 import Game from "./pages/game";
 import FinishProfile from "./pages/finishprofile";
 import LandingPage from "./pages/landingpage";
+import Setup from "./pages/userSetup";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="*" element={<NotFound/>} />
           <Route path="/game" element={<Game/>} />
           <Route path="/finishprofile" element={<FinishProfile/>} />
+          <Route path="/setup" element={<Setup/>}/>
           <Route path="/" element={<LandingPage/>} />
           <Route path="/userprofile" element={<UserProfile/>} /> 
              
