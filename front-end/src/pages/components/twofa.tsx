@@ -1,17 +1,46 @@
 
+import { relative } from "path";
 import { Dispatch, SetStateAction, useState } from "react";
-
+import axios from "axios";
 
 function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: boolean, prompt:boolean, setSwitchValue: Dispatch<SetStateAction<boolean>>, setPrompt: Dispatch<SetStateAction<boolean>>}) {
   const [enable, setEnable] = useState(false);
+  const [qrCode, setCode] = useState('');
+  const [codeFetched, setStatus] = useState(false);
+
+
+  if (!codeFetched)
+  {
+    axios.get("http://localhost:1337/2fa/generate",
+            {
+              withCredentials: true,
+              responseType: 'arraybuffer'
+            }
+          )
+          .then((response) => {
+            let image = btoa(
+              new Uint8Array(response.data)
+                .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
+            
+            console.log(`data:${response.headers['content-type'].toLowerCase()};base64,${image}`);
+            setCode(`data:${response.headers['content-type'].toLowerCase()};base64,${image}`);
+          });
+      setStatus(true);
+  }
+
   const handleDisable = () => {
+    console.log("send request here");
     setSwitchValue(!switchValue);
     setPrompt(!prompt)
   }
   const handleEnable = () => {
-    setEnable(true)
+    setEnable(true);
   }
   const handleClose = () => {
+    if (switchValue == true)
+    {
+    }
     setSwitchValue(!switchValue)
     setPrompt(!prompt)
   }
@@ -39,10 +68,17 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
           <div className="grid place-content-center py-5 place-self-center">
             <p className=" place-self-center"> Do you want to Enable 2fa? </p>
             <p className="text-3xl place-self-center"> I AM A QR CODE </p>
-
+            <img
+                  style={
+                    {
+                      width:250,
+                      height:250
+                    }
+                  } 
+                  src={qrCode}>
+                </img>
               <form action='' className=" grid place-self-center gap-3">
                 <input type='text' className='w-48 h-12 bg-purple-sh-2 outline-none rounded-lg text-impure-white px-2 place-self-center' />
-
                 <div className="flex place-content-center gap-3">
                   <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2"  type="submit" value="Send" onClick={() => handleEnable()}> Confirm </button>
 

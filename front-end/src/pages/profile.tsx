@@ -13,7 +13,8 @@ import { useState } from "react";
 
 function Profile () {
   const [switchValue, setSwitchValue] = useState(false);
-  const [prompt, setPrompt] = useState(false)
+  const [prompt, setPrompt] = useState(false);
+  const [qrCode, setCode] = useState(null);
 
   return(
     <>
@@ -21,7 +22,9 @@ function Profile () {
         <SideBar/>
         <NavBar/>
 
-        {prompt && <Popup switchValue={switchValue} setSwitchValue={setSwitchValue} prompt={prompt} setPrompt={setPrompt}/>}
+        {prompt && <Popup switchValue={switchValue} setSwitchValue={setSwitchValue} prompt={prompt} 
+          setPrompt={setPrompt}
+        />}
         <div className="bg-purple bg-opacity-10 backdrop-blur-lg border-[1px] border-purple/20 h-64 mt-20 mb-16 rounded-3xl flex">
           <div className="grid place-content-center">
             <div className="bg-purple-sh-2 m-12 rounded-full h-48 w-48 grid place-content-center ">
@@ -53,8 +56,6 @@ function Profile () {
                   //based on the popup buttons, either just hide the pop(No is clicked) or confirm the state changing (yes clicked), to change the state, switchValue will change to !switchValue
                   //in other words, popup component will take 'switchValue' and setSwitchValue to change in the case of clicking on yes.
                 }
-
-
               </div>
             </div>
           </div>
@@ -95,23 +96,6 @@ function Profile () {
                   <p className="text-xl text-purple-tone-2 text-opacity-50">Matchs History:</p>
                 </div>
                 <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
                 {/* we need a component for opponents, that will show their name, image, and score from that match*/}
               </div>
             </div>
@@ -123,35 +107,6 @@ function Profile () {
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-50">acheivements:</p>
                 </div>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
                 <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
                 <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
               </div>

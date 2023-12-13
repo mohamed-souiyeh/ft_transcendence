@@ -2,9 +2,11 @@ import {
   Body,
   Controller,
   Get,
+  Header,
   HttpCode,
   Post,
   Req,
+  Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -17,6 +19,7 @@ import { FormDataRequest } from 'nestjs-form-data';
 import { UsersService } from 'src/users/users.service';
 import { Jwt2FAAuthGuard } from '../jwt/guard/jwt-2FAauth.guard';
 import { AuthService } from '../auth.service';
+import { Response } from 'express';
 
 @Controller('2fa')
 export class TwoFaController {
@@ -28,19 +31,21 @@ export class TwoFaController {
 
   @UseGuards(JwtAuthGuard)
   @Get('generate')
+  @Header("Content-Type", "image/png")
   async generate2FASecretAndOTPurl(
     @Req() req: IRequestWithUser,
+    @Res() res: Response,
   ) {
     const { otpauthUrl } = await this.twoFaService.generate2FASecretAndOTPurl(
       req.user.email,
     );
 
-    return this.twoFaService.streamQrCod(req.res, otpauthUrl);
+    return this.twoFaService.streamQrCod(res, otpauthUrl);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('activate')
-  @HttpCode(200)
+  @HttpCode(200) 
   @FormDataRequest(TFA_FormConfig)
   async activate2FA(
     @Req() req: IRequestWithUser,
