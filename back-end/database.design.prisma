@@ -1,0 +1,151 @@
+datasource db {
+  provider = "postgresql"  // definition de systele de gestion
+  url      = env("DATABASE_URL") // la connexion se fait via une variable d'nvironement nomee database_url
+}
+
+
+model user {
+  id Int @id @default(autoincrement())
+  username String @unique
+  score Int @default(0)
+  email String @unique
+  phone String
+
+  // added from userDto
+  provider String
+  TFASecret String
+  TFAisEnabled Boolean
+
+  UnreadNotifications String //NOTE - stringified json object with the key as the notification type and the value as the number of unread notifications of that type
+
+  // use an enum with the power of 2 values to extract the specific bitflag that corresponds to the notification type
+
+  friends user[] @relation("friends")
+  blockedUsers user[] @relation("blockedUsers")
+  friendRequests notification[]
+  conversations conversation[]
+  mateches match[]
+}
+
+//SECTION - conversation model and related models
+
+//SECTION - conversation model
+model conversation {
+  id Int @id @default(autoincrement())
+
+  conversationName String // name of the conversation
+  conversationImage String // image of the conversation
+  conversationDescription String // description of the conversation
+  
+  type String // type of conversation
+
+  maxUsers Int // max number of users in the conversation
+
+  conversationState String //NOTE - state of the conversation ["active", "inactive", "deleted"]
+
+  conversationPassword String //NOTE - password of the conversation need to be hashed
+
+  modiratorIds Int[] //NOTE - ids of the modirators of the conversation
+  
+  usersState userState[] //NOTE - state of the users in the conversation
+  
+  users user[]
+  messages message[]
+  
+  createdAt DateTime @default(now())
+}
+//!SECTION
+
+//SECTION - userState model
+model userState {
+  id Int @id @default(autoincrement())
+  state String //NOTE - state of the user in the conversation 
+  info String //NOTE - a stringefied json object tha hold the info of the user in the conversation
+}
+//!SECTION
+
+//SECTION - message model
+model message {
+  id Int @id @default(autoincrement())
+  text String
+  createdAt DateTime @default(now())
+
+  sender user @relation(fields: [senderId], references: [id])
+  senderId Int
+
+  conversation conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+}
+//!SECTION
+
+//!SECTION
+
+
+
+
+//SECTION - match model and related models
+
+model match {
+  id Int @id @default(autoincrement())
+
+  startedAt DateTime @default(now())
+  endedAt DateTime @default(now())
+
+  winner_stats String //NOTE - stringified json object with the key as (id or username) of the winner of the match and the value as an object with the state and info of the winner in the match
+
+  loser_stats String //NOTE - stringified json object with the key as (id or username) of the loser of the match and the value as an object with the state and info of the loser in the match
+
+  winner user @relation( name: "winner", fields: [winnerId], references: [id])
+  winnerId Int
+
+  loser user @relation(name: "loser", fields: [loserId], references: [id])
+  loserId Int
+}
+
+
+
+//!SECTION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//SECTION - notification model
+
+model notification {
+  id Int @id @default(autoincrement())
+  type String // type of notification
+
+  sender user @relation(fields: [senderId], references: [id])
+  senderId Int
+
+  receiver user @relation(fields: [receiverId], references: [id])
+  receiverId Int
+
+  match match? @relation(fields: [matchId], references: [id])
+  matchId Int?
+
+  conversation conversation? @relation(fields: [conversationId], references: [id])
+  conversationId Int?
+
+  createdAt DateTime @default(now())
+}
+//!SECTION
