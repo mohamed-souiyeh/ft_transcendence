@@ -38,6 +38,7 @@ model user {
   receivedNotifications notification[] @relation(name: "receiver")
 
   conversations conversation[] 
+  bannedConversations conversation[] @relation(name: "bannedUsers")
   sentMessages message[] @relation(name: "sentMessages")
 
   
@@ -81,6 +82,8 @@ model conversation {
   usersState userState[] //NOTE - state of the users in the conversation
   
   users user[]
+  bannedUsers user[] @relation(name: "bannedUsers")
+
   messages message[]
   
   notification notification?
@@ -101,7 +104,7 @@ model userState {
   info Json //NOTE - a stringefied json object tha hold the info of the user in the conversation
 
   userId Int
-  
+
   conversation conversation @relation(fields: [conversationId], references: [id])
   conversationId Int
 }
