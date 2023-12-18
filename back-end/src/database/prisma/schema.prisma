@@ -1,0 +1,175 @@
+datasource db {
+  provider = "postgresql"  // definition de systele de gestion
+  url      = env("DATABASE_URL") // la connexion se fait via une variable d'nvironement nomee database_url
+}
+
+enum UserStatus {
+  online
+  offline
+  busy
+}
+
+model user {
+  id Int @id @default(autoincrement())
+  username String @unique
+  score Int @default(0)
+  email String @unique
+  avatar String
+
+  status UserStatus //NOTE - status of the user ["online", "offline", "busy"]
+
+  // added from userDto
+  provider String
+  TFASecret String
+  TFAisEnabled Boolean
+
+  UnreadNotifications Json //NOTE - stringified json object with the key as the notification type and the value as the number of unread notifications of that type
+
+  // use an enum with the power of 2 values to extract the specific bitflag that corresponds to the notification type
+
+  friends user[] @relation("friends")
+  friendOf user[] @relation("friends")
+
+  blockedUsers user[] @relation("blockedUsers")
+  blockedBy user[] @relation("blockedUsers")
+
+
+  sentNotificatons notification[] @relation(name: "sender")
+  receivedNotifications notification[] @relation(name: "receiver")
+
+  conversations conversation[] 
+  bannedConversations conversation[] @relation(name: "bannedUsers")
+  sentMessages message[] @relation(name: "sentMessages")
+
+  
+  wonMatches match[] @relation(name: "winner")
+  lostMatches match[] @relation(name: "loser")
+
+}
+
+//SECTION - conversation model and related models
+
+enum ConversationType {
+  public
+  protected
+  private 
+  dm // direct message
+}
+
+enum ConversationState {
+  active
+  inactive
+}
+
+//SECTION - conversation model
+model conversation {
+  id Int @id @default(autoincrement())
+
+  conversationName String // name of the conversation
+  conversationImage String // image of the conversation
+  conversationDescription String // description of the conversation
+  
+  type ConversationType // type of conversation
+
+  maxUsers Int // max number of users in the conversation
+
+  conversationState ConversationState //NOTE - state of the conversation ["active", "inactive"]
+
+  conversationPassword String //NOTE - password of the conversation need to be hashed
+
+  modiratorIds Int[] //NOTE - ids of the modirators of the conversation
+  
+  usersState userState[] //NOTE - state of the users in the conversation
+  
+  users user[]
+  bannedUsers user[] @relation(name: "bannedUsers")
+
+  messages message[]
+  
+  notification notification?
+  
+  createdAt DateTime @default(now())
+}
+//!SECTION
+
+enum UserState {
+  active
+  muted
+}
+
+//SECTION - userState model
+model userState {
+  id Int @id @default(autoincrement())
+  state UserState //NOTE - state of the user in the conversation 
+  info Json //NOTE - a stringefied json object tha hold the info of the user in the conversation
+
+  userId Int
+
+  conversation conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+}
+//!SECTION
+
+//SECTION - message model
+model message {
+  id Int @id @default(autoincrement())
+  text String
+  createdAt DateTime @default(now())
+
+  sender user @relation(name: "sentMessages",fields: [senderId], references: [id])
+  senderId Int
+
+  conversation conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+}
+//!SECTION
+
+//!SECTION
+
+
+
+
+//SECTION - match model and related models
+
+model match {
+  id Int @id @default(autoincrement())
+
+  startedAt DateTime @default(now())
+  endedAt DateTime @default(now())
+
+  mode String //NOTE - mode of the match]
+
+  winner_stats Json //NOTE - stringified json object with the key as (id or username) of the winner of the match and the value as an object with the state and info of the winner in the match
+
+  loser_stats Json //NOTE - stringified json object with the key as (id or username) of the loser of the match and the value as an object with the state and info of the loser in the match
+
+  winner user @relation( name: "winner", fields: [winnerId], references: [id])
+  winnerId Int
+
+  loser user @relation(name: "loser", fields: [loserId], references: [id])
+  loserId Int
+}
+//!SECTION
+
+
+//SECTION - notification model
+
+model notification {
+  id Int @id @default(autoincrement())
+
+  type String // type of notification
+
+  sender user @relation(name: "sender", fields: [senderId], references: [id])
+  senderId Int
+
+  receiver user? @relation(name: "receiver", fields: [receiverId], references: [id])
+  receiverId Int?
+
+  conversation conversation? @relation(fields: [conversationId], references: [id])
+  conversationId Int? @unique
+
+  convNotificationData Json? //NOTE - a json object that holds the data of the notification related to the conversation
+
+  createdAt DateTime @default(now())
+}
+//!SECTION

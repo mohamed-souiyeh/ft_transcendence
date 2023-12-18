@@ -65,6 +65,12 @@ services:
       - "5432:5432"
     networks:
       - back-end-network
+    environment:
+      - POSTGRES_HOST
+      - POSTGRES_NAME
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_USER
 
 
 networks:

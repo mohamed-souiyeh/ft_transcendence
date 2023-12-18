@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js" // biblio pour construire des requette SQL
+}
+
+datasource db {
+  provider = "postgresql" // definition de systele de gestion
+  url      = env("DATABASE_URL") // la connexion se fait via une variable d'nvironement nomee database_url
+}
+
+// here we go with prisma :D 
+// chaque model = table 
+// table { fields }
+
+model User {
+  id           Int     @id @default(autoincrement())
+  username     String  @unique
+  passwordHash String // hachi password 9bal mat storih
+  salt         String //hadi salt labghina nzido dekchi dyal securité :p o ala3ib
+  score        Int     @default(0) // inthe first time score must be 0
+  email        String? @unique // not naisscary we can remove it 
+  name         String?
+  photo        String? // assuming this field will store the file path to user's photo
+  // photo               Bytes?
+
+  senderfriends Users_friends[]      @relation("senderForFriendship")
+  receiver      Users_friends[]      @relation("recieverForFriendship")
+  conversations Group_conversation[]
+  messages      Message[]
+  matches       Game_participant[]
+}
+
+model Users_friends {
+  //id       Int    @id @default(autoincrement())
+  userId          Int
+  friendId        Int
+  state           String // friends or enemies :p
+  date            DateTime @default(now())
+  user_sender     User     @relation("senderForFriendship", fields: [userId], references: [id])
+  friend_receiver User     @relation("recieverForFriendship", fields: [friendId], references: [id])
+
+  @@id([userId, friendId])
+}
+
+model Conversation {
+  id    Int    @id @default(autoincrement())
+  title String
+
+  participants Group_conversation[]
+  messages     Message[]
+}
+
+model Group_conversation {
+  userId         Int
+  conversationId Int
+
+  user         User         @relation(fields: [userId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+
+  @@id([userId, conversationId])
+}
+
+model Message {
+  id             Int      @id @default(autoincrement()) // chaque message contient un id wtf !!
+  content        String
+  senderId       Int
+  conversationId Int
+  time           DateTime @default(now())
+
+  sender       User         @relation(fields: [senderId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+}
+
+model Match {
+  id         Int      @id @default(autoincrement()) // chaque message contient un id wtf !!
+  start_time DateTime @default(now())
+  end_time   DateTime @default(now())
+
+  players Game_participant[]
+}
+
+model Game_participant {
+  playerId Int
+  matchId  Int
+  isWinner Boolean @default(false)
+  // Add other fields as needed
+
+  player User  @relation(fields: [playerId], references: [id])
+  match  Match @relation(fields: [matchId], references: [id])
+
+  @@id([playerId, matchId])
+}

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { UserDto } from 'src/users/User_DTO/User.dto';
+import { UserDto } from './User_DTO/User.dto';
 import * as crypto from 'crypto';
 import { MemoryStoredFile } from 'nestjs-form-data';
 
