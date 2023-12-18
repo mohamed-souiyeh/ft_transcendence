@@ -2,7 +2,7 @@
 import { HttpRedirectResponse, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtAuthService } from './jwt/jwt.service';
 import { Response } from 'express';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from 'src/database/users/users.service';
 import { IRequestWithUser } from './Interfaces/IRequestWithUser';
 
 @Injectable()
@@ -10,10 +10,22 @@ export class AuthService {
   constructor(
     private jwtAuthService: JwtAuthService,
     private userService: UsersService,
-  ) {}
+  ) { }
 
   hello(req) {
     return `hello world! from user ${req.user.email}\nof id ${req.user.id}.`;
+  }
+
+  async getUserFromAuthenticationToken(jwt: string, refreshJwt: string) {
+    const payload = await this.jwtAuthService.verifyJwtAccessToken(jwt);
+    if (payload == null)
+      return null;
+    const user = await this.userService.findUserById(payload.id);
+    if (user == null)
+      return null;
+    if (user.activeRefreshToken !== refreshJwt)
+      return null;
+    return user;
   }
 
   async addTokenToCookie(res: Response, Token: string, key: string) {
@@ -57,7 +69,7 @@ export class AuthService {
     //NOTE - add refresh token to db
     await this.userService.replaceRefreshToken(user.id, refreshToken);
 
-    return { message: 'refreshed tokens successfully'};
+    return { message: 'refreshed tokens successfully' };
   }
 
   async googleLogin(req: IRequestWithUser) {

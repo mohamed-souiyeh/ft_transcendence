@@ -2,8 +2,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
-import { UserDto } from 'src/users/User_DTO/User.dto';
+import { UsersService } from 'src/database/users/users.service';
+import { UserDto } from 'src/database/users/User_DTO/User.dto';
 import { JwtPayload } from '../JwtPayloadDto/JwtPayloadDto';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
       }
       return token;
     };
-    
+
     super({
       jwtFromRequest: extractJwtFromCookie,
       secretOrKey: process.env['JWT_REFRESH_SECRET'],
@@ -31,7 +31,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
 
   validate(req: Request, payload: JwtPayload) {
     const refreshToken = req.cookies[process.env.REFRESH_TOKEN_KEY];
-    
+
     const refreshTokenIsValid = this.userService.validatRefreshToken(payload.id, refreshToken);
 
     //NOTE - check if refresh token is valid
@@ -43,7 +43,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
     if (payload.TFAisenabled && !payload.TFAauthenticated) {
       throw new UnauthorizedException();
     }
-    
+
     const user: UserDto = {
       id: payload.id,
       provider: null,
@@ -55,7 +55,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
       TFAisenabled: payload.TFAisenabled,
       TFAsecret: null,
     };
-    
+
     console.log('refresh strategy user dto => ', user);
     return user;
   }
