@@ -49,7 +49,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
   const verifyCode = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const Code = e.target.verfCode.value; 
-    formdata.set("Code", Code);
+    formdata.set("code", Code);
     axios.post("http://localhost:1337/users/update", formdata)
     .then((res) => {
           if (res.status === 200) {
