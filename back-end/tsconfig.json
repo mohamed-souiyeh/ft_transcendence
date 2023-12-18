@@ -21,7 +21,7 @@
     "paths": {
       "include": [
         // other include patterns...
-        "src/users/FormDataInterceptorConfig/avatarConfig.ts"
+        "src/database/users/FormDataInterceptorConfig/avatarConfig.ts"
       ],
       "@nestjs/common": ["./packages/common"],
       "@nestjs/common/*": ["./packages/common/*"],

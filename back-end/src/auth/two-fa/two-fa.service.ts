@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Response } from 'express';
 import { authenticator } from 'otplib';
 import { toFileStream } from 'qrcode';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from 'src/database/users/users.service';
 
 type secretAndOtpauthUrl = {
   secret: string;
@@ -11,7 +11,7 @@ type secretAndOtpauthUrl = {
 
 @Injectable()
 export class TwoFaService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   async generate2FASecretAndOTPurl(
     userEmail: string,
@@ -57,7 +57,7 @@ export class TwoFaService {
 
     authenticator.options = options;
 
-    if (!user.TFAsecret) 
+    if (!user.TFAsecret)
       throw new UnauthorizedException('User does not have 2FA enabled');
     const isVerified = authenticator.check(TFAcode, user.TFAsecret);
     console.log('user => ', user);

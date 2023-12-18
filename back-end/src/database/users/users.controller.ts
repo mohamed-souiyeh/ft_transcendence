@@ -76,8 +76,12 @@ export class UsersController {
   async whoAmI(@Req() req: IRequestWithUser) {
     const user: UserDto = await this.userService.findUserById(req.user.id);
 
-    
     return new UserDto(user);
   }
 
+  @UseGuards()
+  @Get('avatar')
+  async getAvatar() {
+    //REVIEW - under construction
+  }
 }

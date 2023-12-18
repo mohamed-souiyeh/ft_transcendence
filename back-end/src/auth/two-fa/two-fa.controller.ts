@@ -16,7 +16,7 @@ import { IRequestWithUser } from '../Interfaces/IRequestWithUser';
 import { TFA_FormConfig } from './2FA_FormConfig/2FA_FormConfig';
 import { TFACodeDTO } from './uploadCodeDTO/TFACodeDTO';
 import { FormDataRequest } from 'nestjs-form-data';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from 'src/database/users/users.service';
 import { Jwt2FAAuthGuard } from '../jwt/guard/jwt-2FAauth.guard';
 import { AuthService } from '../auth.service';
 import { Response } from 'express';
@@ -27,7 +27,7 @@ export class TwoFaController {
     private readonly twoFaService: TwoFaService,
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   @UseGuards(JwtAuthGuard)
   @Get('generate')
