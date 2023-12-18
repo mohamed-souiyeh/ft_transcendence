@@ -125,6 +125,7 @@ export class AuthService {
     //NOTE - add refresh token to db
     await this.userService.replaceRefreshToken(req.user.id, refreshToken);
 
+    // console.log('ftLogin =>', req.user);
     //NOTE - redirect to home page
     const redirect: HttpRedirectResponse = {
       // use env vars here
