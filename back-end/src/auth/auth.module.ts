@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { GoogleStrategy } from './google/google.strategy';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from 'src/database/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { ftStrategy } from './42/42.strategy';
 import { JwtAuthModule } from './jwt/jwt-auth.module';
@@ -18,7 +18,7 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
 @Module({
   imports: [
     UsersModule,
-    PassportModule.register({ session: false}),
+    PassportModule.register({ session: false }),
     JwtAuthModule,
   ],
   controllers: [AuthController],
