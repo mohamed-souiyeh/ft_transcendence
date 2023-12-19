@@ -17,7 +17,7 @@ export class JwtAuthService {
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,
-      TFAisenabled: user.TFAisenabled,
+      TFAisEnabled: user.TFAisEnabled,
       TFAauthenticated: TFAauthenticated,
     };
 
@@ -33,7 +33,7 @@ export class JwtAuthService {
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,
-      TFAisenabled: user.TFAisenabled,
+      TFAisEnabled: user.TFAisEnabled,
       TFAauthenticated: TFAauthenticated,
     };
 

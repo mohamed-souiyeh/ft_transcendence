@@ -35,8 +35,8 @@ export class ftStrategy extends PassportStrategy(Strategy, '42') {
       email: profile.emails[0].value,
       activeRefreshToken: null,
       redirectUrl: null,
-      TFAisenabled: false,
-      TFAsecret: null,
+      TFAisEnabled: false,
+      TFASecret: null,
     };
 
     let found_user: UserDto = await this.usersService.findUserByEmail(
@@ -50,11 +50,11 @@ export class ftStrategy extends PassportStrategy(Strategy, '42') {
       found_user.redirectUrl = process.env.SETUP_URL;
     }
     else
-    found_user.redirectUrl = process.env.HOME_URL;
-  
+      found_user.redirectUrl = process.env.HOME_URL;
+
     // console.log('42 strategy found user =>', found_user);
 
-    if (found_user.TFAisenabled) {
+    if (found_user.TFAisEnabled) {
       //NOTE - if TFA is enabled, then we need to do something here
       //NOTE - that i still dont know
       found_user.redirectUrl = process.env.TFA_URL;

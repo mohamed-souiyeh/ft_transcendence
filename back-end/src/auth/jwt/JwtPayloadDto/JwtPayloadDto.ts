@@ -1,6 +1,6 @@
 export class JwtPayload {
   id: number;
   email: string;
-  TFAisenabled: boolean;
+  TFAisEnabled: boolean;
   TFAauthenticated: boolean;
 }
