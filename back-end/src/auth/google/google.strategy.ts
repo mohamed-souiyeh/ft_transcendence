@@ -28,7 +28,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const user: UserDto = {
       id: null,
       provider: 'google',
-      username: profile._json.name,
+      username: profile._json.email.split('@')[0],
       score: 0,
       status: UserStatus.online,
       unreadNotifications: {
@@ -38,31 +38,31 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       email: profile._json.email,
       activeRefreshToken: null,
       redirectUrl: null,
-      TFAisenabled: false,
-      TFAsecret: null,
+      TFAisEnabled: false,
+      TFASecret: null,
     };
 
-    let found_user: UserDto = await this.usersService.findUserByEmail(
-      user.email,
-    );
+
+
+    let found_user: UserDto = await this.usersService.findUserByEmail(user.email);
 
     if (!found_user) {
       this.usersService.addUser(user);
       //NOTE - when u make sure that the db doesnt add any thing to the user use the one u already have instead of fetching it again
       found_user = await this.usersService.findUserByEmail(user.email);
+      console.log('google strategy found user =>', found_user);
       found_user.redirectUrl = process.env.SETUP_URL;
     }
     else
       found_user.redirectUrl = process.env.HOME_URL;
 
-    if (found_user.TFAisenabled) {
+    if (found_user.TFAisEnabled) {
       //NOTE - if TFA is enabled, then we need to do something here
       //NOTE - that i still dont know
       found_user.redirectUrl = process.env.TFA_URL;
     }
 
-    console.log('google strategy found user =>', found_user);
-
+    // console.log('google strategy found user =>', found_user);
     return found_user;
   }
 }

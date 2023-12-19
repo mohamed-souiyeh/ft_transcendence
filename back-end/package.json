@@ -7,6 +7,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "migrate": "npx prisma migrate dev",
+    "generate": "npx prisma generate",
+    "push": "npx prisma db push",
+    "studio": "npx prisma studio",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

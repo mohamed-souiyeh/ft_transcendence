@@ -49,7 +49,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
       throw new UnauthorizedException();
     }
 
-    if (payload.TFAisenabled && !payload.TFAauthenticated) {
+    if (payload.TFAisEnabled && !payload.TFAauthenticated) {
       console.log('TFA is enabled but not authenticated');
       throw new UnauthorizedException();
     }
@@ -67,8 +67,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
       email: payload.email,
       activeRefreshToken: req.cookies[process.env.REFRESH_TOKEN_KEY],
       redirectUrl: null,
-      TFAisenabled: payload.TFAisenabled,
-      TFAsecret: null,
+      TFAisEnabled: payload.TFAisEnabled,
+      TFASecret: null,
     };
 
     return user;

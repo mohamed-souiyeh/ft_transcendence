@@ -41,7 +41,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
       throw new UnauthorizedException();
     }
 
-    if (payload.TFAisenabled && !payload.TFAauthenticated) {
+    if (payload.TFAisEnabled && !payload.TFAauthenticated) {
       throw new UnauthorizedException();
     }
 
@@ -59,8 +59,8 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
       email: payload.email,
       activeRefreshToken: refreshToken,
       redirectUrl: null,
-      TFAisenabled: payload.TFAisenabled,
-      TFAsecret: null,
+      TFAisEnabled: payload.TFAisEnabled,
+      TFASecret: null,
     };
 
     console.log('refresh strategy user dto => ', user);

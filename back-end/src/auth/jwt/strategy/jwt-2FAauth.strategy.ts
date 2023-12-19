@@ -64,8 +64,8 @@ export class Jwt2FAStrategy extends PassportStrategy(Strategy, '2FAauth') {
       email: payload.email,
       activeRefreshToken: req.cookies[process.env.REFRESH_TOKEN_KEY],
       redirectUrl: null,
-      TFAisenabled: payload.TFAisenabled,
-      TFAsecret: null,
+      TFAisEnabled: payload.TFAisEnabled,
+      TFASecret: null,
     };
 
     return user;
