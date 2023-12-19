@@ -11,6 +11,7 @@ services:
       - sharedv:/root/shared
     depends_on:
       - back-end-dev
+      - studio
     networks:
       - front-end-network
 
@@ -56,9 +57,50 @@ services:
       - TFA_URL
       - DEFAULT_AVATAR
 
+  studio:
+    image: studio
+    restart: always
+    build: ./studio/
+    container_name: studio
+    ports:
+      - "5555:5555"
+    volumes:
+      - sharedv:/root/shared
+    depends_on:
+      - postgres
+    networks:
+      - back-end-network
+    environment:
+      - DATABASE_URL
+      - FT_APP_ID
+      - FT_APP_SECRET
+      - FT_REDIRECT_URI
+      - GOOGLE_CLIENT_ID
+      - GOOGLE_REDIRECT_URI
+      - GOOGLE_SECRET
+      - JWT_SECRET
+      - NODE_VERSION
+      - POSTGRES_HOST
+      - POSTGRES_NAME
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_USER
+      - PRIVATE_KEY_PATH
+      - PUBLIC_CERT_PATH
+      - JWT_REFRESH_SECRET
+      - REFRESH_TOKEN_KEY
+      - ACCESS_TOKEN_KEY
+      - TWO_FACTOR_AUTHENTICATION_APP_NAME
+      - HOME_URL
+      - LOGIN_URL
+      - SETUP_URL
+      - TFA_URL
+      - DEFAULT_AVATAR
+
   postgres:
     image: postgres
     restart: always
+    container_name: postgres
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
@@ -71,6 +113,7 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_PORT
       - POSTGRES_USER
+      - POSTGRES_DB
 
 
 networks:

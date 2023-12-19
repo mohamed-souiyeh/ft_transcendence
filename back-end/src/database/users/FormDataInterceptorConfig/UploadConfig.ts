@@ -4,9 +4,9 @@ export const uploadConfig = {
   storage: FileSystemStoredFile,
   fileSystemStoragePath: 'avatars',
   limits: {
-    fields: 1,
-    fileSize: 1024 * 1024 * 5, // this is 1MB
-    files: 1,
+    // fields: 1,
+    fileSize: 1024 * 1024 * 5, // this is 5MB
+    // files: 1,
   },
 };
 
