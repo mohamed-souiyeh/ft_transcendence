@@ -43,13 +43,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     };
 
 
-
+    console.log('google strategy user =>', user);
     let found_user: UserDto = await this.usersService.findUserByEmail(user.email);
 
     if (!found_user) {
-      this.usersService.addUser(user);
-      //NOTE - when u make sure that the db doesnt add any thing to the user use the one u already have instead of fetching it again
-      found_user = await this.usersService.findUserByEmail(user.email);
+      found_user = await this.usersService.addUser(user);
+
       console.log('google strategy found user =>', found_user);
       found_user.redirectUrl = process.env.SETUP_URL;
     }

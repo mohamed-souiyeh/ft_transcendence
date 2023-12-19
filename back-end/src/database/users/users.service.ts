@@ -121,7 +121,7 @@ export class UsersService {
         id: id,
       },
       data: {
-        avatar: avatar,
+        avatar: avatar.path,
       }
     });
 
@@ -179,7 +179,7 @@ export class UsersService {
   async addUser(user: UserDto): Promise<any> {
 
     user.username = user.email.split('@')[0];
-    await this.prismaService.user.create({
+    const db_user = await this.prismaService.user.create({
       data: {
         username: user.username,
         score: user.score,
@@ -193,6 +193,8 @@ export class UsersService {
         activeRefreshToken: user.activeRefreshToken,
       }
     });
+    console.log("db_user => ", db_user);
+    return db_user;
   }
 
   async findUserByUsername(username: string): Promise<UserDto | null> {

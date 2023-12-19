@@ -44,9 +44,7 @@ export class ftStrategy extends PassportStrategy(Strategy, '42') {
     );
 
     if (!found_user) {
-      this.usersService.addUser(user);
-      //NOTE - when u make sure that the db doesnt add any thing to the user use the one u already have instead of fetching it again
-      found_user = await this.usersService.findUserByEmail(user.email);
+      found_user = await this.usersService.addUser(user);
       found_user.redirectUrl = process.env.SETUP_URL;
     }
     else

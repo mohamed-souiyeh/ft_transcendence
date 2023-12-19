@@ -1,14 +1,17 @@
 game-dev: volumes front-end
 
-back-end: volumes
-	@doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d  back-end-dev
+back-end: volumes studio
+	@doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d --build  back-end-dev
 
 front-end: volumes
-	@doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d front-end-dev
+	@doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d --build front-end-dev
 
 
-database: volumes
+database: volumes studio
 	@doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d postgres
+
+studio: volumes
+	@doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d studio
 
 volumes:
 	@mkdir -p ./dev-ops/volumes/database
