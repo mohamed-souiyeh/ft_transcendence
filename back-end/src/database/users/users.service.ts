@@ -4,6 +4,8 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { UserDto } from './User_DTO/User.dto';
 import * as crypto from 'crypto';
 import { MemoryStoredFile } from 'nestjs-form-data';
+import { Prisma, UserStatus, UserState } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 
 //FIXME - dont forget to handle the error thrown by the postgresql database
@@ -11,6 +13,9 @@ import { MemoryStoredFile } from 'nestjs-form-data';
 
 @Injectable()
 export class UsersService {
+
+  constructor(private readonly prismaService: PrismaService) {}
+
   i: number = 1;
 
   private readonly reservedUsernames: string[] = [
@@ -24,24 +29,34 @@ export class UsersService {
       id: this.i++,
       provider: 'myass',
       username: 'trandandan',
-      profilePicture: process.env.DEFAULT_AVATAR,
+      score: 0,
+      unreadNotifications: {
+        friendRequests: 0,
+      },
+      avatar: process.env.DEFAULT_AVATAR,
       email: 'trandandan1337@gmail.com',
       activeRefreshToken: null,
+      status: UserStatus.offline,
       redirectUrl: null,
       TFAisenabled: false,
-      TFAsecret: 'secret',
+      TFAsecret: null,
     },
     {
       id: this.i++,
       provider: 'myass',
       username: 'mohamed',
-      profilePicture: process.env.DEFAULT_AVATAR,
+      score: 0,
+      unreadNotifications: {
+        friendRequests: 0,
+      },
+      avatar: process.env.DEFAULT_AVATAR,
       email: 'msouiyeh@gmail.com',
       //FIXME - this needs to be hashed for security reasons
       activeRefreshToken: null,
+      status: UserStatus.offline,
       redirectUrl: null,
       TFAisenabled: false,
-      TFAsecret: 'secret',
+      TFAsecret: null,
     },
   ];
 
@@ -70,7 +85,7 @@ export class UsersService {
 
     if (user === null) throw new NotFoundException('User not found');
 
-    user.profilePicture = avatar.path;
+    user.avatar = avatar.path;
 
     console.log(
       'user after avatar update and re query => ',

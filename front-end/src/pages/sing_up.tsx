@@ -5,6 +5,17 @@ import intra from '../assets/42.svg'
 
 import { Link} from "react-router-dom";
 
+
+function googleSignUp()
+{
+  window.location.href = 'http://localhost:1337/auth/google';
+}
+
+function ftSignUp() {
+  window.location.href = 'http://localhost:1337/auth/42';
+}
+
+
 function SingUp () {
   return (
     <>
@@ -18,7 +29,13 @@ function SingUp () {
         </div>
 
         <div className='py-2'>
-          <button  className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1">
+          <button 
+             onClick = {
+              ()=> {
+                googleSignUp();
+              }
+            }
+            className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1">
             <div>
               <img className='flex-none pr-3' src={google} />
             </div>
@@ -30,7 +47,13 @@ function SingUp () {
         </div>
 
         <div className='py-2'>
-          <button  className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1">
+          <button 
+            onClick = {
+              () => {
+                ftSignUp();
+              }
+            }
+            className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1">
             <div>
               <img className='flex-none pr-3' src={intra} />
             </div>

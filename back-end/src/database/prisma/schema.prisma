@@ -1,3 +1,8 @@
+
+generator client {
+  provider = "prisma-client-js" // biblio pour construire des requette SQL
+}
+
 datasource db {
   provider = "postgresql"  // definition de systele de gestion
   url      = env("DATABASE_URL") // la connexion se fait via une variable d'nvironement nomee database_url
@@ -20,11 +25,12 @@ model user {
 
   // added from userDto
   provider String
-  TFASecret String
+  TFASecret String?
   TFAisEnabled Boolean
 
-  UnreadNotifications Json //NOTE - stringified json object with the key as the notification type and the value as the number of unread notifications of that type
+  unreadNotifications Json //NOTE - stringified json object with the key as the notification type and the value as the number of unread notifications of that type
 
+  activeRefreshToken String? //NOTE - the refresh token that is currently active
   // use an enum with the power of 2 values to extract the specific bitflag that corresponds to the notification type
 
   friends user[] @relation("friends")

@@ -62,11 +62,11 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @FormDataRequest(uploadConfig)
   async updateUserData(@Req() req: IRequestWithUser, @Body() data: UploadDTO) {
-    if (data.avatar === undefined || data.username === undefined)
-      throw new BadRequestException('no avatar or username provided');
 
-    await this.userService.updateUserUsername(req.user.id, data.username);
-    await this.userService.updateAvatar(req.user.id, data.avatar);
+    if (data.username !== undefined)
+      await this.userService.updateUserUsername(req.user.id, data.username);
+    if (data.avatar !== undefined)
+      await this.userService.updateAvatar(req.user.id, data.avatar);
 
     return true;
   }

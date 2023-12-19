@@ -4,13 +4,53 @@ import hi from "../assets/hi.svg"
 import bot from "../assets/bot.png";
 import controllers  from "../assets/controllers.png";
 import Ranked from "./components/ranked";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Home () {
+  const [user, setUser] = useState({});
+  const navigate = useNavigate();
+  const [fetched, setFetchState] = useState(false);
+
+  useEffect( 
+    ()=>
+    {
+      if (!fetched)
+      {
+        axios.
+        get("http://localhost:1337/users/whoami",
+          {
+            withCredentials: true
+          }
+        ).
+        then((res)=>
+          {
+            
+            setUser(res.data);
+          }
+          ).catch((e)=>{
+            console.log(e);
+          }).
+          catch(
+            (e)=>
+            {
+              console.log(e);
+            }
+            );
+            setFetchState(true);
+          }
+        }
+    )
+
+    console.log(user);
   return (
     <>
       <div className="w-screen h-screen grid justify-center ">
         {<SideBar/>}
-        {<NavBar/>}
+        {<NavBar 
+          name={user.profilePicture}
+        />}
 
         <div className="w-[850px] h-[50%]">
           <div className="my-16 bg-purple-sh-2 h-[120px] w-[850px] flex border-4 border-purple-tone-1 rounded-3xl ">
@@ -19,7 +59,10 @@ function Home () {
             </div>
             <div className="grid place-content-center">
               <div className="flex">
-                <h1>Welcome,</h1> <h1 className="text-purple"> User!</h1>
+                <h1>Welcome,</h1> 
+                <h1 className="text-purple">
+                  {user.username}
+                </h1>
               </div>
               <p className="text-2xl"> Pick a game mode and have unlimited fun!!</p> 
             </div>
@@ -28,7 +71,12 @@ function Home () {
 
           <div className="h-[120px] w-[850px] flex place-content-between">
             <div className="bg-purple w-[400px] h-[120px] rounded-3xl border-[1px] border-purple-tone-1 bg-opacity-30 backdrop-blur-lg flex place-content-between">
-              <div className="">
+              <div onClick={
+                  ()=> 
+                  {
+                    navigate("/game");
+                  }
+                } className="">
                 <p className="p-2 text-2xl"> Random matching </p>
                 <p className="p-2"> In this mode, players will be randomly matched with each other.</p>
               </div>
@@ -56,14 +104,6 @@ function Home () {
               <p className="text-xl text-purple text-opacity-50">Matches</p>
               <p className="text-xl text-purple text-opacity-50">Rank</p>
             </div>
-            <Ranked/>
-            <Ranked/>
-            <Ranked/>
-            <Ranked/>
-            <Ranked/>
-            <Ranked/>
-            <Ranked/>
-            <Ranked/>
             <Ranked/>
             <Ranked/>
             {/* we need some data in here, top players and their amount, so we could loop on them, put their names and number of matches they played and render them using a an element i will code later */}
