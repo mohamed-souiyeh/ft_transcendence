@@ -5,6 +5,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/database/users/users.service';
 import { UserDto } from 'src/database/users/User_DTO/User.dto';
 import { JwtPayload } from '../JwtPayloadDto/JwtPayloadDto';
+import { UserStatus } from '@prisma/client';
 
 @Injectable()
 export class JwtRefreshTokenStrategy extends PassportStrategy(
@@ -44,11 +45,17 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
       throw new UnauthorizedException();
     }
 
+    //TODO - fetch the user fromt he database or the caching service to get acurret info about the user
     const user: UserDto = {
       id: payload.id,
       provider: null,
       username: null,
-      profilePicture: null,
+      avatar: null,
+      score: 0,
+      status: UserStatus.online,
+      unreadNotifications: {
+        friendRequests: 0,
+      },
       email: payload.email,
       activeRefreshToken: refreshToken,
       redirectUrl: null,

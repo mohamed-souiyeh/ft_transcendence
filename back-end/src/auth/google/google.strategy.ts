@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
 import { UsersService } from 'src/database/users/users.service';
 import { UserDto } from '../../database/users/User_DTO/User.dto';
+import { UserStatus } from '@prisma/client';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -28,7 +29,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       id: null,
       provider: 'google',
       username: profile._json.name,
-      profilePicture: process.env.DEFAULT_AVATAR,
+      score: 0,
+      status: UserStatus.online,
+      unreadNotifications: {
+        friendRequests: 0,
+      },
+      avatar: process.env.DEFAULT_AVATAR,
       email: profile._json.email,
       activeRefreshToken: null,
       redirectUrl: null,

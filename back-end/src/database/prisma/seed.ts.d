@@ -14,8 +14,6 @@ async function main() {
     where: { username: 'Alice' },
     update: {},
     create: {
-      passwordHash: 'password456',
-      salt: '123',
       username: 'Alice',
       email: 'alice@example.com',
       // Ajoutez d'autres données d'utilisateur au besoin...

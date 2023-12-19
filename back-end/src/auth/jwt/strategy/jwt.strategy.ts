@@ -8,6 +8,7 @@ import { Request } from 'express';
 import { UsersService } from 'src/database/users/users.service';
 import { UserDto } from 'src/database/users/User_DTO/User.dto';
 import { JwtPayload } from '../JwtPayloadDto/JwtPayloadDto';
+import { UserStatus } from '@prisma/client';
 
 
 // config({
@@ -57,7 +58,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
       id: payload.id,
       provider: null,
       username: null,
-      profilePicture: null,
+      avatar: null,
+      score: 0,
+      status: UserStatus.online,
+      unreadNotifications: {
+        friendRequests: 0,
+      },
       email: payload.email,
       activeRefreshToken: req.cookies[process.env.REFRESH_TOKEN_KEY],
       redirectUrl: null,
