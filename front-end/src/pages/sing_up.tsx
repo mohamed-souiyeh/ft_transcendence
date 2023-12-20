@@ -1,9 +1,6 @@
-
 import logo from '../assets/Logo.svg'
 import google from '../assets/google.svg'
 import intra from '../assets/42.svg'
-
-import { Link} from "react-router-dom";
 
 
 function googleSignUp()
@@ -16,7 +13,7 @@ function ftSignUp() {
 }
 
 
-function SingUp () {
+function SignUp () {
   return (
     <>
 
@@ -24,18 +21,16 @@ function SingUp () {
         <div className="grid place-content-center">
           <img src={logo}/>
         </div>
-        <div className="grid place-content-center py-2">
-          <h1 className='text-impure-white'>Sign up</h1>
+        <div className="grid place-content-center pt-2">
+          <h1 className='text-purple-tone-1'>Welcome</h1>
+        </div>
+        <div className="grid place-content-end pb-2">
+          <p className='text-purple-tone-2 text-sm'> Please choose how to authenticate </p>
         </div>
 
         <div className='py-2'>
-          <button 
-             onClick = {
-              ()=> {
-                googleSignUp();
-              }
-            }
-            className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1">
+          <button onClick = { ()=> { googleSignUp(); } }
+            className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1 focus:outline-none">
             <div>
               <img className='flex-none pr-3' src={google} />
             </div>
@@ -53,7 +48,7 @@ function SingUp () {
                 ftSignUp();
               }
             }
-            className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1">
+            className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1 focus:outline-none">
             <div>
               <img className='flex-none pr-3' src={intra} />
             </div>
@@ -64,21 +59,12 @@ function SingUp () {
           </button>
         </div>
 
-        <div className='py-2 w-l-card-w flex flex-row-reverse'>
-          <div>
-            <Link className=' px-1 text-white font-bold hover:text-purple-sh-2' to="/login"> Sign in! </Link>
-          </div>
-          <div>
-            <p className='text-purple-tone-1'> already have an account?</p>
-          </div>
-
-        </div>
       </div>     
     </>
   )
 }
 
 
-export default SingUp;
+export default SignUp;
 
 
