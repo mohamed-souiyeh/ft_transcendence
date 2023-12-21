@@ -64,7 +64,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
       )
     .catch((e) => {
         console.log('an Error occured!!', e.response.data.message);
-        // setConfirmed(false)
+        setConfirmed(false)
       })
     // console.log('Code inserted by user is:', Code);
   }

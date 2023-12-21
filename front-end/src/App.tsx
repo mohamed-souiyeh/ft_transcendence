@@ -7,28 +7,41 @@ import UserProfile from "./pages/user";
 // import Game from "./pages/game";
 import LandingPage from "./pages/landingpage";
 import Setup from "./pages/userSetup";
+import RequireAuth from "./pages/components/requireAuth";
+import React, { useState } from "react";
+import { createContext } from "react";
 // import { apiGlobal } from "./pages/interceptor";
 
 
+export const AuthContext = createContext({auth: false, setAuth : React.Dispatch<React.SetStateAction<boolean>> });
+
 function App() {
+
+const [auth, setAuth] = useState(false)
+
+  console.log("__auth is :", auth)
 
   return (
     <>
+      <AuthContext.Provider value={{auth, setAuth}}>
       <BrowserRouter>
         <Routes>
-    {/* Public Routes */}
+          {/* Public Routes */}
           <Route path="/" element={<LandingPage/>} />
           <Route path="/login" element={<SignUp/>} />
+            <Route path="*" element={<NotFound/>} />
 
-    {/* Private Routes */}
-          <Route path="/setup" element={<Setup/>}/>
-          <Route path="/home" element={<Home/>}/>
-          <Route path="/profile" element={<Profile name=""/>} />
-          <Route path="/userprofile" element={<UserProfile/>} />
-          <Route path="*" element={<NotFound/>} />
-          {/* <Route path="/game" element={<Game/>} /> */}
+            <Route path="/setup" element={<Setup/>}/>
+            <Route path="/home" element={<Home/>}/>
+          {/* Private Routes */}
+          <Route element={<RequireAuth/>}>
+            <Route path="/profile" element={<Profile name=""/>} />
+            <Route path="/userprofile" element={<UserProfile/>} />
+            {/* <Route path="/game" element={<Game/>} /> */}
+          </Route>
         </Routes>
       </BrowserRouter>
+      </AuthContext.Provider>
     </>
   )
 }

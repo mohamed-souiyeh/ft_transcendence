@@ -4,14 +4,17 @@ import hi from "../assets/hi.svg"
 import bot from "../assets/bot.png";
 import controllers  from "../assets/controllers.png";
 import Ranked from "./components/ranked";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../App";
 
 function Home () {
   const [user, setUser] = useState({});
   const navigate = useNavigate();
   const [fetched, setFetchState] = useState(false);
+  const {auth, setAuth}  = useContext(AuthContext);
+
 
   useEffect( 
     ()=>
@@ -26,8 +29,8 @@ function Home () {
         ).
         then((res)=>
           {
-            
             setUser(res.data);
+            setAuth(true)
           }
           ).catch((e)=>{
             console.log(e);
