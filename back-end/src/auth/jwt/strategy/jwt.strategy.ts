@@ -54,21 +54,23 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
       throw new UnauthorizedException();
     }
 
+    const db_user = await this.userService.findUserById(payload.id);
     const user: UserDto = {
-      id: payload.id,
-      provider: null,
-      username: null,
-      avatar: null,
-      score: 0,
-      status: UserStatus.online,
-      unreadNotifications: {
-        friendRequests: 0,
-      },
-      email: payload.email,
+      // id: db_user.id,
+      // provider: db_user.provider,
+      // username: db_user.username,
+      // avatar: db_user.avatar,
+      // score: 0,
+      // status: UserStatus.online,
+      // unreadNotifications: {
+      //   friendRequests: 0,
+      // },
+      // email: payload.email,
+      // redirectUrl: null,
+      // TFAisEnabled: payload.TFAisEnabled,
+      // TFASecret: null,
+      ...db_user,
       activeRefreshToken: req.cookies[process.env.REFRESH_TOKEN_KEY],
-      redirectUrl: null,
-      TFAisEnabled: payload.TFAisEnabled,
-      TFASecret: null,
     };
 
     return user;

@@ -40,7 +40,11 @@ export class TwoFaService {
   }
 
   async streamQrCod(stream: Response, otpauthUrl: string) {
-    return toFileStream(stream, otpauthUrl);
+    return toFileStream(stream, otpauthUrl, {
+      color: {
+        dark: '#302C42'
+      }
+    });
   }
 
   async verifyTwoFactorAuthenticationCode(
