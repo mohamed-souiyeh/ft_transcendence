@@ -18,6 +18,7 @@ model user {
   id Int @id @default(autoincrement())
   username String @unique
   score Int @default(0)
+  machesPlayed Int @default(0)
   email String @unique
   avatar String
 
@@ -26,9 +27,13 @@ model user {
   // added from userDto
   provider String
   TFASecret String?
-  TFAisEnabled Boolean
+  TFAisEnabled Boolean @default(false)
 
-  unreadNotifications Json //NOTE - stringified json object with the key as the notification type and the value as the number of unread notifications of that type
+  isAuthenticated Boolean @default(false)
+
+  isProfileSetup Boolean @default(false) // NOTE - if the user has completed the profile setup
+
+  friendRequests Boolean @default(false)
 
   activeRefreshToken String? //NOTE - the refresh token that is currently active
   // use an enum with the power of 2 values to extract the specific bitflag that corresponds to the notification type
@@ -54,7 +59,6 @@ model user {
   lostMatches match[] @relation(name: "loser")
 
   achievements achievement[]
-
 }
 
 //SECTION - conversation model and related models
@@ -75,9 +79,6 @@ model channel {
   channelImage String // image of the channel
   channelDescription String // description of the channel
   
-
-  modsActions Json //NOTE - a stringefied json object that holds the actions that the modirators can do in the channel
-
   channelPassword String? //NOTE - password of the channel need to be hashed
 
   ownerId Int //NOTE - id of the owner of the channel
@@ -116,8 +117,9 @@ enum UserState {
 //SECTION - userState model
 model userState {
   id Int @id @default(autoincrement())
-  state UserState //NOTE - state of the user in the conversation 
-  info Json //NOTE - a stringefied json object tha hold the info of the user in the conversation
+  state UserState //NOTE - state of the user in the conversation
+
+  // info Json //NOTE - a stringefied json object tha hold the info of the user in the conversation
 
   untile DateTime? //NOTE - the time at which the user state will be changed to active again after being muted or banned
   userId Int
@@ -190,6 +192,7 @@ model notification {
 
 //SECTION - achievement model
 
+// populate the database with the achievements and then when a user gets an achievement add it to the user achievements through a simple relation, i think that is possible through the achievement service in the constructor
 model achievement {
   id Int @id @default(autoincrement())
 
