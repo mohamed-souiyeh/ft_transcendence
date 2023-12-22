@@ -18,6 +18,7 @@ model user {
   id Int @id @default(autoincrement())
   username String @unique
   score Int @default(0)
+  machesPlayed Int @default(0)
   email String @unique
   avatar String
 
@@ -26,9 +27,13 @@ model user {
   // added from userDto
   provider String
   TFASecret String?
-  TFAisEnabled Boolean
+  TFAisEnabled Boolean @default(false)
 
-  unreadNotifications Json //NOTE - stringified json object with the key as the notification type and the value as the number of unread notifications of that type
+  isAuthenticated Boolean @default(false)
+
+  isProfileSetup Boolean @default(false) // NOTE - if the user has completed the profile setup
+
+  friendRequests Boolean @default(false)
 
   activeRefreshToken String? //NOTE - the refresh token that is currently active
   // use an enum with the power of 2 values to extract the specific bitflag that corresponds to the notification type
@@ -43,57 +48,62 @@ model user {
   sentNotificatons notification[] @relation(name: "sender")
   receivedNotifications notification[] @relation(name: "receiver")
 
-  conversations conversation[] 
-  bannedConversations conversation[] @relation(name: "bannedUsers")
+  channels channel[]
+  dms dm[]
+  
+
   sentMessages message[] @relation(name: "sentMessages")
 
   
   wonMatches match[] @relation(name: "winner")
   lostMatches match[] @relation(name: "loser")
 
+  achievements achievement[]
 }
 
 //SECTION - conversation model and related models
 
-enum ConversationType {
+enum ChannelType {
   public
   protected
   private 
-  dm // direct message
-}
-
-enum ConversationState {
-  active
-  inactive
 }
 
 //SECTION - conversation model
-model conversation {
+model channel {
   id Int @id @default(autoincrement())
 
-  conversationName String // name of the conversation
-  conversationImage String // image of the conversation
-  conversationDescription String // description of the conversation
+  type ChannelType // type of channel
   
-  type ConversationType // type of conversation
-
-  maxUsers Int // max number of users in the conversation
-
-  conversationState ConversationState //NOTE - state of the conversation ["active", "inactive"]
-
-  conversationPassword String //NOTE - password of the conversation need to be hashed
-
-  modiratorIds Int[] //NOTE - ids of the modirators of the conversation
+  channelName String // name of the channel
+  channelImage String // image of the channel
+  channelDescription String // description of the channel
   
-  usersState userState[] //NOTE - state of the users in the conversation
+  channelPassword String? //NOTE - password of the channel need to be hashed
+
+  ownerId Int //NOTE - id of the owner of the channel
+
+  modiratorIds Int[] //NOTE - ids of the modirators of the channel
+  
+  usersState userState[] //NOTE - state of the users in the channel
   
   users user[]
-  bannedUsers user[] @relation(name: "bannedUsers")
 
   messages message[]
   
-  notification notification?
-  
+  createdAt DateTime @default(now())
+}
+//!SECTION
+
+//SECTION - dm model
+
+model dm {
+  id Int @id @default(autoincrement())
+
+  users user[]
+
+  messages message[]
+
   createdAt DateTime @default(now())
 }
 //!SECTION
@@ -101,18 +111,21 @@ model conversation {
 enum UserState {
   active
   muted
+  banned
 }
 
 //SECTION - userState model
 model userState {
   id Int @id @default(autoincrement())
-  state UserState //NOTE - state of the user in the conversation 
-  info Json //NOTE - a stringefied json object tha hold the info of the user in the conversation
+  state UserState //NOTE - state of the user in the conversation
 
+  // info Json //NOTE - a stringefied json object tha hold the info of the user in the conversation
+
+  untile DateTime? //NOTE - the time at which the user state will be changed to active again after being muted or banned
   userId Int
 
-  conversation conversation @relation(fields: [conversationId], references: [id])
-  conversationId Int
+  channel channel @relation(fields: [channelId], references: [id])
+  channelId Int
 }
 //!SECTION
 
@@ -125,8 +138,11 @@ model message {
   sender user @relation(name: "sentMessages",fields: [senderId], references: [id])
   senderId Int
 
-  conversation conversation @relation(fields: [conversationId], references: [id])
-  conversationId Int
+  channel channel? @relation(fields: [channelId], references: [id])
+  channelId Int?
+
+  dm dm? @relation(fields: [dmId], references: [id])
+  dmId Int?
 }
 //!SECTION
 
@@ -163,19 +179,28 @@ model match {
 model notification {
   id Int @id @default(autoincrement())
 
-  type String // type of notification
 
   sender user @relation(name: "sender", fields: [senderId], references: [id])
   senderId Int
 
-  receiver user? @relation(name: "receiver", fields: [receiverId], references: [id])
-  receiverId Int?
-
-  conversation conversation? @relation(fields: [conversationId], references: [id])
-  conversationId Int? @unique
-
-  convNotificationData Json? //NOTE - a json object that holds the data of the notification related to the conversation
+  receiver user @relation(name: "receiver", fields: [receiverId], references: [id])
+  receiverId Int
 
   createdAt DateTime @default(now())
 }
 //!SECTION
+
+//SECTION - achievement model
+
+// populate the database with the achievements and then when a user gets an achievement add it to the user achievements through a simple relation, i think that is possible through the achievement service in the constructor
+model achievement {
+  id Int @id @default(autoincrement())
+
+  name String
+  description String
+  image String
+
+  users user[]
+}
+
+//!SECTION 

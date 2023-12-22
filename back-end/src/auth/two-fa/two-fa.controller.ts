@@ -74,10 +74,7 @@ export class TwoFaController {
   @Post('verify')
   @HttpCode(200)
   @FormDataRequest(TFA_FormConfig)
-  async verify2FA(
-    @Req() req: IRequestWithUser,
-    @Body() code: TFACodeDTO,
-  ) {
+  async verify2FA(@Req() req: IRequestWithUser, @Body() code: TFACodeDTO) {
     const isVerified =
       await this.twoFaService.verifyTwoFactorAuthenticationCode(
         code.code,
@@ -87,6 +84,7 @@ export class TwoFaController {
     if (!isVerified) throw new UnauthorizedException('code is not valid');
 
     await this.authService.refresh(req);
+    await this.usersService.setAuthenticated(req.user.id, true);
     return { message: 'code is valid' };
   }
 }

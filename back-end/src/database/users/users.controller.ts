@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BadRequestException,
   Body,
@@ -20,21 +21,33 @@ import {
   usernameUpdateConfig,
 } from './FormDataInterceptorConfig/UploadConfig';
 import { UpdateUsernameDTO, UploadDTO } from './uploadDTO/uploadDTO';
-import { UserDto } from './User_DTO/User.dto';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private userService: UsersService) {}
 
+  @Get('allforhome')
+  @UseGuards(JwtAuthGuard)
+  async getUserDataForHome(@Req() req: IRequestWithUser) {
+    const user = await this.userService.getUserDataForHome(req.user.id);
+
+    return user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('whoami')
+  async whoAmI(@Req() req: IRequestWithUser) {
+    const user = await this.userService.whoami(req.user.id);
+
+    return user;
+  }
+
   @HttpCode(200)
   @Post('update/avatar')
   @UseGuards(JwtAuthGuard)
   @FormDataRequest(avatarUpdateConfig)
-  async updateUserAvatar(
-    @Req() req: IRequestWithUser,
-    @Body() data: UploadDTO,
-  ) {
+  async updateUserAvatar(@Req() req: IRequestWithUser, @Body() data: UploadDTO) {
     if (data.avatar === undefined)
       throw new BadRequestException('no avatar provided');
 
@@ -46,10 +59,7 @@ export class UsersController {
   @Post('update/username')
   @UseGuards(JwtAuthGuard)
   @FormDataRequest(usernameUpdateConfig)
-  async updateUserUsername(
-    @Req() req: IRequestWithUser,
-    @Body() data: UpdateUsernameDTO,
-  ) {
+  async updateUserUsername(@Req() req: IRequestWithUser, @Body() data: UpdateUsernameDTO,) {
     if (data.username === undefined)
       throw new BadRequestException('no username provided');
 
@@ -67,23 +77,18 @@ export class UsersController {
       await this.userService.updateUserUsername(req.user.id, data.username);
     if (data.avatar !== undefined){
       console.log("data.avatar => ", data.avatar);
-      // await this.userService.updateAvatar(req.user.id, data.avatar as any);
+      await this.userService.updateAvatar(req.user.id, data.avatar as any);
     }
-
+    await this.userService.setProfileSetup(req.user.id, true);
     return true;
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('whoami')
-  async whoAmI(@Req() req: IRequestWithUser) {
-    const user: UserDto = await this.userService.findUserById(req.user.id);
 
-    return new UserDto(user);
-  }
 
   @UseGuards()
   @Get('avatar')
   async getAvatar() {
     //REVIEW - under construction
+    return {message: "under construction"};
   }
 }
