@@ -50,9 +50,10 @@ export class AuthService {
       if (user) await this.userService.replaceRefreshToken(user.id, null);
 
       await this.userService.setAuthenticated(req.user.id, false);
-      this.addTokenToCookie(req.res, '', process.env.ACCESS_TOKEN_KEY);
-      this.addTokenToCookie(req.res, '', process.env.REFRESH_TOKEN_KEY);
+      await this.addTokenToCookie(req.res, '', process.env.ACCESS_TOKEN_KEY);
+      await this.addTokenToCookie(req.res, '', process.env.REFRESH_TOKEN_KEY);
 
+      await this.userService.setStatus(req.user.id, UserStatus.offline);
       throw new UnauthorizedException('refresh token is not valid');
     }
 
