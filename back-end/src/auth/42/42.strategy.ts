@@ -26,16 +26,16 @@ export class ftStrategy extends PassportStrategy(Strategy, '42') {
       id: null,
       provider: '42',
       score: 0,
+      machesPlayed: 0,
       username: profile.username,
       status: UserStatus.online,
-      unreadNotifications: {
-        friendRequests: 0,
-      },
+      friendRequests: false,
       avatar: process.env.DEFAULT_AVATAR,
       email: profile.emails[0].value,
       activeRefreshToken: null,
       redirectUrl: null,
       TFAisEnabled: false,
+      isProfileSetup: false,
       TFASecret: null,
     };
 
@@ -45,8 +45,10 @@ export class ftStrategy extends PassportStrategy(Strategy, '42') {
 
     if (!found_user) {
       found_user = await this.usersService.addUser(user);
-      found_user.redirectUrl = process.env.SETUP_URL;
     }
+
+    if (!found_user.isProfileSetup)
+      found_user.redirectUrl = process.env.SETUP_URL;
     else
       found_user.redirectUrl = process.env.HOME_URL;
 

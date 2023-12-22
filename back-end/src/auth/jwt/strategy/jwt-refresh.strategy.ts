@@ -3,9 +3,7 @@ import { Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/database/users/users.service';
-import { UserDto } from 'src/database/users/User_DTO/User.dto';
 import { JwtPayload } from '../JwtPayloadDto/JwtPayloadDto';
-import { UserStatus } from '@prisma/client';
 
 @Injectable()
 export class JwtRefreshTokenStrategy extends PassportStrategy(
@@ -30,40 +28,28 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
     });
   }
 
-  validate(req: Request, payload: JwtPayload) {
+  async validate(req: Request, payload: JwtPayload) {
     const refreshToken = req.cookies[process.env.REFRESH_TOKEN_KEY];
 
-    const refreshTokenIsValid = this.userService.validatRefreshToken(payload.id, refreshToken);
+    const refreshTokenIsValid = await this.userService.validatRefreshToken(payload.id, refreshToken);
 
     //NOTE - check if refresh token is valid
     if (!refreshTokenIsValid) {
-      this.userService.replaceRefreshToken(payload.id, null);
-      throw new UnauthorizedException();
+      await this.userService.replaceRefreshToken(payload.id, null);
+      await this.userService.setAuthenticated(payload.id, false);
+      throw new UnauthorizedException('refresh token is not valid');
     }
 
     if (payload.TFAisEnabled && !payload.TFAauthenticated) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('TFA is enabled but not authenticated');
     }
+    console.log("refresh token is valid => ", refreshTokenIsValid);
 
-    //TODO - fetch the user fromt he database or the caching service to get acurret info about the user
-    const user: UserDto = {
-      id: payload.id,
-      provider: null,
-      username: null,
-      avatar: null,
-      score: 0,
-      status: UserStatus.online,
-      unreadNotifications: {
-        friendRequests: 0,
-      },
-      email: payload.email,
-      activeRefreshToken: refreshToken,
-      redirectUrl: null,
-      TFAisEnabled: payload.TFAisEnabled,
-      TFASecret: null,
-    };
-
-    console.log('refresh strategy user dto => ', user);
+    const user = {
+      ...refreshTokenIsValid,
+      TFAauthenticated: payload.TFAauthenticated,
+    }
+    console.log('jwt refresh strategy user =>', user);
     return user;
   }
 }

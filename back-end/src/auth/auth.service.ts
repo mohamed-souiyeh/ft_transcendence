@@ -4,6 +4,7 @@ import { JwtAuthService } from './jwt/jwt.service';
 import { Response } from 'express';
 import { UsersService } from 'src/database/users/users.service';
 import { IRequestWithUser } from './Interfaces/IRequestWithUser';
+import { UserStatus } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -44,14 +45,15 @@ export class AuthService {
     //NOTE - get user from db
     const user = await this.userService.findUserById(req.user.id);
 
-    //NOTE - check if refresh token is valid
-    //FIXME - uncomment it
-    if (
-      !user ||
-      user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]
-    ) {
+
+    if (!user || user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]) {
       if (user) await this.userService.replaceRefreshToken(user.id, null);
-      throw new UnauthorizedException();
+
+      await this.userService.setAuthenticated(req.user.id, false);
+      this.addTokenToCookie(req.res, '', process.env.ACCESS_TOKEN_KEY);
+      this.addTokenToCookie(req.res, '', process.env.REFRESH_TOKEN_KEY);
+
+      throw new UnauthorizedException('refresh token is not valid');
     }
 
     //NOTE - get signed tokens
@@ -92,6 +94,11 @@ export class AuthService {
     //NOTE - add refresh token to db
     await this.userService.replaceRefreshToken(req.user.id, refreshToken);
 
+    if (req.user.TFAisEnabled === false) {
+     await this.userService.setAuthenticated(req.user.id, true);
+    }
+
+
     //NOTE - redirect to home page
     const redirect: HttpRedirectResponse = {
       // use env vars here
@@ -125,6 +132,10 @@ export class AuthService {
     //NOTE - add refresh token to db
     await this.userService.replaceRefreshToken(req.user.id, refreshToken);
 
+    if (req.user.TFAisEnabled === false) {
+      await this.userService.setAuthenticated(req.user.id, true);
+    }
+
     // console.log('ftLogin =>', req.user);
     //NOTE - redirect to home page
     const redirect: HttpRedirectResponse = {
@@ -143,13 +154,9 @@ export class AuthService {
     //reset refresh token in db
     await this.userService.replaceRefreshToken(req.user.id, null);
 
-    //NOTE - redirect to login page
-    const redirect: HttpRedirectResponse = {
-      // use env vars here
-      url: process.env.LOGIN_URL,
-      statusCode: 302,
-    };
-    //FIXME - redirect to login page
-    return redirect;
+    await this.userService.setStatus(req.user.id, UserStatus.offline);
+
+    await this.userService.setAuthenticated(req.user.id, false);
+    return {message: 'logged out successfully'};
   }
 }
