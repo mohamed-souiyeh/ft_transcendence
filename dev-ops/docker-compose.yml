@@ -56,6 +56,7 @@ services:
       - SETUP_URL
       - TFA_URL
       - DEFAULT_AVATAR
+      - DEFAULT_CHANNEL_AVATAR
 
   studio:
     image: studio
@@ -72,30 +73,12 @@ services:
       - back-end-network
     environment:
       - DATABASE_URL
-      - FT_APP_ID
-      - FT_APP_SECRET
-      - FT_REDIRECT_URI
-      - GOOGLE_CLIENT_ID
-      - GOOGLE_REDIRECT_URI
-      - GOOGLE_SECRET
-      - JWT_SECRET
       - NODE_VERSION
       - POSTGRES_HOST
       - POSTGRES_NAME
       - POSTGRES_PASSWORD
       - POSTGRES_PORT
       - POSTGRES_USER
-      - PRIVATE_KEY_PATH
-      - PUBLIC_CERT_PATH
-      - JWT_REFRESH_SECRET
-      - REFRESH_TOKEN_KEY
-      - ACCESS_TOKEN_KEY
-      - TWO_FACTOR_AUTHENTICATION_APP_NAME
-      - HOME_URL
-      - LOGIN_URL
-      - SETUP_URL
-      - TFA_URL
-      - DEFAULT_AVATAR
 
   postgres:
     image: postgres
@@ -103,8 +86,6 @@ services:
     container_name: postgres
     volumes:
       - postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     networks:
       - back-end-network
     environment:
