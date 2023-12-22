@@ -20,3 +20,11 @@ on connection update the user status to online
 
 on desconnect update the user status to offline
 
+
+
+#201E2D
+#302C42
+#8176AF
+#C0B7E8
+#DFDAF6
+#EDE9FB
