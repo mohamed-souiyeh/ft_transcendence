@@ -24,6 +24,8 @@ npm install
 
 npm run push
 
+npm run generate
+
 npm run dev
 
 # tail -F anything
