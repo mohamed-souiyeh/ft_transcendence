@@ -50,7 +50,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
     e.preventDefault();
     const Code = e.target.verfCode.value; 
     formdata.set("code", Code);
-    axios.post("http://localhost:1337/users/update", formdata)
+    axios.post("http://localhost:1337/2fa/activate", formdata)
     .then((res) => {
           if (res.status === 200) {
             console.log('the code is correct')
