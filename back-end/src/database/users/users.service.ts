@@ -99,6 +99,8 @@ export class UsersService {
         username: true,
         email: true,
         TFAisEnabled: true,
+        isProfileSetup: true,
+        isAuthenticated: true,
       }
     });
 
