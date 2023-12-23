@@ -1,0 +1,30 @@
+
+// events design
+messageEvent
+{
+  { authorUsername,
+    usersAutherBlockedBy,
+  },
+  message,
+  channelOrDm,
+  convId,
+}
+
+we need to include the users the auther is blocked by to hide the msgs from them (i am thinking of sending an actual object containing the auther username and the users he is blocked by instead of just the auther username)
+
+
+// gateway design
+i need to have a room for every conversation that at least have one user online
+
+on connection update the user status to online
+
+on desconnect update the user status to offline
+
+
+
+#201E2D
+#302C42
+#8176AF
+#C0B7E8
+#DFDAF6
+#EDE9FB

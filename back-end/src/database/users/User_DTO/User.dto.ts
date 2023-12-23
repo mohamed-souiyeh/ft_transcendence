@@ -11,6 +11,8 @@ export class UserDto {
 
   score: number;
 
+  machesPlayed: number;
+
   @IsEmail()
   email: string;
   @Exclude()
@@ -23,11 +25,11 @@ export class UserDto {
   @Exclude()
   TFASecret: string | null;
 
-  @Exclude()
   TFAisEnabled: boolean;
 
-  unreadNotifications: Prisma.InputJsonObject; //TODO - replace object with unread notification type declaration
+  isProfileSetup: boolean;
 
+  friendRequests: boolean;
 
   @Exclude()
   redirectUrl: string | null;
