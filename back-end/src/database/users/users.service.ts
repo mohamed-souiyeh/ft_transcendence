@@ -16,50 +16,183 @@ export class UsersService {
 
   constructor(private readonly prismaService: PrismaService) { }
 
-  i: number = 1;
-
   private readonly reservedUsernames: string[] = [
     "SEGV",
     "HMMD",
     "Barbarousa",
     "barbarousa",
   ];
-  // private readonly users: UserDto[] = [
-  //   {
-  //     id: this.i++,
-  //     provider: 'myass',
-  //     username: 'trandandan',
-  //     score: 0,
-  //     unreadNotifications: {
-  //       friendRequests: 0,
-  //     },
-  //     avatar: process.env.DEFAULT_AVATAR,
-  //     email: 'trandandan1337@gmail.com',
-  //     activeRefreshToken: null,
-  //     status: UserStatus.offline,
-  //     redirectUrl: null,
-  //     TFAisEnabled: false,
-  //     TFASecret: null,
-  //   },
-  //   {
-  //     id: this.i++,
-  //     provider: 'myass',
-  //     username: 'mohamed',
-  //     score: 0,
-  //     unreadNotifications: {
-  //       friendRequests: 0,
-  //     },
-  //     avatar: process.env.DEFAULT_AVATAR,
-  //     email: 'msouiyeh@gmail.com',
-  // // FIXME - this needs to be hashed for security reasons
-  //     activeRefreshToken: null,
-  //     status: UserStatus.offline,
-  //     redirectUrl: null,
-  //     TFAisEnabled: false,
-  //     TFASecret: null,
-  //   },
-  // ];
 
+  //SECTION - CREATE OPERATIONS
+
+  async addUser(user: UserDto): Promise<any> {
+
+    user.username = user.email.split('.')[0];
+    const db_user = await this.prismaService.user.create({
+      data: {
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+        status: user.status,
+        provider: user.provider,
+      }
+    });
+    return db_user;
+  }
+  //!SECTION
+
+
+  //SECTION - READ OPERATIONS
+
+  async getUserDataForHome(userId: number) {
+
+
+    const userRelations = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        sentNotificatons: true,
+        receivedNotifications: true,
+        channels: true,
+        dms: true,
+      }
+    });
+
+    const userData = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        username: true,
+        score: true,
+        machesPlayed: true,
+        email: true,
+        isProfileSetup: true,
+        isAuthenticated: true,
+        TFAisEnabled: true,
+        friendRequests: true,
+      }
+    });
+
+    if (userData === null) throw new NotFoundException('User not found');
+
+    const user = {
+      ...userData,
+      sentNotificatons: userRelations.sentNotificatons,
+      receivedNotifications: userRelations.receivedNotifications,
+      channels: userRelations.channels,
+      dms: userRelations.dms,
+      };
+
+    return user;
+  }
+
+  async whoami(userId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        TFAisEnabled: true,
+        isProfileSetup: true,
+        isAuthenticated: true,
+      }
+    });
+
+    if (user === null) throw new NotFoundException('User not found');
+
+    return user;
+  }
+
+  async getStatus(id: number): Promise<any> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: id,
+      },
+      select: {
+        status: true,
+      }
+    });
+
+    if (user === null) throw new NotFoundException('User not found');
+
+    return user.status;
+  }
+
+  async findUserByUsername(username: string): Promise<any> {
+    const db_user = await this.prismaService.user.findUnique({
+      where: {
+        username: username,
+      }
+    });
+
+    if (!db_user) return null;
+
+    return db_user;
+  }
+
+  async findUserByEmail(email: string): Promise<any> {
+    const db_user = await this.prismaService.user.findUnique({
+      where: {
+        email: email,
+      }
+    });
+
+    if (!db_user) return null;
+
+    return db_user;
+  }
+
+  async findUserById(id: number): Promise<any> {
+    const db_user = await this.prismaService.user.findUnique({
+      where: {
+        id: id,
+      }
+    });
+
+    if (!db_user) return null;
+
+    return db_user;
+  }
+  //!SECTION
+
+
+  //SECTION - UPDATE OPERATIONS
+
+  async setProfileSetup(id: number, state: boolean): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        isProfileSetup: state,
+      }
+    });
+
+    if (user === null) throw new NotFoundException('User not found');
+
+    return user;
+  }
+
+  async setAuthenticated(id: number, state: boolean): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        isAuthenticated: state,
+      }
+    });
+
+    if (user === null) throw new NotFoundException('User not found');
+
+    return user;
+  }
 
   async setStatus(id: number, status: UserStatus): Promise<any> {
     const user = await this.prismaService.user.update({
@@ -73,10 +206,7 @@ export class UsersService {
 
     if (user === null) throw new NotFoundException('User not found');
 
-    console.log(
-      'user after status update and re query => ',
-      user,
-    );
+    return user;
   }
 
   async turnOff2FA(id: number) {
@@ -88,6 +218,7 @@ export class UsersService {
         TFAisEnabled: false,
       }
     });
+    return user;
   }
 
   async turnOn2FA(id: number) {
@@ -99,6 +230,7 @@ export class UsersService {
         TFAisEnabled: true,
       }
     });
+    return user;
   }
 
   async set2FAscret(email: string, secret: string): Promise<any> {
@@ -112,7 +244,7 @@ export class UsersService {
     });
 
     if (!user) return null;
-
+    return user;
   }
 
   async updateAvatar(id: number, avatar: any): Promise<any> {
@@ -127,11 +259,45 @@ export class UsersService {
 
     if (user === null) throw new NotFoundException('User not found');
 
-    console.log(
-      'user after avatar update and re query => ',
-      user,
-    );
+    return user;
   }
+
+  async replaceRefreshToken(id: number, refreshToken: string | null): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        activeRefreshToken: refreshToken,
+      }
+    });
+
+    return user;
+  }
+
+  async updateUserUsername(id: number, username: string): Promise<any> {
+    await this.checkIfUsernamUnique(username);
+
+    const user = await this.prismaService.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        username: username,
+      }
+    });
+
+    if (user === null) throw new NotFoundException('User not found');
+
+    return user;
+  }
+  //!SECTION
+
+
+
+
+
+  //SECTION - VALIDATION OPERATIONS
 
   async checkIfUsernamUnique(username: string): Promise<any> {
     await this.checkUsername(username);
@@ -156,156 +322,22 @@ export class UsersService {
     if (!regex.test(username)) throw new ConflictException(error_msg);
   }
 
-  async updateUserUsername(id: number, username: string): Promise<any> {
-    await this.checkIfUsernamUnique(username);
+  async validatRefreshToken(id: number, refreshToken: string): Promise<any> {
+    const user = await this.findUserById(id);
 
-    const user = await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        username: username,
-      }
-    });
+    if (user === null)
+      throw new NotFoundException('User not found');
 
-    console.log("user before update => ", user)
-
-    if (user === null) throw new NotFoundException('User not found');
-
-    console.log("user after update and re query => ", user);
-  }
-
-  //NOTE - DONE
-  async addUser(user: UserDto): Promise<any> {
-
-    user.username = user.email.split('@')[0];
-    const db_user = await this.prismaService.user.create({
-      data: {
-        username: user.username,
-        score: user.score,
-        email: user.email,
-        avatar: user.avatar,
-        status: user.status,
-        provider: user.provider,
-        TFASecret: user.TFASecret,
-        TFAisEnabled: user.TFAisEnabled,
-        unreadNotifications: user.unreadNotifications,
-        activeRefreshToken: user.activeRefreshToken,
-      }
-    });
-    console.log("db_user => ", db_user);
-    return db_user;
-  }
-
-  async findUserByUsername(username: string): Promise<UserDto | null> {
-    const db_user = await this.prismaService.user.findUnique({
-      where: {
-        username: username,
-      }
-    });
-
-    console.log("db_user => ", db_user);
-    if (!db_user) return null;
-    const user: UserDto = {
-      id: db_user.id,
-      username: db_user.username,
-      score: db_user.score,
-      email: db_user.email,
-      avatar: db_user.avatar,
-      status: db_user.status,
-      provider: db_user.provider,
-      TFASecret: db_user.TFASecret,
-      TFAisEnabled: db_user.TFAisEnabled,
-      unreadNotifications: db_user.unreadNotifications as Prisma.InputJsonObject,
-      activeRefreshToken: db_user.activeRefreshToken,
-
-      redirectUrl: null,
-    };
-    
-    return user;
-  }
-
-  async findUserByEmail(email: string): Promise<UserDto | null> {
-    const db_user = await this.prismaService.user.findUnique({
-      where: {
-        email: email,
-      }
-    });
-
-    if (!db_user) return null;
-
-    const user: UserDto = {
-      id: db_user.id,
-      username: db_user.username,
-      score: db_user.score,
-      email: db_user.email,
-      avatar: db_user.avatar,
-      status: db_user.status,
-      provider: db_user.provider,
-      TFASecret: db_user.TFASecret,
-      TFAisEnabled: db_user.TFAisEnabled,
-      unreadNotifications: db_user.unreadNotifications as Prisma.InputJsonObject,
-      activeRefreshToken: db_user.activeRefreshToken,
-
-      redirectUrl: null,
-    };
-    return user;
-  }
-
-  async findUserById(id: number): Promise<UserDto | null> {
-    const db_user = await this.prismaService.user.findUnique({
-      where: {
-        id: id,
-      }
-    });
-
-    if (!db_user) return null;
-
-    const user: UserDto = {
-      id: db_user.id,
-      username: db_user.username,
-      score: db_user.score,
-      email: db_user.email,
-      avatar: db_user.avatar,
-      status: db_user.status,
-      provider: db_user.provider,
-      TFASecret: db_user.TFASecret,
-      TFAisEnabled: db_user.TFAisEnabled,
-      unreadNotifications: db_user.unreadNotifications as Prisma.InputJsonObject,
-      activeRefreshToken: db_user.activeRefreshToken,
-
-      redirectUrl: null,
-    };
+    if (user.activeRefreshToken !== refreshToken) return null;
 
     return user;
   }
+  //!SECTION
 
-  async replaceRefreshToken(
-    id: number,
-    refreshToken: string | null,
-  ): Promise<boolean | null> {
-    await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        activeRefreshToken: refreshToken,
-      }
-    });
 
-    return true;
-  }
 
-  async validatRefreshToken(
-    id: number,
-    refreshToken: string,
-  ): Promise<boolean> {
-    const user: UserDto | null = await this.findUserById(id);
 
-    if (user === null) return false;
-
-    if (user.activeRefreshToken !== refreshToken) return false;
-
-    return true;
-  }
+  //! Jojo's section
+  // walo '-'
+  // !
 }

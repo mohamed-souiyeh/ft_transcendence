@@ -19,9 +19,7 @@ export class AuthController {
 
   @Get('refresh')
   @UseGuards(JwtRefreshGuard)
-  async refresh(
-    @Req() req: IRequestWithUser
-  ) {
+  async refresh(@Req() req: IRequestWithUser) {
     return this.authService.refresh(req);
   }
 

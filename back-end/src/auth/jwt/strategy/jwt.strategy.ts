@@ -39,38 +39,24 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
   }
 
   async validate(req: Request, payload: JwtPayload) {
-    console.log('jwt strategy payload =>', payload);
     const refreshTokenIsValid = await this.userService.validatRefreshToken(payload.id, req.cookies[process.env.REFRESH_TOKEN_KEY])
 
     //NOTE - check if refresh token is valid
     if (!refreshTokenIsValid) {
       console.log('refresh token is not valid');
       await this.userService.replaceRefreshToken(payload.id, null);
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('refresh token is not valid');
     }
 
     if (payload.TFAisEnabled && !payload.TFAauthenticated) {
       console.log('TFA is enabled but not authenticated');
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('TFA is enabled but not authenticated');
     }
 
-    const user: UserDto = {
-      id: payload.id,
-      provider: null,
-      username: null,
-      avatar: null,
-      score: 0,
-      status: UserStatus.online,
-      unreadNotifications: {
-        friendRequests: 0,
-      },
-      email: payload.email,
-      activeRefreshToken: req.cookies[process.env.REFRESH_TOKEN_KEY],
-      redirectUrl: null,
-      TFAisEnabled: payload.TFAisEnabled,
-      TFASecret: null,
-    };
-
+    const user = {
+      ...refreshTokenIsValid,
+      TFAauthenticated: payload.TFAauthenticated,
+    }
     return user;
   }
 }

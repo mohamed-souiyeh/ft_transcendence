@@ -30,15 +30,15 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       provider: 'google',
       username: profile._json.email.split('@')[0],
       score: 0,
+      machesPlayed: 0,
       status: UserStatus.online,
-      unreadNotifications: {
-        friendRequests: 0,
-      },
+      friendRequests: false,
       avatar: process.env.DEFAULT_AVATAR,
       email: profile._json.email,
       activeRefreshToken: null,
       redirectUrl: null,
       TFAisEnabled: false,
+      isProfileSetup: false,
       TFASecret: null,
     };
 
@@ -50,8 +50,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       found_user = await this.usersService.addUser(user);
 
       console.log('google strategy found user =>', found_user);
-      found_user.redirectUrl = process.env.SETUP_URL;
     }
+
+
+    if (!found_user.isProfileSetup) 
+      found_user.redirectUrl = process.env.SETUP_URL;
     else
       found_user.redirectUrl = process.env.HOME_URL;
 

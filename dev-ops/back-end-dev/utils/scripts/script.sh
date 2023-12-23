@@ -22,9 +22,9 @@ npm install
 
 /utils/scripts/wait_for_it.sh postgres:5432 -t 600
 
-sleep 5
-
 npm run push
+
+npm run generate
 
 npm run dev
 
