@@ -165,11 +165,11 @@ model match {
 
   loser_stats Json //NOTE - stringified json object with the key as (id or username) of the loser of the match and the value as an object with the state and info of the loser in the match
 
-  winner user @relation( name: "winner", fields: [winnerId], references: [id])
-  winnerId Int
+  winner user? @relation( name: "winner", fields: [winnerId], references: [id])
+  winnerId Int?
 
-  loser user @relation(name: "loser", fields: [loserId], references: [id])
-  loserId Int
+  loser user? @relation(name: "loser", fields: [loserId], references: [id])
+  loserId Int?
 }
 //!SECTION
 

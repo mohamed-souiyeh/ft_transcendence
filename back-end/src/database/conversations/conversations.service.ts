@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IRequestWithUser } from 'src/auth/Interfaces/IRequestWithUser';
 import { createChanneldto } from './channel.dto/channel.dto';
-import { UserState } from '@prisma/client';
+import { ChannelType, UserState } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { createDMdto } from './dmDTO/createDM.dto';
 @Injectable()
@@ -36,6 +36,10 @@ export class ConversationsService {
 
   async createChannel(req: IRequestWithUser, channelFromBody: createChanneldto) {
     const channelData = new createChanneldto(channelFromBody);
+
+    if (channelData.type === ChannelType.protected && !channelData.channelPassword) {
+      throw new BadRequestException("channelPassword is required for protected channels");
+    }
 
     console.log("channel Data => ", channelData);
     if (channelData.channelPassword) {
