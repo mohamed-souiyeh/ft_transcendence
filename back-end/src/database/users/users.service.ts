@@ -67,7 +67,7 @@ export class UsersService {
         id: true,
         username: true,
         score: true,
-        machesPlayed: true,
+        matchesPlayed: true,
         email: true,
         isProfileSetup: true,
         isAuthenticated: true,
@@ -163,6 +163,22 @@ export class UsersService {
 
 
   //SECTION - UPDATE OPERATIONS
+
+
+  async setScore(id: number, score: number): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        score: score,
+      }
+    });
+
+    if (user === null) throw new NotFoundException('User not found');
+
+    return user;
+  }
 
   async setProfileSetup(id: number, state: boolean): Promise<any> {
     const user = await this.prismaService.user.update({

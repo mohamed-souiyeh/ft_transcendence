@@ -18,7 +18,7 @@ model user {
   id Int @id @default(autoincrement())
   username String @unique
   score Int @default(0)
-  machesPlayed Int @default(0)
+  matchesPlayed Int @default(0)
   email String @unique
   avatar String
 

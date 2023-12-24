@@ -20,13 +20,13 @@ export class NotificationsService {
   }
 
   async getNotificationById(id: number) {
-    return this.prismaService.notification.findUnique({
+    return await this.prismaService.notification.findUnique({
       where: { id },
     });
   }
 
   async updateNotification(id: number, notificationDto: NotificationDto) {
-    return this.prismaService.notification.update({
+    return await this.prismaService.notification.update({
       where: { id },
       data: {
         senderId: notificationDto.senderId,
@@ -37,7 +37,7 @@ export class NotificationsService {
   }
 
   async deleteNotification(id: number) {
-    return this.prismaService.notification.delete({
+    return await this.prismaService.notification.delete({
       where: { id },
     });
   }

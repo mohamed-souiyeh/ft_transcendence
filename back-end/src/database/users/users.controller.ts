@@ -84,6 +84,10 @@ export class UsersController {
   }
 
 
+  // @Get('test')
+  // async test() {
+  //   return this.userService.setScore(1, 1000);
+  // }
 
   @UseGuards()
   @Get('avatar')
