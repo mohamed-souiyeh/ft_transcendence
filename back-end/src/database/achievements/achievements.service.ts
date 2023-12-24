@@ -13,7 +13,7 @@ export class AchievementsService {
 
 
   async createAchievement(achievement: AchievementDto) {
-    return this.prismaService.achievement.create({ data: 
+    return await this.prismaService.achievement.create({ data: 
       {
         name: achievement.name,
         description: achievement.description,
@@ -24,7 +24,7 @@ export class AchievementsService {
 
   // * getting 
   async getAllAchievements() {
-    return this.prismaService.achievement.findMany();
+    return await this.prismaService.achievement.findMany();
   }
 
   async getAchievementById(acheivementId: number) {

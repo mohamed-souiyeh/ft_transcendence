@@ -4,27 +4,27 @@ import { NotificationDto } from './notifications.dto';
 
 @Controller('notifications')
 export class NotificationsController {
-  constructor(private readonly notificationService: NotificationsService) {}
+  constructor(private readonly notificationService: NotificationsService) { }
 
 
-  @Post()
-  async createNotification(@Body() notificationDto: NotificationDto) {
-    return this.notificationService.createNotification(notificationDto);
-  }
+  // @Post()
+  // async createNotification(@Body() notificationDto: NotificationDto) {
+  //   return await this.notificationService.createNotification(notificationDto);
+  // }
 
-  @Get(':id')
-  async getNotificationById(@Param('id') id: number) {
-    return this.notificationService.getNotificationById(id);
-  }
+  // @Get(':id')
+  // async getNotificationById(@Param('id') id: number) {
+  //   return await this.notificationService.getNotificationById(id);
+  // }
 
-  @Put(':id')
-  async updateNotification(@Param('id') id: number, @Body() notificationDto: NotificationDto) {
-    return this.notificationService.updateNotification(id, notificationDto);
-  }
+  // @Put(':id')
+  // async updateNotification(@Param('id') id: number, @Body() notificationDto: NotificationDto) {
+  //   return await this.notificationService.updateNotification(id, notificationDto);
+  // }
 
-  @Delete(':id')
-  async deleteNotification(@Param('id') id: number) {
-    return this.notificationService.deleteNotification(id);
-  }
+  // @Delete(':id')
+  // async deleteNotification(@Param('id') id: number) {
+  //   return await this.notificationService.deleteNotification(id);
+  // }
 
 }

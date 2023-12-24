@@ -4,37 +4,52 @@ import { MatchDto } from './matches.dto';
 
 @Injectable()
 export class MatchesService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
 
-//! jojo's section 
-  findAll() {
-    return this.prismaService.match.findMany();
+  //! jojo's section 
+  async findAll() {
+    return await this.prismaService.match.findMany();
   }
 
-  findOne(id: number) {
-    return this.prismaService.match.findUnique({ where: { id } });
+  async findOne(id: number) {
+    return await this.prismaService.match.findUnique({ where: { id } });
   }
 
   //Todo pour cette quoi il faux voire comment ajouter winnerstats et loserstate 
-  // create(match: MatchDto) {
-  //   return this.prismaService.match.create({ data: 
-  //     {
-  //       mode: match.mode,
+  async create(match: MatchDto) {
+    await this.prismaService.user.update({
+      where: { id: match.winnerId },
+      data: { matchesPlayed: { increment: 1 } },
+    });
 
-  //     }
-  //      });
-  // }
+    await this.prismaService.user.update({
+      where: { id: match.loserId },
+      data: { matchesPlayed: { increment: 1 } },
+    });
 
-  update(id: number, updateMatch: MatchDto) {
-    return this.prismaService.match.update({
+    return await this.prismaService.match.create({
+      data: {
+        mode: match.mode,
+        startedAt: match.startedAt,
+        endedAt: match.endedAt,
+        winner_stats: match.winnerStats,
+        loser_stats: match.loserStats,
+        winnerId: match.winnerId,
+        loserId: match.loserId,
+      }
+    });
+  }
+
+  async update(id: number, updateMatch: MatchDto) {
+    return await this.prismaService.match.update({
       where: { id },
       data: updateMatch,
     });
   }
 
-  remove(id: number) {
-    return this.prismaService.match.delete({ where: { id } });
+  async remove(id: number) {
+    return await this.prismaService.match.delete({ where: { id } });
   }
 
 
