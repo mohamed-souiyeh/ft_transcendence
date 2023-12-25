@@ -10,15 +10,9 @@ messageEvent
   convId,
 }
 
-we need to include the users the auther is blocked by to hide the msgs from them (i am thinking of sending an actual object containing the auther username and the users he is blocked by instead of just the auther username)
 
 
-// gateway design
-i need to have a room for every conversation that at least have one user online
 
-on connection update the user status to online
-
-on desconnect update the user status to offline
 
 
 
@@ -28,3 +22,66 @@ on desconnect update the user status to offline
 #C0B7E8
 #DFDAF6
 #EDE9FB
+
+// gateway design
+i need to have a room for every conversation that at least have one user online
+
+on connection update the user status to online //NOTE - DONE
+
+on desconnect update the user status to offline //NOTE - DONE
+
+chat design
+
+when the client connect we retrieve all the conversations that he belong to
+and and make him join the room that belong for every cnversation by using the room identifier `${convType}.${convId}` if the room is already there socket io manages adding him to it and it it is not there it is created.
+
+comunication protocol:
+we need to limit the length of msg in the client side and the gatway
+
+server:
+messageEvent
+{
+  userInfo: {
+    authorUsername,
+    Role,
+    usersAuthorBlockedBy,
+  },
+  message: string,
+  channelOrDm: string,
+  convId: number,
+}
+
+client
+{
+  authorUsername: string,
+  message: string,
+  convetype: ChannelType,
+  convId: number,
+}
+
+events:
+
+sendMsg: event used by the client to send msgs to the 
+          erver (aka the server subsecribe to it).
+
+
+broadcast: event used by the server to broadcast duh the msg to all clients
+            in a room (aka the clients subsecribe to it).
+
+
+getAllMsgs: event used by the server to retrieve all the msgs related a specific conversation (aka the server subsecribe to it).
+
+moderator events:
+
+kick
+
+ban
+
+mute
+
+giveAdminRole
+
+removeAdminRole
+
+leavChannel
+

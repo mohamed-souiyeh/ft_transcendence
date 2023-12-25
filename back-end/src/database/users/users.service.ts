@@ -44,6 +44,24 @@ export class UsersService {
 
   //SECTION - READ OPERATIONS
 
+
+  async getUserConvs(userId: number): Promise<any> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        channels: true,
+        dms: true,
+      }
+    });
+
+    if (user === null) throw new NotFoundException('User not found');
+
+    return user;
+  }
+
+
   async getUserDataForHome(userId: number) {
 
 
@@ -304,7 +322,7 @@ export class UsersService {
     });
 
     if (user === null) throw new NotFoundException('User not found');
-
+    
     return user;
   }
   //!SECTION

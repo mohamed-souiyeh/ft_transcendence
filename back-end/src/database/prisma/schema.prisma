@@ -66,7 +66,8 @@ model user {
 enum ChannelType {
   public
   protected
-  private 
+  private
+  dm
 }
 
 //SECTION - conversation model
@@ -99,6 +100,8 @@ model channel {
 
 model dm {
   id Int @id @default(autoincrement())
+
+  type ChannelType @default(dm)
 
   users user[]
 
