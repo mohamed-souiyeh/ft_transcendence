@@ -13,34 +13,34 @@ import { AchievementDto } from './acheivement.dto';
 
 @Controller('achievements')
 export class AchievementsController {
-  constructor(private readonly achievementsService: AchievementsService) {}
+  constructor(private readonly achievementsService: AchievementsService) { }
 
 
-  @Post()
-  createAchievement(@Body() achievementDto: AchievementDto) {
-    return this.achievementsService.createAchievement(achievementDto);
-  }
+  // @Post()
+  // async createAchievement(@Body() achievementDto: AchievementDto) {
+  //   return await this.achievementsService.createAchievement(achievementDto);
+  // }
 
-  @Get()
-  getAllAchievements() {
-    return this.achievementsService.getAllAchievements();
-  }
+  // @Get()
+  // async getAllAchievements() {
+  //   return await this.achievementsService.getAllAchievements();
+  // }
 
-  @Get(':id')
-  getAchievementById(@Param('id') id: string) {
-    return this.achievementsService.getAchievementById(+id);
-  }
+  // @Get(':id')
+  // async getAchievementById(@Param('id') id: string) {
+  //   return await this.achievementsService.getAchievementById(+id);
+  // }
 
-  @Put(':id')
-  updateAchievement(
-    @Param('id') id: string,
-    @Body() achievementDto: AchievementDto,
-  ) {
-    return this.achievementsService.updateAchievement(+id, achievementDto);
-  }
+  // @Put(':id')
+  // async updateAchievement(
+  //   @Param('id') id: string,
+  //   @Body() achievementDto: AchievementDto,
+  // ) {
+  //   return await this.achievementsService.updateAchievement(+id, achievementDto);
+  // }
 
-  @Delete(':id')
-  deleteAchievement(@Param('id') id: string) {
-    return this.achievementsService.deleteAchievement(+id);
-  }
+  // @Delete(':id')
+  // async deleteAchievement(@Param('id') id: string) {
+  //   return await this.achievementsService.deleteAchievement(+id);
+  // }
 }

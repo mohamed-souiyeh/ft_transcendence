@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsInt, IsBoolean, IsDate, IsObject } from 'class-validator';
+import { Prisma } from '@prisma/client';
+import { IsNotEmpty, IsDate, IsObject } from 'class-validator';
 
 export class MatchDto {
 
@@ -14,11 +15,11 @@ export class MatchDto {
 
     @IsNotEmpty()
     @IsObject()
-    winnerStats: object;
+    winnerStats: Prisma.JsonObject;
 
     @IsNotEmpty()
     @IsObject()
-    loserStats: object;
+    loserStats: Prisma.JsonObject;
 
 
     winnerId : number;

@@ -1,33 +1,34 @@
+import { MatchDto } from './matches.dto';
 import { MatchesService } from './matches.service';
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Body, Param, Put, Delete, Post } from '@nestjs/common';
 
 @Controller('matches')
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {
   }
 
-  @Get()
-  findAll() {
-    return this.matchesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.matchesService.findOne(Number(id));
-  }
-
-  // @Post()
-  // create(@Body() createMatchDto: MatchDto) {
-  //   return this.matchesService.create(createMatchDto);
+  // @Get()
+  // async findAll() {
+  //   return await this.matchesService.findAll();
   // }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateMatchDto: MatchDto) {
-    return this.matchesService.update(Number(id), updateMatchDto);
+  // @Get(':id')
+  // async findOne(@Param('id') id: string) {
+  //   return await this.matchesService.findOne(Number(id));
+  // }
+
+  @Post()
+  async create(@Body() createMatchDto: MatchDto) {
+    return await this.matchesService.create(createMatchDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.matchesService.remove(Number(id));
-  }
+  // @Put(':id')
+  // async update(@Param('id') id: string, @Body() updateMatchDto: MatchDto)  {
+  //   return await this.matchesService.update(Number(id), updateMatchDto);
+  // }
+
+  // @Delete(':id')
+  // async remove(@Param('id') id: string) {
+  //   return await this.matchesService.remove(Number(id));
+  // }
 }
