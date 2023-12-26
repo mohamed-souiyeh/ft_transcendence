@@ -16,28 +16,18 @@ import { UsersService } from 'src/database/users/users.service';
 import { gameService } from './game.service';
 import { AuthService } from 'src/auth/auth.service';
 import { parse } from 'cookie';
-import {room} from './Room';
-import { MatchDTO } from './dto/matchDTO';
+import { room } from './Room';
 import { match } from 'assert';
 import { MatchDto } from 'src/database/matches/matches.dto';
 
-//TODO - okay daba khassed function dyal creation dyal lmatch tweli tsuporti winner and loser states and khassed function bach t updati scores dyal cola player and how many matches le3bo? ghan7awel ndirhom f function we7da dyal creation
-// what else u can work on now
-// okay binma ngadlik leblan i need u to stitch somthing for me
-// i want an app just like the one u made ghir tkon 3ando interface where i can see what is emeted by the sockets
-// littraly the whole shit
-// veeeeery simple one
-// ana ghadi nemmiti object fih author and msg and other info
-// o want to see all that
-// just stringfy that obbject and spit it out on the screen
-// it would be good if there is a dm space and a chanell space
-// and i can chouse with what user i will send the msg
-
-
-
 // Managing the sockets
-@WebSocketGateway({ cors: {origin:"http://localhost:8082",
-							credentials:true}})
+@WebSocketGateway({
+	cors: {
+		origin: "http://localhost:8082",
+		credentials: true
+	},
+	namespace: '/game'
+})
 export class gameServer implements OnModuleInit {
 	@WebSocketServer()
 	server: Server;
@@ -47,96 +37,83 @@ export class gameServer implements OnModuleInit {
 
 
 	constructor(private authService: AuthService,
-				private gameService: gameService,
-				private userService: UsersService)
-	{}
+		private gameService: gameService,
+		private userService: UsersService) { }
 
 	onModuleInit() {
-		this.gameService.gameLoop(this.server, this.roomsList);
+		this.gameService.gameLoop(this.server, this.roomsList); 
 	}
 
 	async handleConnection(client: Socket) {
-		// NOTE get the users informations from the socket here and store them in an array so that if the same user try to connect to the gateway he won't be allowed
-		let matchDTO:MatchDto = new MatchDto();
-		matchDTO.mode = "random";
-		matchDTO.winnerStats = {};
-		matchDTO.loserStats = {};
-		matchDTO.winnerId = 1;
-		matchDTO.loserId = 4;
-
-		// failat ra returnat null 7it mal9atch l user tani li ghadii tlinki lih wach nta baghi tlinki user with id 1 m3a lberd?
-		try
-		{
-			await this.gameService.matchesService.create(matchDTO);
-		}
-		catch (e)
-		{
-			console.log(e);
-		}
-		let user = await this.gameService.chatService.getUserFromSocket(client); 
-		if (this.connectedUsers.includes(user.username))
-		{
-			client.disconnect();
-			return ;
-		}
-		console.log("This man is ", user.username);
-		if (this.roomsList.length == 0)
-		{
-			let room_ = new room();
-			room_.id = 0;
-			room_.firstClient = client;
-			room_.gameMode = "random";
-			room_.roomState = "queuing";
-			this.roomsList.push(room_);
-			client.join(`${room_.id}`);
-		}
-		// console.log(username);
-		this.connectedUsers.push(user.username);
 	}
 
-	async handleDisconnect(client: Socket)
-	{
-		let user = await this.gameService.chatService.getUserFromSocket(client);
-		this.connectedUsers.splice(this.connectedUsers.indexOf(user.username), 1);
+	async handleDisconnect(client: Socket) {
+		console.log("Client disconnected", client.id);
+		console.log("Rooms length", this.roomsList.length);
 		let roomCheck = await this.roomsList.find(room => room.firstClient === client || room.secondClient === client);
 		if (roomCheck)
 		{
+			this.roomsList.splice(this.roomsList.indexOf(roomCheck), 1);
+			console.log("Room found ");
 			if (roomCheck.firstClient && roomCheck.secondClient)
 			{
-				// Set the winner on the database depending on the score
-				// this.gameService.matchesService.
+			}
+			if (roomCheck.firstClient && roomCheck.gameMode == "robot")
+			{
 			}
 			this.server.to(`${roomCheck.id}`).emit("leaveGame");
 			this.roomsList.splice(this.roomsList.indexOf(roomCheck), 1);
 		} 
+		try {
+			let user = await this.gameService.chatService.getUserFromSocket(client);
+			this.connectedUsers.splice(this.connectedUsers.indexOf(user.username), 1);
+			this.userService.setStatus(user.id, "online");
+		}
+		catch (e) {
+			console.log("oops");
+			console.log(e);
+		}
 	}
 
+	// NOTE BOT MODE
 	// NOTE - set the player status in the database to busy using the user service
 	@SubscribeMessage('botMode')
-	async setGameAsBotMode(client: Socket) 
-	{
-		let user = await this.gameService.chatService.getUserFromSocket(client);
-		if (this.connectedUsers.includes(user.username))
+	async setGameAsBotMode(client: Socket) {
+		await console.log("BOT MODE !!!!!", client.id);
+		try
 		{
+			let user = await this.gameService.chatService.getUserFromSocket(client);
+			this.connectedUsers.push(user.username);
+
+			if(await this.userService.getStatus(user.id) == "busy")
+			{
+				this.server.to(`${client.id}`).emit("alreadyQueuing");
+				return ;
+			}
+
+			this.userService.setStatus(user.id, "busy");
+			this.userService.setScore(user.id, 0);
+
+			let room_= await new room();
+			room_.firstClient = client;
+			room_.gameMode = "robot";
+			room_.roomState = "ready";
+			room_.id = this.roomsList.length;
+			await this.roomsList.push(room_);
+			client.join(`${room_.id}`);
+			console.log("Rooms L ", this.roomsList.length);
+			this.server.to(`${room_.id}`).emit("botGame");
+		}
+		catch (e)
+		{
+			console.log("oops");
+			console.log(e);
 			client.disconnect();
 			return ;
 		}
-		await console.log("BOT MODE !!!!!", client.id);
-
-		let room_= new room();
-		// room_.firstName = user.username;
-		room_.firstClient = client;
-		room_.gameMode = "robot";
-		room_.roomState = "ready";
-		room_.id = this.roomsList.length;
-		this.roomsList.push(room_);
-		client.join(`${room_.id}`);
-		console.log("Rooms ", room_.id);
-		this.server.to(`${room_.id}`).emit("botGame");
 	}
 	@SubscribeMessage('invite')
-	async invitePlayer(client: Socket, invitedUser: string)
-	{
+	async invitePlayer(client: Socket, invitedUser: string) {
 		// Check if the invited user is already in a game if he is return and don't create a new room
 		let room_ = new room();
 		room_.id = this.roomsList.length + 1;
@@ -146,37 +123,141 @@ export class gameServer implements OnModuleInit {
 	}
 	// The triggered event once the user accepts the invite
 	@SubscribeMessage('acceptPlayingInvite')
-	async acceptMatchInvite(client: Socket, roomID: number)
-	{
+	async acceptMatchInvite(client: Socket, roomID: number) {
 		// The invited user will join the room by it's id and a match will start
 	}
 	@SubscribeMessage('declinePlayingInvite')
-	async declineMatchInvite(client: Socket, roomID: number)
-	{
+	async declineMatchInvite(client: Socket, roomID: number) {
 		// The invited user will decline the invite and the room will be deleted and both users will be disconnected
 		let roomToDelete = this.roomsList.find(room => room.id === roomID);
-		if (roomToDelete)
-		{
+		if (roomToDelete) {
 			this.roomsList.splice(this.roomsList.indexOf(roomToDelete), 1);
 		}
 	}
 	@SubscribeMessage('leaveRoom')
-	async leaveMatch(client: Socket, roomID:number)
-	{
+	async leaveMatch(client: Socket) {
+		let match = new MatchDto();
+		let roomCheck = await this.roomsList.find(room => room.firstClient === client || room.secondClient === client);
+		if (roomCheck)
+		{
+			if (roomCheck.gameMode != "robot")
+			{
+				if (roomCheck.score1 >= roomCheck.score2)
+				{
+					match.winnerId = roomCheck.user1ID;
+					match.loserId = roomCheck.user2ID;
+					match.endedAt = roomCheck.endTime;
+					match.mode = roomCheck.gameMode;
+					match.winnerStats = {score: roomCheck.score2, 
+										 name: roomCheck.secondName};
+					match.loserStats = {score: roomCheck.score1, 
+										 name: roomCheck.firstName};
+					this.userService.findUserById(roomCheck.user2ID).then((user) => {
+						this.userService.setScore(user.id, user.score + (roomCheck.score1 - roomCheck.score2));
+					});
+				}
+				else
+				{
+					match.winnerId = roomCheck.user2ID;
+					match.loserId = roomCheck.user1ID;
+					match.mode = roomCheck.gameMode;
+					match.endedAt = roomCheck.endTime;
+					match.winnerStats = {score: roomCheck.score1, name: roomCheck.firstName};
+					match.loserStats = {score: roomCheck.score2, name: roomCheck.secondName};
+					this.userService.findUserById(roomCheck.user1ID).then((user) => 
+					{
+						this.userService.setScore(user.id, user.score + (roomCheck.score2 - roomCheck.score1));
+					});
+				}
+				this.gameService.matchesService.create(match);
+			}
+			{
+				try
+				{
+					let user = await this.gameService.chatService.getUserFromSocket(client);
+					// Calculate score
+					if (roomCheck.gameMode == "robot")
+					{
+						let score = await this.userService.getScore(user.id);
+						console.log("Scoreeee ", score);
+						score++;
+						console.log("Scoreeee ", score);
+						this.userService.setScore(user.id, score);
+					}
+					this.userService.setStatus(user.id, "online"); 
+				}
+				catch (e)
+				{
+					console.log(e);
+				}
+				this.server.to(`${roomCheck.id}`).emit("leaveGame");
+				this.roomsList.splice(this.roomsList.indexOf(roomCheck), 1);
+			}
+		}
 		// Emit an event to all players connected to the room that the match is done
 		this.server.to(`${client.id}`).emit("leaveGame");
 		// client.disconnect();
 	}
-	@SubscribeMessage('queuing')
-	async waitingForRandomOponent(client: Socket)
-	{
-		let user = await this.gameService.chatService.getUserFromSocket(client);
-		if (this.connectedUsers.includes(user.username))
+	@SubscribeMessage('gameOver')
+	async gameOver(client: Socket) {
+		let match = new MatchDto();
+		let roomCheck = await this.roomsList.find(room => room.firstClient === client ||
+												  room.secondClient === client);
+		console.log("Game over"); 
+		if (roomCheck)
 		{
+			if(roomCheck.gameMode != "robot")
+			{
+				if (roomCheck.score1 > roomCheck.score2)
+				{
+					match.winnerId = roomCheck.user1ID;
+					match.loserId = roomCheck.user2ID;
+					match.endedAt = roomCheck.endTime;
+					match.mode = roomCheck.gameMode;
+					match.winnerStats = {score: roomCheck.score2, 
+										 name: roomCheck.secondName};
+					match.loserStats = {score: roomCheck.score1, 
+										 name: roomCheck.firstName};
+					this.userService.findUserById(roomCheck.user2ID).then((user) => {
+						this.userService.setScore(user.id, user.score + (roomCheck.score1 - roomCheck.score2));
+					});
+				}
+				else
+				{
+					match.winnerId = roomCheck.user2ID;
+					match.loserId = roomCheck.user1ID;
+					match.mode = roomCheck.gameMode;
+					match.endedAt = roomCheck.endTime;
+					match.winnerStats = {score: roomCheck.score1, name: roomCheck.firstName};
+					match.loserStats = {score: roomCheck.score2, name: roomCheck.secondName};
+					this.userService.findUserById(roomCheck.user1ID).then((user) => 
+					{
+						this.userService.setScore(user.id, user.score + (roomCheck.score2 - roomCheck.score1));
+					});
+				}
+				this.gameService.matchesService.create(match);
+			}
+		}
+	}
+
+	@SubscribeMessage('queuing')
+	async waitingForRandomOponent(client: Socket) {
+		console.log("Player queuing");
+		try{
+			let user = await this.gameService.chatService.getUserFromSocket(client);
+			let userStatus:string = await this.userService.getStatus(user.id);
+			if (userStatus == "busy")
+			{
+				this.server.to(`${client.id}`).emit("alreadyQueuing");
+				client.disconnect();
+				return ;
+			}
+		}
+		catch (e)	{
+			console.log(e);
 			client.disconnect();
 			return ;
 		}
-		console.log("Player queuing");
 		for (let i = 0 ; i < this.roomsList.length; i++)
 		{
 			if (this.roomsList[i].roomState != "invite" && this.roomsList[i].gameMode != "robot")
@@ -184,6 +265,20 @@ export class gameServer implements OnModuleInit {
 				if (!this.roomsList[i].firstClient)
 				{
 					this.roomsList[i].firstClient = client;
+					try
+					{
+						let user = await this.gameService.chatService.getUserFromSocket(client);
+						this.roomsList[i].firstName = user.username;
+						this.roomsList[i].user1ID = user.id;
+						this.userService.setStatus(user.id, "busy");
+						console.log("player " + this.roomsList[i].user1ID + "here");
+					}
+					catch (e)
+					{
+						console.log(e);
+						client.disconnect();
+						return ;
+					}
 					return ;
 				}
 				else if (!this.roomsList[i].secondClient)
@@ -191,8 +286,20 @@ export class gameServer implements OnModuleInit {
 					client.join(`${this.roomsList[i].id}`);
 					this.roomsList[i].secondClient = client;
 					this.roomsList[i].roomState = "ready";
-					console.log("player 2 here");
-					// NOTE - set the player status in the database to busy using the user service
+					try
+					{
+						let user = await this.gameService.chatService.getUserFromSocket(client);
+						this.roomsList[i].secondName = user.username;
+						this.roomsList[i].user2ID = user.id;
+						this.userService.setStatus(user.id, "busy");
+						console.log("player " + this.roomsList[i].user2ID + "here");
+					}
+					catch (e)
+					{
+						console.log(e);
+						client.disconnect();
+						return ;
+					}
 					this.server.to(`${this.roomsList[i].id}`).emit("matchFound", true);
 					return ;
 				}
@@ -204,34 +311,43 @@ export class gameServer implements OnModuleInit {
 		room_.firstClient = client;
 		room_.gameMode = "random";
 		this.roomsList.push(room_);
-		this.connectedUsers.push(user.username);
+		try
+		{
+			let user = await this.gameService.chatService.getUserFromSocket(client);
+			room_.firstName = user.username;
+			room_.user1ID = user.id;
+			this.userService.setStatus(user.id, "busy");
+			console.log("player " + room_.user1ID + "here");
+		}
+		catch (e)
+		{
+			console.log(e);
+			client.disconnect();
+			return ;
+		}
+		// this.connectedUsers.push(user.username);
 		console.log("Rooms count ", this.roomsList.length);
 	}
 	@SubscribeMessage('left')
-	async leftMove(client: Socket, vel: number)
-	{
+	async leftMove(client: Socket, vel: number) {
 		const room = this.roomsList.find(room => room.firstClient === client);
-		if (room)
-		{
+		if (room) {
 			console.log("LEFT");
 			room.firstvelocity = vel;
 		}
 	}
 	@SubscribeMessage('right')
-	async rightMove(client: Socket, vel: number)
-	{
+	async rightMove(client: Socket, vel: number) {
 		const room = this.roomsList.find(room => room.secondClient === client);
-		if (room)
-		{
+		if (room) {
 			console.log("RIGHT");
 			room.secondvelocity = vel;
 		}
 	}
 	@SubscribeMessage('balllaunch')
-	async ballLaunch(client: Socket, launched: boolean) 
-	{
-		const room = this.roomsList.find(room => room.firstClient === client 
-				|| room.secondClient === client);
+	async ballLaunch(client: Socket, launched: boolean) {
+		const room = this.roomsList.find(room => room.firstClient === client
+			|| room.secondClient === client);
 		if (room) {
 			if (room.firstPlayerHaveTheBall && client == room.firstClient) {
 				console.log("One");

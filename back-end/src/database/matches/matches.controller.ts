@@ -1,6 +1,7 @@
 import { MatchDto } from './matches.dto';
 import { MatchesService } from './matches.service';
-import { Controller, Get, Body, Param, Put, Delete, Post } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { MatchDto } from './matches.dto';
 
 @Controller('matches')
 export class MatchesController {

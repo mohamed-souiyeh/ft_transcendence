@@ -7,11 +7,13 @@ import Ranked from "./components/ranked";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useSocket } from "../clientSocket";
 
 function Home () {
   const [user, setUser] = useState({});
   const navigate = useNavigate();
   const [fetched, setFetchState] = useState(false);
+  const socket = useSocket();
 
   useEffect( 
     ()=>
@@ -74,6 +76,7 @@ function Home () {
               <div onClick={
                   ()=> 
                   {
+                    socket.emit("queuing");
                     navigate("/game");
                   }
                 } className="">
@@ -84,7 +87,13 @@ function Home () {
             </div>
 
             <div className="bg-purple w-[400px] h-[120px] rounded-3xl border-[1px] border-purple-tone-1 bg-opacity-30 backdrop-blur-lg flex place-content-between">
-              <div className="">
+              <div onClick={
+                  ()=> 
+                  {
+                    socket.emit("botMode");
+                    navigate("/game");
+                  }}
+                  className="">
                 <p className="p-2 text-2xl"> Against Bot </p>
                 <p className="p-2"> In this mode, players will play against a bot.</p>
               </div>

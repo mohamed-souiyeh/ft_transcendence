@@ -11,6 +11,7 @@ import pic from '../../assets/taha.jpg'
 
 import './game.css';
 import { useNavigate } from 'react-router-dom';
+import { Socket } from 'socket.io-client/debug';
 
 function rad2Degree(angle:number) : number
 {
@@ -26,32 +27,44 @@ function Game()
   let [score1, setScore1] = useState(0);
   let [score2, setScore2] = useState(0);
   let [leftPic, setLeftPic] = useState(pic);
-  let [gameState, setState] = useState('Looking for partner :(');
+  let [gameState, setState] = useState(false);
   let [profileImage, setImage] = useState('');
   let foundMatch:boolean = false;
   let navigate = useNavigate();
-  let socket = useSocket();
+  const socket = useSocket();
   const frameRef = useRef<number>(0);
-  
+  let formdata = new FormData();
+  console.log(gameState);
   
   const leaveGame = () => {
     socket.emit("leaveRoom")
   }
   
-  useEffect(()=>
+  useEffect(() => 
+  {
     {
+      //FIXME - replace href with navigate
       socket.on("botGame", ()=>{
         setLeftPic(botPic);
       })
       socket.on("leaveGame", ()=>{
         window.location.href = "http://localhost:8082/home";
       })
-      // socket.on("gameOver", ()=>{
+      socket.on("alreadyPlaying", ()=>{
+        window.location.href = "http://localhost:8082/home";
+      });
+      socket.on("alreadyQueuing", ()=>{
+        window.location.href = "http://localhost:8082/home";
+      });
+      socket.on("gameover", ()=>{
+          if (!gameState)
+          {
+            socket.emit("gameOver");
+            window.location.href = "http://localhost:8082/home";
+            setState(true);
+          }
+        });
     }
-  )
-
-  useEffect(() => 
-  {
     if (canvasRef.current) 
     {
       gl = canvasRef.current.getContext("webgl");
@@ -180,33 +193,33 @@ function Game()
         0, 0,-3, 0,
         0, 0, 0, 1
       ];
-      socket.on('matchFound', (v:boolean)=>{foundMatch = v;});
+      if (socket)
+        socket.on('matchFound', (v:boolean)=>{foundMatch = v;});
 
-      if (!foundMatch)
-       setState((gameState) => gameState = 'Looking for partner :(');
-      else
-        setState((gameState) => gameState = score1 + '      |     ' +score2);
-      socket.emit('playing');
-      if (foundMatch)
+    if (foundMatch)
+    {
+      setScore1((score1));
+      setScore2((score2));
+      if (socket)
       {
-        setScore1((score1));
-        setScore2((score2));
-        socket.on('score', (v:number, v1:number) => {
-          score1 = v;
-          score2 = v1;
-        });
-        socket.on('left', (v:number)=>{first.vector3D.y = v;});
-        socket.on('right', (v:number)=>{second.vector3D.y = v;});
-  
+          socket.emit('playing');
+          socket.on('score', (v:number, v1:number) => {
+            score1 = v;
+            score2 = v1;
+          });
+          socket.on('left', (v:number)=>{first.vector3D.y = v;});
+          socket.on('right', (v:number)=>{second.vector3D.y = v;});
+          socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
+          socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
+          socket.on('balllaunched', (v:boolean)=>{ballLaunched=v;});
+        }
+        
         if (gl)
         {
           gl.clearColor(0.282, 0.17, 0.37, 1.0);
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           gl.enable(gl.DEPTH_TEST);
   
-          socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
-          socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
-          socket.on('balllaunched', (v:boolean)=>{ballLaunched=v;});
           terrain.renderEntity(gl, 36);
           terrain.setColor(gl, [0.41, 0.26,0.5]);
           terrain.rotateX(gl, rad2Degree(0.004));
@@ -250,7 +263,8 @@ function Game()
     };
 
     window.addEventListener("resize", handle);
-    return () => cancelAnimationFrame(frameRef.current);
+    return () => {cancelAnimationFrame(frameRef.current);
+    }
   }, []);
 
   return (<>
@@ -262,7 +276,7 @@ function Game()
           {/* <h1>{gameState}</h1>s */}
           {<Profile score = {score1}
                     score2= {score2}
-                    pic1=''
+                    pic1={leftPic}
                     pic2={leftPic}/>}
           <canvas style={{right:"300px",
                           width: "100%",

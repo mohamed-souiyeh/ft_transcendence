@@ -8,6 +8,8 @@ import { PrismaService } from 'src/database/prisma/prisma.service';
 import { ChatService } from 'src/sockets/chat/chat.service';
 import { room } from './Room';
 import { MatchesService } from 'src/database/matches/matches.service';
+import { MatchDto } from 'src/database/matches/matches.dto';
+
 
 @Injectable()
 export class gameService
@@ -15,14 +17,6 @@ export class gameService
     constructor(private readonly authService: AuthService,
                 public readonly chatService: ChatService,
                 public readonly matchesService: MatchesService) {}
-
-    async achievement(userID: number)
-    {
-        // Get the user id and check how many games he has played and won in the database
-        // if he has played his first game, give him the achievement
-        // if he has played one game and won, give him the achievement
-        // if he has played 5 games and won, give him the achievement
-    }
     async paddleCollision(room: room)
     {
         if (room.firstPaddlePos + room.firstPaddleSpeed 
@@ -46,26 +40,32 @@ export class gameService
     {
         if (room.ballPosX + 0.2 / 10 >= 0.97 &&
             room.ballPosY - 0.2 / 10 <= room.firstPaddlePos + 1 / 10 &&
-            room.ballPosY + 0.2 / 10 >= room.firstPaddlePos - 1 / 10) {
+            room.ballPosY + 0.2 / 10 >= room.firstPaddlePos - 1 / 10) 
+        {
             console.log('collisiooooon');
             if (room.speed <= 0.05)
                 room.speed += 0.0001;
+            if (room.firstPaddleSpeed <= 0.05)
+                room.firstPaddleSpeed += 0.0001;
             let y = room.firstPaddlePos - room.ballPosY;
             let x = room.ballPosX - 0.97;
-            room.velocityAngle = Math.atan2(-y/2, x/2) * 180/Math.PI;
+            room.velocityAngle = (Math.random() % 180) * 180/Math.PI;
             console.log("angle ", room.velocityAngle);
-            room.ballVelocityX = 1;
+            room.ballVelocityX = -1;
         }
         if (room.ballPosX - 0.2 / 10 <= -0.97 && 
             room.ballPosY - 0.2 / 10 <= room.secondPaddlePos + 1 / 10 && 
-            room.ballPosY + 0.2 / 10 >= room.secondPaddlePos - 1 / 10) {
+            room.ballPosY + 0.2 / 10 >= room.secondPaddlePos - 1 / 10) 
+        {
             console.log('collisiooooon');
             if (room.speed <= 0.05)
                 room.speed += 0.0001;
+            if (room.secondPaddleSpeed <= 0.05)
+                room.secondPaddleSpeed += 0.0001;
             let y = room.secondPaddlePos - room.ballPosY;
-            let x = room.ballPosX - 0.97;
-            room.velocityAngle = Math.atan2(y/2, x/2) * 180/Math.PI;
-            room.ballVelocityX = -1;
+            let x = -room.ballPosX + 0.97;
+            room.velocityAngle = (Math.random() % 180) * 180/Math.PI;
+            room.ballVelocityX = 1;
         }
         if (room.ballPosX >= 1) {
             room.score1++;
@@ -83,6 +83,16 @@ export class gameService
             room.secondPaddleSpeed = 0.01;
             server.to("room" + room.id).emit('balllaunched', false);
         }
+        if (room.ballPosY >= 7 / 10) {
+            room.ballPosY = 7 / 10;
+            room.ballVelocityY = -1;
+            room.velocityAngle *= -1;
+        }
+        if (room.ballPosY <= -7 / 10) {
+            room.ballPosY = -7 / 10;
+            room.ballVelocityY = 1;
+            room.velocityAngle *= -1;
+        }
     }
     async gameLoop(server:Server, rooms: room[])
     {
@@ -94,14 +104,14 @@ export class gameService
 					this.paddleCollision(rooms[i]);
 					if (!rooms[i].ballLaunched) {
 						if (rooms[i].firstPlayerHaveTheBall) {
-							rooms[i].ballPosX = 0.97 - 0.05;
+							rooms[i].ballPosX = 0.94 - 0.05;
 							rooms[i].ballPosY = rooms[i].firstPaddlePos;
 							rooms[i].velocityAngle = 0;
 							rooms[i].ballVelocityX = 1;
 							rooms[i].ballVelocityY = 1;
 						}
 						if (rooms[i].secondPlayerHaveTheBall) {
-							rooms[i].ballPosX = -0.97 + 0.05;
+							rooms[i].ballPosX = -0.94 + 0.05;
 							rooms[i].ballPosY = rooms[i].secondPaddlePos;
 							rooms[i].ballVelocityX = -1;
 							rooms[i].ballVelocityY = -1;
@@ -115,7 +125,7 @@ export class gameService
 						if (rooms[i].firstPlayerHaveTheBall)
 							server.to("room" + i).emit('balllaunched', true);
 						if (rooms[i].secondPlayerHaveTheBall)
-							server.to("room" + i).emit('balllaunched', true);
+							server.to("room" + i).emit('balllaunched', true); 
 	
 						this.updateBallDIrection(server, rooms[i]);
 					}
@@ -135,9 +145,9 @@ export class gameService
 						rooms[i].secondPaddleSpeed = 0.005;
 						if (rooms[i].ballPosX < 0.0)
 						{
-							if (rooms[i].ballPosY > rooms[i].secondPaddlePos + 0.01)
+							if (rooms[i].ballPosY > rooms[i].secondPaddlePos + 0.1)
 								rooms[i].secondvelocity = 1;
-							if (rooms[i].ballPosY < rooms[i].secondPaddlePos - 0.01)
+							if (rooms[i].ballPosY < rooms[i].secondPaddlePos - 0.1)
 								rooms[i].secondvelocity = -1;
 						}
 						else
@@ -145,14 +155,22 @@ export class gameService
 							rooms[i].secondvelocity = 0;
 						}
 					}
+                    else
+                    {
+                        if (rooms[i].score1 >= 6 || rooms[i].score2 >= 6)
+                        {
+                            server.to(i + '').emit('gameover');
+                            rooms[i].endTime = new Date();
+                            rooms[i].roomState = "ended";
+                        }
+                    }
 	
 					rooms[i].ballPosX += (rooms[i].speed
-												* Math.cos(rooms[i].velocityAngle * Math.PI/180) 
-                                                * rooms[i].ballVelocityX);
+                                        * Math.cos(rooms[i].velocityAngle * Math.PI/180) 
+                                        * rooms[i].ballVelocityX);
 					rooms[i].ballPosY += (rooms[i].speed
-												* Math.sin(rooms[i].velocityAngle * Math.PI/180) 
-                                                * rooms[i].ballVelocityY);
-	
+                                        * Math.sin(rooms[i].velocityAngle * Math.PI/180) 
+                                        * rooms[i].ballVelocityY);
 					server.to(i + '').emit('ballPosX', (rooms[i].ballPosX));
 					server.to(i + '').emit('ballPosY', (rooms[i].ballPosY));
 					server.to(i + '').emit('score', rooms[i].score1, rooms[i].score2);
@@ -165,3 +183,4 @@ export class gameService
 		}, 1000 / 60);
     }
 }
+ 
