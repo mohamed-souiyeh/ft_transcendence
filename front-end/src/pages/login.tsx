@@ -1,6 +1,9 @@
 import logo from '../assets/Logo.svg'
 import google from '../assets/google.svg'
 import intra from '../assets/42.svg'
+import { UserContext } from '../App';
+import { useContext } from 'react';
+import { Navigate } from 'react-router-dom';
 
 
 function googleSignUp()
@@ -14,6 +17,14 @@ function ftSignUp() {
 
 
 function SignUp () {
+  const {user}  = useContext(UserContext)
+
+  if (Object.keys(user).length)
+  return(
+    <>
+      { <Navigate to="/home" />}
+    </>
+  )
   return (
     <>
 

@@ -1,7 +1,7 @@
 
 
-import axios from "axios";
+// import axios from "axios";
 
-export let apiGlobal = axios.create({
-    baseURL: "http://localhost:1337"
-});
+// export let apiGlobal = axios.create({
+//     baseURL: "http://localhost:1337"
+// });

@@ -4,55 +4,22 @@ import hi from "../assets/hi.svg"
 import bot from "../assets/bot.png";
 import controllers  from "../assets/controllers.png";
 import Ranked from "./components/ranked";
-import { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../App";
+import { UserContext } from "../App";
 
 function Home () {
-  const [user, setUser] = useState({});
   const navigate = useNavigate();
-  const [fetched, setFetchState] = useState(false);
-  const {auth, setAuth}  = useContext(AuthContext);
 
+  const {user}  = useContext(UserContext)
 
-  useEffect( 
-    ()=>
-    {
-      if (!fetched)
-      {
-        axios.
-        get("http://localhost:1337/users/whoami",
-          {
-            withCredentials: true
-          }
-        ).
-        then((res)=>
-          {
-            setUser(res.data);
-            setAuth(true)
-          }
-          ).catch((e)=>{
-            console.log(e);
-          }).
-          catch(
-            (e)=>
-            {
-              console.log(e);
-            }
-            );
-            setFetchState(true);
-          }
-        }
-    )
-
-    console.log(user);
+  console.log(user)
   return (
     <>
       <div className="w-screen h-screen grid justify-center ">
         {<SideBar/>}
         {<NavBar 
-          name={user.profilePicture}
+          // name={user.profilePicture}
         />}
 
         <div className="w-[850px] h-[50%]">
