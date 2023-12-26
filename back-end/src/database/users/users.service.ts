@@ -4,7 +4,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { UserDto } from './User_DTO/User.dto';
 import * as crypto from 'crypto';
 import { MemoryStoredFile } from 'nestjs-form-data';
-import { Prisma, UserStatus, UserState, user } from '@prisma/client';
+import { Prisma, UserStatus, UserState, user, ChannelType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 
@@ -45,285 +45,286 @@ export class UsersService {
   //SECTION - READ OPERATIONS
 
 
-  async getUserConvs(userId: number): Promise<any> {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        id: userId,
-      },
-      include: {
-        channels: true,
-        dms: true,
-      }
-    });
 
-    if (user === null) throw new NotFoundException('User not found');
+  async getUserConvs(userId: number): Promise < any > {
+  const user = await this.prismaService.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      channels: true,
+      dms: true,
+    }
+  });
 
-    return user;
+  if(user === null) throw new NotFoundException('User not found');
+
+return user;
   }
 
 
   async getUserDataForHome(userId: number) {
 
 
-    const userRelations = await this.prismaService.user.findUnique({
-      where: {
-        id: userId,
-      },
-      include: {
-        sentNotificatons: true,
-        receivedNotifications: true,
-        channels: true,
-        dms: true,
-      }
-    });
+  const userRelations = await this.prismaService.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      sentNotificatons: true,
+      receivedNotifications: true,
+      channels: true,
+      dms: true,
+    }
+  });
 
-    const userData = await this.prismaService.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        id: true,
-        username: true,
-        score: true,
-        matchesPlayed: true,
-        email: true,
-        isProfileSetup: true,
-        isAuthenticated: true,
-        TFAisEnabled: true,
-        friendRequests: true,
-      }
-    });
+  const userData = await this.prismaService.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      username: true,
+      score: true,
+      matchesPlayed: true,
+      email: true,
+      isProfileSetup: true,
+      isAuthenticated: true,
+      TFAisEnabled: true,
+      friendRequests: true,
+    }
+  });
 
-    if (userData === null) throw new NotFoundException('User not found');
+  if (userData === null) throw new NotFoundException('User not found');
 
-    const user = {
-      ...userData,
-      sentNotificatons: userRelations.sentNotificatons,
-      receivedNotifications: userRelations.receivedNotifications,
-      channels: userRelations.channels,
-      dms: userRelations.dms,
-      };
+  const user = {
+    ...userData,
+    sentNotificatons: userRelations.sentNotificatons,
+    receivedNotifications: userRelations.receivedNotifications,
+    channels: userRelations.channels,
+    dms: userRelations.dms,
+  };
 
-    return user;
-  }
+  return user;
+}
 
   async whoami(userId: number) {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        TFAisEnabled: true,
-        isProfileSetup: true,
-        isAuthenticated: true,
-      }
-    });
+  const user = await this.prismaService.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      TFAisEnabled: true,
+      isProfileSetup: true,
+      isAuthenticated: true,
+    }
+  });
 
-    if (user === null) throw new NotFoundException('User not found');
+  if (user === null) throw new NotFoundException('User not found');
 
-    return user;
+  return user;
+}
+
+  async getStatus(id: number): Promise < any > {
+  const user = await this.prismaService.user.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      status: true,
+    }
+  });
+
+  if(user === null) throw new NotFoundException('User not found');
+
+return user.status;
   }
 
-  async getStatus(id: number): Promise<any> {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        id: id,
-      },
-      select: {
-        status: true,
-      }
-    });
+  async findUserByUsername(username: string): Promise < any > {
+  const db_user = await this.prismaService.user.findUnique({
+    where: {
+      username: username,
+    }
+  });
 
-    if (user === null) throw new NotFoundException('User not found');
+  if(!db_user) return null;
 
-    return user.status;
-  }
+  return db_user;
+}
 
-  async findUserByUsername(username: string): Promise<any> {
-    const db_user = await this.prismaService.user.findUnique({
-      where: {
-        username: username,
-      }
-    });
+  async findUserByEmail(email: string): Promise < any > {
+  const db_user = await this.prismaService.user.findUnique({
+    where: {
+      email: email,
+    }
+  });
 
-    if (!db_user) return null;
+  if(!db_user) return null;
 
-    return db_user;
-  }
+  return db_user;
+}
 
-  async findUserByEmail(email: string): Promise<any> {
-    const db_user = await this.prismaService.user.findUnique({
-      where: {
-        email: email,
-      }
-    });
+  async findUserById(id: number): Promise < any > {
+  const db_user = await this.prismaService.user.findUnique({
+    where: {
+      id: id,
+    }
+  });
 
-    if (!db_user) return null;
+  if(!db_user) return null;
 
-    return db_user;
-  }
-
-  async findUserById(id: number): Promise<any> {
-    const db_user = await this.prismaService.user.findUnique({
-      where: {
-        id: id,
-      }
-    });
-
-    if (!db_user) return null;
-
-    return db_user;
-  }
+  return db_user;
+}
   //!SECTION
 
 
   //SECTION - UPDATE OPERATIONS
 
 
-  async setScore(id: number, score: number): Promise<any> {
-    const user = await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        score: score,
-      }
-    });
+  async setScore(id: number, score: number): Promise < any > {
+  const user = await this.prismaService.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      score: score,
+    }
+  });
 
-    if (user === null) throw new NotFoundException('User not found');
+  if(user === null) throw new NotFoundException('User not found');
 
-    return user;
+return user;
   }
 
-  async setProfileSetup(id: number, state: boolean): Promise<any> {
-    const user = await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        isProfileSetup: state,
-      }
-    });
+  async setProfileSetup(id: number, state: boolean): Promise < any > {
+  const user = await this.prismaService.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      isProfileSetup: state,
+    }
+  });
 
-    if (user === null) throw new NotFoundException('User not found');
+  if(user === null) throw new NotFoundException('User not found');
 
-    return user;
+return user;
   }
 
-  async setAuthenticated(id: number, state: boolean): Promise<any> {
-    const user = await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        isAuthenticated: state,
-      }
-    });
+  async setAuthenticated(id: number, state: boolean): Promise < any > {
+  const user = await this.prismaService.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      isAuthenticated: state,
+    }
+  });
 
-    if (user === null) throw new NotFoundException('User not found');
+  if(user === null) throw new NotFoundException('User not found');
 
-    return user;
+return user;
   }
 
-  async setStatus(id: number, status: UserStatus): Promise<any> {
-    const user = await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        status: status,
-      }
-    });
+  async setStatus(id: number, status: UserStatus): Promise < any > {
+  const user = await this.prismaService.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      status: status,
+    }
+  });
 
-    if (user === null) throw new NotFoundException('User not found');
+  if(user === null) throw new NotFoundException('User not found');
 
-    return user;
+return user;
   }
 
   async turnOff2FA(id: number) {
-    const user = await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        TFAisEnabled: false,
-      }
-    });
-    return user;
-  }
+  const user = await this.prismaService.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      TFAisEnabled: false,
+    }
+  });
+  return user;
+}
 
   async turnOn2FA(id: number) {
-    const user = await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        TFAisEnabled: true,
-      }
-    });
-    return user;
+  const user = await this.prismaService.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      TFAisEnabled: true,
+    }
+  });
+  return user;
+}
+
+  async set2FAscret(email: string, secret: string): Promise < any > {
+  const user = await this.prismaService.user.update({
+    where: {
+      email: email,
+    },
+    data: {
+      TFASecret: secret,
+    }
+  });
+
+  if(!user) return null;
+  return user;
+}
+
+  async updateAvatar(id: number, avatar: any): Promise < any > {
+  const user = await this.prismaService.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      avatar: avatar.path,
+    }
+  });
+
+  if(user === null) throw new NotFoundException('User not found');
+
+return user;
   }
 
-  async set2FAscret(email: string, secret: string): Promise<any> {
-    const user = await this.prismaService.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        TFASecret: secret,
-      }
-    });
+  async replaceRefreshToken(id: number, refreshToken: string | null): Promise < any > {
+  const user = await this.prismaService.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      activeRefreshToken: refreshToken,
+    }
+  });
 
-    if (!user) return null;
-    return user;
-  }
+  return user;
+}
 
-  async updateAvatar(id: number, avatar: any): Promise<any> {
-    const user = await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        avatar: avatar.path,
-      }
-    });
+  async updateUserUsername(id: number, username: string): Promise < any > {
+  await this.checkIfUsernamUnique(username);
 
-    if (user === null) throw new NotFoundException('User not found');
+  const user = await this.prismaService.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      username: username,
+    }
+  });
 
-    return user;
-  }
+  if(user === null) throw new NotFoundException('User not found');
 
-  async replaceRefreshToken(id: number, refreshToken: string | null): Promise<any> {
-    const user = await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        activeRefreshToken: refreshToken,
-      }
-    });
-
-    return user;
-  }
-
-  async updateUserUsername(id: number, username: string): Promise<any> {
-    await this.checkIfUsernamUnique(username);
-
-    const user = await this.prismaService.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        username: username,
-      }
-    });
-
-    if (user === null) throw new NotFoundException('User not found');
-    
-    return user;
+return user;
   }
   //!SECTION
 
@@ -333,38 +334,38 @@ export class UsersService {
 
   //SECTION - VALIDATION OPERATIONS
 
-  async checkIfUsernamUnique(username: string): Promise<any> {
-    await this.checkUsername(username);
-    const isUnique = await this.findUserByUsername(username);
-    const isReserved = this.reservedUsernames.includes(username, 0);
+  async checkIfUsernamUnique(username: string): Promise < any > {
+  await this.checkUsername(username);
+  const isUnique = await this.findUserByUsername(username);
+  const isReserved = this.reservedUsernames.includes(username, 0);
 
 
-    if (isUnique === null && !isReserved) return {
-      "message": "Username is unique"
-    };
+  if(isUnique === null && !isReserved) return {
+    "message": "Username is unique"
+  };
 
-    throw new ConflictException('Username already taken');
+throw new ConflictException('Username already taken');
   }
 
-  async checkUsername(username: string): Promise<any> {
-    const error_msg: string = 'Username must be between 5 and 13 characters long, and contain only letters and numbers and underscores';
+  async checkUsername(username: string): Promise < any > {
+  const error_msg: string = 'Username must be between 5 and 13 characters long, and contain only letters and numbers and underscores';
 
 
-    const regex: RegExp = /^[a-zA-Z0-9_]{5,13}$/;
+  const regex: RegExp = /^[a-zA-Z0-9_]{5,13}$/;
 
 
-    if (!regex.test(username)) throw new ConflictException(error_msg);
-  }
+  if(!regex.test(username)) throw new ConflictException(error_msg);
+}
 
-  async validatRefreshToken(id: number, refreshToken: string): Promise<any> {
-    const user = await this.findUserById(id);
+  async validatRefreshToken(id: number, refreshToken: string): Promise < any > {
+  const user = await this.findUserById(id);
 
-    if (user === null)
-      throw new NotFoundException('User not found');
+  if(user === null)
+throw new NotFoundException('User not found');
 
-    if (user.activeRefreshToken !== refreshToken) return null;
+if (user.activeRefreshToken !== refreshToken) return null;
 
-    return user;
+return user;
   }
   //!SECTION
 
