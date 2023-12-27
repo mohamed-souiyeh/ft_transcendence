@@ -47,10 +47,7 @@ export class ftStrategy extends PassportStrategy(Strategy, '42') {
       found_user = await this.usersService.addUser(user);
     }
 
-    if (!found_user.isProfileSetup)
-      found_user.redirectUrl = process.env.SETUP_URL;
-    else
-      found_user.redirectUrl = process.env.HOME_URL;
+    found_user.redirectUrl = process.env.LOADING_URL;
 
     // console.log('42 strategy found user =>', found_user);
 

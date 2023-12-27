@@ -5,6 +5,7 @@ import { Response } from 'express';
 import { UsersService } from 'src/database/users/users.service';
 import { IRequestWithUser } from './Interfaces/IRequestWithUser';
 import { UserStatus } from '@prisma/client';
+import { UserDto } from 'src/database/users/User_DTO/User.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,7 @@ export class AuthService {
     const payload = await this.jwtAuthService.verifyJwtAccessToken(jwt);
     if (payload == null)
       return null;
-    const user = await this.userService.findUserById(payload.id);
+    const user = await this.userService.getUserConvs(payload.id);
     if (user == null)
       return null;
     if (user.activeRefreshToken !== refreshJwt)
@@ -36,6 +37,7 @@ export class AuthService {
       // secure: true,
     });
   }
+
 
   async refresh(req: IRequestWithUser) {
     if (!req.user) {

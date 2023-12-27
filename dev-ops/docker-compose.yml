@@ -55,6 +55,7 @@ services:
       - LOGIN_URL
       - SETUP_URL
       - TFA_URL
+      - LOADING_URL
       - DEFAULT_AVATAR
       - DEFAULT_CHANNEL_AVATAR
 
