@@ -7,13 +7,16 @@ import Ranked from "./components/ranked";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useSocket } from "../clientSocket";
+import { useMode, useSocket } from "../clientSocket";
+import { GameModeProvider} from "../clientSocket";
 
 function Home () {
   const [user, setUser] = useState({});
   const navigate = useNavigate();
   const [fetched, setFetchState] = useState(false);
-  const socket = useSocket();
+  // const socket = useSocket("");
+  const {mode, setMode} = useMode();
+
 
   useEffect( 
     ()=>
@@ -76,7 +79,8 @@ function Home () {
               <div onClick={
                   ()=> 
                   {
-                    socket.emit("queuing");
+                    // socket.emit("queuing");
+                    setMode("queuing");
                     navigate("/game");
                   }
                 } className="">
@@ -90,7 +94,8 @@ function Home () {
               <div onClick={
                   ()=> 
                   {
-                    socket.emit("botMode");
+                    // socket.emit("botMode");
+                    setMode("botMode");
                     navigate("/game");
                   }}
                   className="">

@@ -3,9 +3,6 @@ import {
 }
 	from '@nestjs/common';
 import {
-	OnGatewayInit,
-	OnGatewayConnection,
-	OnGatewayDisconnect,
 	SubscribeMessage,
 	WebSocketGateway,
 	WebSocketServer
@@ -15,15 +12,13 @@ import { Server, Socket } from 'socket.io';
 import { UsersService } from 'src/database/users/users.service';
 import { gameService } from './game.service';
 import { AuthService } from 'src/auth/auth.service';
-import { parse } from 'cookie';
 import { room } from './Room';
-import { match } from 'assert';
 import { MatchDto } from 'src/database/matches/matches.dto';
 
 // Managing the sockets
 @WebSocketGateway({
 	cors: {
-		origin: "http://localhost:8082",
+		origin: "http://localhost:8082", 
 		credentials: true
 	},
 	namespace: '/game'
@@ -33,18 +28,31 @@ export class gameServer implements OnModuleInit {
 	server: Server;
 
 	roomsList: room[] = new Array<room>();
-	connectedUsers: string[] = new Array<string>();
 
 
-	constructor(private authService: AuthService,
+	constructor(
 		private gameService: gameService,
-		private userService: UsersService) { }
+		private userService: UsersService) 
+		{ }
 
 	onModuleInit() {
 		this.gameService.gameLoop(this.server, this.roomsList); 
 	}
 
 	async handleConnection(client: Socket) {
+		console.log("Client connected", client.id);
+		try {
+			let user = await this.gameService.chatService.getUserFromSocket(client);
+			if (await this.userService.getStatus(user.id) == "busy")
+			{
+				this.server.to(`${client.id}`).emit("alreadyQueuing");
+				client.disconnect();
+				return ;
+			}
+		}
+		catch (e) {
+			console.log(e);
+		}
 	}
 
 	async handleDisconnect(client: Socket) {
@@ -53,37 +61,24 @@ export class gameServer implements OnModuleInit {
 		let roomCheck = await this.roomsList.find(room => room.firstClient === client || room.secondClient === client);
 		if (roomCheck)
 		{
-			this.roomsList.splice(this.roomsList.indexOf(roomCheck), 1);
-			console.log("Room found ");
-			if (roomCheck.firstClient && roomCheck.secondClient)
-			{
-			}
-			if (roomCheck.firstClient && roomCheck.gameMode == "robot")
-			{
-			}
 			this.server.to(`${roomCheck.id}`).emit("leaveGame");
 			this.roomsList.splice(this.roomsList.indexOf(roomCheck), 1);
 		} 
 		try {
 			let user = await this.gameService.chatService.getUserFromSocket(client);
-			this.connectedUsers.splice(this.connectedUsers.indexOf(user.username), 1);
 			this.userService.setStatus(user.id, "online");
 		}
 		catch (e) {
-			console.log("oops");
 			console.log(e);
 		}
 	}
 
-	// NOTE BOT MODE
-	// NOTE - set the player status in the database to busy using the user service
 	@SubscribeMessage('botMode')
 	async setGameAsBotMode(client: Socket) {
-		await console.log("BOT MODE !!!!!", client.id);
+		await console.log("BOT MODE !!!!!", client);
 		try
 		{
 			let user = await this.gameService.chatService.getUserFromSocket(client);
-			this.connectedUsers.push(user.username);
 
 			if(await this.userService.getStatus(user.id) == "busy")
 			{
@@ -108,13 +103,25 @@ export class gameServer implements OnModuleInit {
 		{
 			console.log("oops");
 			console.log(e);
-			client.disconnect();
 			return ;
 		}
 	}
 	@SubscribeMessage('invite')
 	async invitePlayer(client: Socket, invitedUser: string) {
-		// Check if the invited user is already in a game if he is return and don't create a new room
+		try
+		{
+			let user = await this.gameService.chatService.getUserFromSocket(client);
+			if(await this.userService.getStatus(user.id) == "busy")
+			{
+				this.server.to(`${client.id}`).emit("alreadyQueuing");
+				return ;
+			}
+		}
+		catch (e)
+		{
+			console.log(e);
+			return ;
+		}
 		let room_ = new room();
 		room_.id = this.roomsList.length + 1;
 		room_.firstClient = client;
@@ -140,6 +147,7 @@ export class gameServer implements OnModuleInit {
 		let roomCheck = await this.roomsList.find(room => room.firstClient === client || room.secondClient === client);
 		if (roomCheck)
 		{
+			this.server.to(`${roomCheck.id}`).emit("leaveGame");
 			if (roomCheck.gameMode != "robot")
 			{
 				if (roomCheck.score1 >= roomCheck.score2)
@@ -152,8 +160,12 @@ export class gameServer implements OnModuleInit {
 										 name: roomCheck.secondName};
 					match.loserStats = {score: roomCheck.score1, 
 										 name: roomCheck.firstName};
-					this.userService.findUserById(roomCheck.user2ID).then((user) => {
-						this.userService.setScore(user.id, user.score + (roomCheck.score1 - roomCheck.score2));
+					this.userService.findUserById(roomCheck.user2ID).then((user) => 
+					{
+						if (user)
+						{
+							this.userService.setScore(user.id, user.score + (roomCheck.score1 - roomCheck.score2));
+						}
 					});
 				}
 				else
@@ -162,14 +174,17 @@ export class gameServer implements OnModuleInit {
 					match.loserId = roomCheck.user1ID;
 					match.mode = roomCheck.gameMode;
 					match.endedAt = roomCheck.endTime;
-					match.winnerStats = {score: roomCheck.score1, name: roomCheck.firstName};
-					match.loserStats = {score: roomCheck.score2, name: roomCheck.secondName};
+					match.winnerStats = {score: roomCheck.score1, 
+										 name: roomCheck.firstName};
+					match.loserStats = {score: roomCheck.score2, 
+										 name: roomCheck.secondName};
 					this.userService.findUserById(roomCheck.user1ID).then((user) => 
 					{
 						this.userService.setScore(user.id, user.score + (roomCheck.score2 - roomCheck.score1));
 					});
 				}
-				this.gameService.matchesService.create(match);
+				if (match.winnerId && match.loserId)
+					this.gameService.matchesService.create(match);
 			}
 			{
 				try
@@ -190,12 +205,11 @@ export class gameServer implements OnModuleInit {
 				{
 					console.log(e);
 				}
-				this.server.to(`${roomCheck.id}`).emit("leaveGame");
+				// this.server.to(`${roomCheck.id}`).emit("leaveGame");
 				this.roomsList.splice(this.roomsList.indexOf(roomCheck), 1);
 			}
 		}
 		// Emit an event to all players connected to the room that the match is done
-		this.server.to(`${client.id}`).emit("leaveGame");
 		// client.disconnect();
 	}
 	@SubscribeMessage('gameOver')

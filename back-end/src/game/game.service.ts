@@ -157,7 +157,7 @@ export class gameService
 					}
                     else
                     {
-                        if (rooms[i].score1 >= 6 || rooms[i].score2 >= 6)
+                        if (rooms[i].score1 >= 6 || rooms[i].score2 >= 6) 
                         {
                             server.to(i + '').emit('gameover');
                             rooms[i].endTime = new Date();

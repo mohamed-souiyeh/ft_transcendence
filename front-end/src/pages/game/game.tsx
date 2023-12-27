@@ -5,7 +5,7 @@ import Profile from "../components/userProfileIcone";
 import {io} from 'socket.io-client';
 import {Cube} from './cube';
 import quitButton from './exitGame.png';
-import { useSocket } from '../../clientSocket';
+import { useMode, useSocket } from '../../clientSocket';
 import botPic from '../../assets/bot.png'
 import pic from '../../assets/taha.jpg'
 
@@ -31,40 +31,49 @@ function Game()
   let [profileImage, setImage] = useState('');
   let foundMatch:boolean = false;
   let navigate = useNavigate();
-  const socket = useSocket();
   const frameRef = useRef<number>(0);
+  let gameMode = useMode();
   let formdata = new FormData();
   console.log(gameState);
   
+  const socket = useSocket("game");
+
   const leaveGame = () => {
+    if (socket)
     socket.emit("leaveRoom")
   }
   
+  console.log(gameMode.mode);
+  
+  // socket.emit(gameMode.mode);
   useEffect(() => 
   {
+  {
+    if (socket && gameMode.mode)
     {
-      //FIXME - replace href with navigate
-      socket.on("botGame", ()=>{
-        setLeftPic(botPic);
-      })
-      socket.on("leaveGame", ()=>{
-        window.location.href = "http://localhost:8082/home";
-      })
-      socket.on("alreadyPlaying", ()=>{
-        window.location.href = "http://localhost:8082/home";
-      });
-      socket.on("alreadyQueuing", ()=>{
-        window.location.href = "http://localhost:8082/home";
-      });
-      socket.on("gameover", ()=>{
-          if (!gameState)
-          {
-            socket.emit("gameOver");
-            window.location.href = "http://localhost:8082/home";
-            setState(true);
-          }
+        socket.emit(gameMode.mode);
+        socket.on("botGame", ()=>{
+          setLeftPic(botPic);
+        })
+        socket.on("leaveGame", ()=>{
+          navigate("/home");
+        })
+        socket.on("alreadyPlaying", ()=>{
+          navigate("/home");
         });
-    }
+        socket.on("alreadyQueuing", ()=>{
+          navigate("/home");
+        });
+        socket.on("gameover", ()=>{
+            if (!gameState)
+            {
+              socket.emit("gameOver");
+              navigate("/home");
+              setState(true);
+            }
+          });
+        }
+      }
     if (canvasRef.current) 
     {
       gl = canvasRef.current.getContext("webgl");
@@ -137,33 +146,47 @@ function Game()
               ballLaunched = true;
               ball.speed = 0.009;
             }
+            if (socket)
             socket.emit('balllaunch', ballLaunched);
         }
       if (e.code == 'KeyW')
       {
-        socket.emit('right', 1);
-        socket.emit('left', 1);
+        if (socket)
+        {
+          socket.emit('right', 1);
+          socket.emit('left', 1);
+
+        }
       }
       if (e.code == 'KeyS')
       {
-        socket.emit('right', -1);
-        socket.emit('left', -1);
+        if (socket)
+        {
+          socket.emit('right', -1);
+          socket.emit('left', -1);
+        }
       }
     })
 
     document.addEventListener('keyup', (e) => {
       if (e.code == 'KeyW')
       {
-        socket.emit('right', 0);
-        socket.emit('left', 0);
+        if (socket)
+        {
+          socket.emit('right', 0);
+          socket.emit('left', 0);
+        }
       }
       if (e.code == 'KeyS')
       {
-        socket.emit('right', 0);
-        socket.emit('left', 0);
+        if (socket)
+        {
+          socket.emit('right', 0);
+          socket.emit('left', 0);
+        }
       }
     })
-    
+
     let firstPlayerHasTheBall:boolean = true;
     let secondPlayerHasTheBall:boolean = false;
     let ballLaunched:boolean = false;
@@ -265,7 +288,7 @@ function Game()
     window.addEventListener("resize", handle);
     return () => {cancelAnimationFrame(frameRef.current);
     }
-  }, []);
+  }, [socket, gameMode.mode]);
 
   return (<>
           <div className="w-screen grid justify-center ">
