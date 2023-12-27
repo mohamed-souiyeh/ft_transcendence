@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IRequestWithUser } from 'src/auth/Interfaces/IRequestWithUser';
 import { createChanneldto } from './channel.dto/channel.dto';
@@ -9,6 +9,62 @@ import { createDMdto } from './dmDTO/createDM.dto';
 export class ConversationsService {
   constructor(private readonly prismaService: PrismaService) { }
 
+
+//SECTION - READ operations
+  async getDmMessages(dmId: number) {
+    const dm = await this.prismaService.dms.findUnique({
+      where: {
+        id: dmId,
+      },
+      include: {
+        messages: {
+          include: {
+            sender: {
+              select: {
+                id: true,
+                username: true,
+              },
+            },
+          }
+        },
+        users: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      }
+    });
+
+    if (dm === null) return null;
+
+    return dm;
+  }
+
+
+  async getChannelMessages(channelId: number) {
+    const channel = await this.prismaService.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+      include: {
+        messages: {
+          include: {
+            sender: {
+              include: {
+                blockedBy: true,
+              },
+            },
+          }
+        },
+        usersState: true,
+      }
+    });
+
+    if (channel === null) return null;
+
+    return channel;
+  }
 
   async getChannel(id: number, userId: number) {
     const channel = await this.prismaService.channel.findUnique({
@@ -35,15 +91,11 @@ export class ConversationsService {
             },
           },
         },
-        usersState: {
-          where: {
-            userId: userId,
-          }
-        },
+        usersState: true,
       }
     });
 
-    if (channel === null) throw new NotFoundException('Channel not found');
+    if (channel === null) return null;
 
     return channel;
   }
@@ -69,9 +121,26 @@ export class ConversationsService {
       }
     });
 
-    if (dm === null) throw new NotFoundException('DM not found');
+    if (dm === null) return null;
 
     return dm;
+  }
+//!SECTION - READ operations
+
+
+//SECTION - create operations
+
+  async createMessage(msg: any) {
+    const message = await this.prismaService.message.create({
+      data: {
+        text: msg.text,
+        senderId: msg.senderId,
+        dmId: msg.dmId ? msg.dmId : null,
+        channelId: msg.channelId ? msg.channelId : null,
+      },
+    });
+
+    return message;
   }
 
 
@@ -134,4 +203,5 @@ export class ConversationsService {
       }
     })
   }
+//!SECTION - create operations
 }

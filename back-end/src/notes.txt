@@ -63,9 +63,9 @@ client
 
 events:
 
-channelGuard: make sure that the user belong and can send msgs to the channel and the channel room exist
+channelGuard: make sure that the user belong and can send msgs to the channel and the channel room exist //NOTE - DONE
 
-dmGuard: make sure that the user belong and can send msgs to the dm and the dm room exist
+dmGuard: make sure that the user belong and can send msgs to the dm and the dm room exist //NOTE - DONE
 
 checkpls: checks if the requisting user can participate in the current chat
           checkDmpls: //NOTE - DONE
@@ -73,18 +73,24 @@ checkpls: checks if the requisting user can participate in the current chat
 
 
 Msg: event used by the client to send msgs to the server (aka the server subsecribe to it).
-          channelmsg: //NOTE - need to explore adding the acknoledgement
+          channelmsg: //NOTE - need to explore adding the acknoledgement 
+          //ANCHOR - 
           dmmsg: //NOTE - need to explore adding the acknoledgement
 
 broadcast: event used by the server to broadcast duh the msg to all clients
             in a room (aka the clients subsecribe to it). //NOTE - DONE
 
 
-getAllMsgs: event used by the server to retrieve all the msgs related a specific conversation (aka the server subsecribe to it).
+
+getAllMsgsGuard: to make sure that the conv exist and the user requesting it's msg belong to the conv and is not banned from it aka can not see the conve (this is in the channel case) //NOTE - still needs testing
+
+getAllMsgs: event used by the server to retrieve all the msgs related a specific conversation (aka the server subsecribe to it). //NOTE - DONE for both dm and channels
 
 moderator events:
 
 moderatorGuard: make sure the user have permitions to do an operation //NOTE - DONE
+
+msg still need to persist in the database //NOTE - DONE
 
 kick
 
@@ -97,5 +103,7 @@ giveAdminRole
 removeAdminRole
 
 leavChannel
+
+removeChannel
 
 addUsers

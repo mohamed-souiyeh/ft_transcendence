@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ChatService } from '../chat.service';
 import { JwtAuthService } from 'src/auth/jwt/jwt.service';
 import { ConversationsService } from 'src/database/conversations/conversations.service';
 import Joi from 'joi';
 import { WsException } from '@nestjs/websockets';
-import { Role, UserState } from '@prisma/client';
+import { ChannelType, Role, UserState } from '@prisma/client';
 
 @Injectable()
 export class modiratorChatGuard implements CanActivate {
@@ -16,7 +17,7 @@ export class modiratorChatGuard implements CanActivate {
 
   async validaGuardData(data: any) {
     const schema = Joi.object({
-      convType: Joi.string().required().valid('public', 'protected', 'private'),
+      convType: Joi.string().required().valid(ChannelType.private, ChannelType.protected, ChannelType.public),
       convId: Joi.number().required(),
       targetedUserId: Joi.number().required(),
     });
