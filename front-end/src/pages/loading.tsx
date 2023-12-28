@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react"
 import { UserContext } from "../App"
 import axios from "axios"
 import { Navigate, useNavigate} from "react-router-dom"
+import Cookies from 'js-cookie';
 
 function Loading() {
 
@@ -15,6 +16,7 @@ function Loading() {
       })
         .then((resp) => {
           setUser(resp.data)
+               Cookies.set('user', JSON.stringify(resp.data) );
         })
         .catch((err)=> {
           console.log('SIKE~!', err)

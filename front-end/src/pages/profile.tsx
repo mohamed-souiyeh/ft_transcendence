@@ -8,14 +8,40 @@ import games from "../assets/controller.png"
 import { Switch, ConfigProvider } from "antd";
 import { useContext, useState } from "react";
 import { UserContext } from "../App";
+import axios from "axios";
 
 
 
 
 function Profile () {
+
+
+
   const [switchValue, setSwitchValue] = useState(false);
   const [prompt, setPrompt] = useState(false);
   // const [qrCode, setCode] = useState(null);
+  
+  //--------------The Code below is for testing purpose:
+
+      axios.get("http://localhost:1337/auth/refresh", {
+        withCredentials: true
+      })
+        .then((resp) => {
+            console.log("we have as a resp:", resp)
+        })
+        .catch((err)=> {
+          console.log('SIKE~!', err)
+            if (err.response) {
+              if(err.response.status == 401){
+              console.log("this user is not Authenticated")
+            }
+          }
+        })
+  //----------------------------
+
+
+
+
   const {user} = useContext(UserContext)
 
   return(

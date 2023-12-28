@@ -8,15 +8,16 @@ import UserProfile from "./pages/user";
 import LandingPage from "./pages/landingpage";
 import Setup from "./pages/userSetup";
 import RequireAuth from "./pages/components/requireAuth";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createContext } from "react";
 // import { apiGlobal } from "./pages/interceptor";
 import TwoFAConfirmation from "./pages/twofaconfirm";
 import Loading from "./pages/loading";
-
+import Cookies from 'js-cookie'
 
 export const AuthContext = createContext({auth: false, setAuth : React.Dispatch<React.SetStateAction<boolean>> });
 export const UserContext = createContext({user: {}, setUser : React.Dispatch<React.SetStateAction<boolean>> });
+
 
 function App() {
 
@@ -30,6 +31,19 @@ function App() {
 
   const [auth, setAuth] = useState(false)
   const [user, setUser] = useState({})
+
+  //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
+
+  useEffect(() => {
+    const userData = Cookies.get('user');
+
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
+
+
   return (
     <>
       <AuthContext.Provider value={{auth, setAuth}}>
