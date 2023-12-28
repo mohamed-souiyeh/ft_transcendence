@@ -4,19 +4,24 @@ import { baseGateWayConfig } from '../baseGateWayConfig/baseGateWay.config';
 import { ChatService } from './chat.service';
 import { UsersService } from 'src/database/users/users.service';
 import { JwtAuthService } from 'src/auth/jwt/jwt.service';
-import { ChannelType, UserState, UserStatus } from '@prisma/client';
+import { ChannelType, Role, UserState, UserStatus } from '@prisma/client';
 import { JwtPayload } from 'src/auth/jwt/JwtPayloadDto/JwtPayloadDto';
 import { Server, Socket } from 'socket.io';
 import Joi from 'joi';
 import { ConversationsService } from 'src/database/conversations/conversations.service';
 import { UseGuards } from '@nestjs/common';
-import { modiratorChatGuard } from './chat-guard/moderatorchat.guard';
-import { channel } from 'diagnostics_channel';
+import { modiratorChatGuard } from './modiratorchat-guard/moderatorchat.guard';
 import { ChannelGuard } from './channel/channel.guard';
 import { DmGuard } from './dm/dm.guard';
 import { GetAllMsgsGuard } from './get-all-msgs/get-all-msgs.guard';
 import { ChannelBroadcastedMsg } from './types/channelBroadcastedMsg.type';
 import { dmBroadcastedMsg } from './types/dmBroadcastedMsg.type';
+import { LeaveChannelGuard } from './leave-channel/leave-channel.guard';
+import { AddUsersGuard } from './add-users/add-users.guard';
+import { ChangeChannelTypeGuard } from './change-channel-type/change-channel-type.guard';
+import { ChangeChannelPasswordGuard } from './change-channel-password/change-channel-password.guard';
+import { JoinChannelGuard } from './join-channel/join-channel.guard';
+import { RemoveChannelGuard } from './remove-channel/remove-channel.guard';
 
 const chatGatewayConfig = {
   ...baseGateWayConfig,
@@ -26,7 +31,9 @@ const chatGatewayConfig = {
 @WebSocketGateway(chatGatewayConfig)
 export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
 
-  constructor(private readonly chatService: ChatService, private readonly usersService: UsersService, private readonly jwtAuthService: JwtAuthService,
+  constructor(private readonly chatService: ChatService,
+    private readonly usersService: UsersService,
+    private readonly jwtAuthService: JwtAuthService,
     private readonly convService: ConversationsService) { }
 
   @WebSocketServer()
@@ -56,7 +63,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   async handleConnection(client: Socket) {
     try {
       const user = await this.chatService.getUserFromSocket(client);
-      await this.usersService.setStatus(user.id, UserStatus.online);
+
+      if (await this.usersService.getStatus(user.id) === UserStatus.offline)
+        await this.usersService.setOnlineStatus(user.id);
 
       await this.addToRooms(user, client);
       console.log('client connected');
@@ -72,7 +81,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     const { jwt } = await this.chatService.getTokensFromSocket(client);
 
     const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
-    await this.usersService.setStatus(payload.id, UserStatus.offline);
+    await this.usersService.setOfflineStatus(payload.id);
 
     // console.log("payload => ", payload);
     console.log('client disconnected');
@@ -181,64 +190,166 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     }
   }
 
-  @UseGuards(modiratorChatGuard)
-  @SubscribeMessage('kickUser')
-  async kickUser(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
-    return "kickUser";
+
+  async replaceOwner(convId: number, userId: number) {
+    const conv = await this.convService.getChannel(convId, userId);
+
+    if (userId !== conv.ownerId) return;
+
+    const newOwnerProspects = conv.usersState.filter(userState => userState.role === Role.modirator);
+
+    console.log("newOwnerProspects => ", newOwnerProspects);
+    if (newOwnerProspects.length !== 0) {
+      await this.convService.updateUserRole(convId, newOwnerProspects[0].userId, Role.owner);
+      return true;
+    }
+
+    const newOwner = conv.usersState.find(userState => userState.role === Role.user);
+
+    console.log("newOwner => ", newOwner);
+    if (newOwner === undefined) {
+      await this.convService.deleteChannel(convId);
+      return false;
+    }
+
+    await this.convService.updateUserRole(convId, newOwner.userId, Role.owner);
+    return true;
   }
 
-  @SubscribeMessage('banUser')
-  async banUser(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
-
-  }
-
-  @SubscribeMessage('unbanUser')
-  async unbanUser(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
-
-  }
-
-  @SubscribeMessage('muteUser')
-  async muteUser(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
-
-  }
-
-  @SubscribeMessage('unmuteUser')
-  async unmuteUser(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
-
-  }
-
-  @SubscribeMessage('giveAdminRole')
-  async giveAdminRole(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
-
-  }
-
-  @SubscribeMessage('removeAdminRole')
-  async removeAdminRole(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
-
-  }
-
+  @UseGuards(LeaveChannelGuard)
   @SubscribeMessage('leaveChannel')
   async leaveChannel(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
+    msg.convId = Number(msg.convId);
 
+    const { jwt } = await this.chatService.getTokensFromSocket(client);
+
+    const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
+
+
+    if (await this.replaceOwner(msg.convId, payload.id) === false)
+      return { message: 'you left and channel removed' };
+
+    await this.convService.removeUserFromChannel(msg.convId, payload.id);
+
+    return { message: 'you left the channel' };
   }
-  
-  
-  @SubscribeMessage('addUsers')
-  async addUser(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
 
+  @UseGuards(modiratorChatGuard)
+  @SubscribeMessage('kickUser')
+  async kickUser(@MessageBody() msg: any) {
+    this.convService.removeUserFromChannel(msg.convId, msg.targetedUserId);
+    return { message: 'user kicked' };
+  }
+
+  async checkDate(date: Date) {
+    if (date === undefined)
+      throw new WsException({ error: 'Unauthorized operation', message: 'you need to provide an end date for this operation' });
+
+    const now = new Date();
+    const until = new Date(date);
+    if (until < now)
+      throw new WsException({ error: 'Unauthorized operation', message: 'the end date for the ban is in the past' });
+    return until;
+  }
+
+  @UseGuards(modiratorChatGuard)
+  @SubscribeMessage('banUser')
+  async banUser(@MessageBody() msg: any) {
+    const until = await this.checkDate(msg.until);
+
+    return this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.banned, until);
+  }
+
+  @UseGuards(modiratorChatGuard)
+  @SubscribeMessage('unbanUser')
+  async unbanUser(@MessageBody() msg: any) {
+    return this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.active);
+  }
+
+  @UseGuards(modiratorChatGuard)
+  @SubscribeMessage('muteUser')
+  async muteUser(@MessageBody() msg: any) {
+    const until = await this.checkDate(msg.until);
+
+    return this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.muted, until);
+  }
+
+  @UseGuards(modiratorChatGuard)
+  @SubscribeMessage('unmuteUser')
+  async unmuteUser(@MessageBody() msg: any) {
+    return this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.active);
+  }
+
+
+  @UseGuards(modiratorChatGuard)
+  @SubscribeMessage('giveAdminRole')
+  async giveAdminRole(@MessageBody() msg: any) {
+    return this.convService.updateUserRole(msg.convId, msg.targetedUserId, Role.modirator);
+  }
+
+  @UseGuards(modiratorChatGuard)
+  @SubscribeMessage('removeAdminRole')
+  async removeAdminRole(@MessageBody() msg: any) {
+    return this.convService.updateUserRole(msg.convId, msg.targetedUserId, Role.user);
   }
 
 
 
+  @UseGuards(AddUsersGuard)
+  @SubscribeMessage('addUser')
+  async addUser(@MessageBody() msg: any) {
+    msg.convId = Number(msg.convId);
+    msg.targetedUserId = Number(msg.targetedUserId);
+
+    await this.convService.addUserToChannel(msg.convId, msg.targetedUserId);
+
+    return { message: 'user added' };
+  }
+
+  @UseGuards(ChangeChannelTypeGuard)
+  @SubscribeMessage('changeChannelType')
+  async changeChanneltype(@MessageBody() msg: any) {
+    return this.convService.setChanneltype(msg.convId, msg.newType,
+      msg.password === undefined ? null : msg.password);
+  }
+
+
+  @UseGuards(ChangeChannelPasswordGuard)
+  @SubscribeMessage('changeChannelPassword')
+  async changeChannelPassword(@MessageBody() msg: any) {
+    msg.convId = Number(msg.convId);
+
+    await this.convService.setChannelPassword(msg.convId, msg.password);
+
+    return { message: 'password changed' };
+  }
+
+  @UseGuards(JoinChannelGuard)
+  @SubscribeMessage('joinChannel')
+  async joinChannel(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
+    msg.convId = Number(msg.convId);
+
+    const { jwt } = await this.chatService.getTokensFromSocket(client);
+
+    const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
+
+
+    await this.convService.addUserToChannel(msg.convId, payload.id);
+
+    return { message: 'you joined the channel' };
+  }
+
+  @UseGuards(RemoveChannelGuard)
+  @SubscribeMessage('removeChannel')
+  async removeChannel(@MessageBody() msg: any) {
+    msg.convId = Number(msg.convId);
+
+    await this.convService.deleteChannel(msg.convId);
+
+    return { message: 'channel removed' };
+  }
 
   //!SECTION - Channels
-
-
-
-
-
-
-
 
 
   //SECTION - DMs
@@ -368,7 +479,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       }
 
       return messages;
-    }else if (msg.convType in ChannelType) {
+    } else if (msg.convType in ChannelType) {
       const conv = await this.convService.getChannelMessages(msg.convId);
       const messages: Array<ChannelBroadcastedMsg> = new Array<ChannelBroadcastedMsg>();
       for (const msg of conv.messages) {

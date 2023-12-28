@@ -92,18 +92,85 @@ moderatorGuard: make sure the user have permitions to do an operation //NOTE - D
 
 msg still need to persist in the database //NOTE - DONE
 
-kick
 
-ban - unban
+msgBody for the following events
+{
+  targetedUserId: number,
+  convType: string,
+  convId: number,
+  until: Date,
+}
 
-mute - unmute
+kick // NOTE - DONE
 
-giveAdminRole
+ban - unban //NOTE - DONE
 
-removeAdminRole
+mute - unmute //NOTE - DONE
 
-leavChannel
+giveAdminRole //NOTE - DONE
 
-removeChannel
+removeAdminRole //NOTE - DONE
 
-addUsers
+
+
+msgBody for the leavChannelEvent
+{
+  convType: string,
+  convId: number,
+}
+
+leavChannel //NOTE - if the owner left the channel we need to set a new owner
+
+
+
+msgBody for add user event
+{
+  convType: string,
+  convId: number,
+  targetedUserId: number,
+}
+
+addUsers //NOTE - DONE
+
+
+
+
+msgBody for changeChannelType event
+{
+  convType: string,
+  convId: number,
+  newType: string,
+  password: string (required in case of changing the state of the channel to protected)
+}
+
+change the type of the channel to public or private or protected only by the oner of the channel // NOTE - DONE
+
+
+
+
+msgBody for change channel password event
+{
+  convType: string,
+  convId: number,
+  password: string,
+}
+change channel password //NOTE - DONE
+
+
+msgBody for join channel event 
+{
+  convType: string,
+  convId: number,
+  password: string,
+}
+join channel (only public and protected) // NOTE - DONE
+
+
+
+msgBody for leave channel event 
+{
+  convType: string,
+  convId: number,
+}
+removeChannel // NOTE - DONE
+

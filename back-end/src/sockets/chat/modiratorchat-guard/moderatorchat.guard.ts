@@ -20,6 +20,7 @@ export class modiratorChatGuard implements CanActivate {
       convType: Joi.string().required().valid(ChannelType.private, ChannelType.protected, ChannelType.public),
       convId: Joi.number().required(),
       targetedUserId: Joi.number().required(),
+      until: Joi.date().optional(),
     });
 
     const { error } = schema.validate(data);
@@ -49,9 +50,22 @@ export class modiratorChatGuard implements CanActivate {
 
     const conv = await this.convService.getChannel(data.convId, payload.id);
 
+    if (conv === null)
+      throw new WsException({error: 'Unauthorized operation'
+      , message: 'the channel doesnt exist'});
+    
     const userState = conv.usersState.find(userState => userState.userId === payload.id);
 
-    console.log("userState => ", userState);
+    if (userState === undefined)
+      throw new WsException({error: 'Unauthorized operation'
+      , message: 'you are not in the channel'});
+
+    const targetedUserState = conv.usersState.find(userState => userState.userId === data.targetedUserId);
+
+    if (targetedUserState === undefined)
+      throw new WsException({error: 'Unauthorized operation'
+      , message: 'the targeted user is not in the channel'});
+    // console.log("userState => ", userState);
 
     //NOTE - check if the user doesnt have required role for the operation
     if (userState.state !== UserState.active)
@@ -61,9 +75,10 @@ export class modiratorChatGuard implements CanActivate {
     if (userState.role === Role.user)
       throw new WsException({error: 'Unauthorized operation'
       , message: 'you dont have the required role for this operation'});
-    
-    console.log("data.targetedUserId => ", data.targetedUserId);
-    console.log("conv.ownerId => ", conv.ownerId);
+
+    if (userState.userId === data.targetedUserId)
+      throw new WsException({error: 'Unauthorized operation'
+      , message: 'are u dumb or what?, you cant perform this operation on yourself'});
 
     if (data.targetedUserId === conv.ownerId)
       throw new WsException({error: 'Unauthorized operation'
