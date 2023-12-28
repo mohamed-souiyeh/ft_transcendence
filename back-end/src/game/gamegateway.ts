@@ -11,7 +11,6 @@ import {
 import { Server, Socket } from 'socket.io';
 import { UsersService } from 'src/database/users/users.service';
 import { gameService } from './game.service';
-import { AuthService } from 'src/auth/auth.service';
 import { room } from './Room';
 import { MatchDto } from 'src/database/matches/matches.dto';
 
@@ -28,7 +27,6 @@ export class gameServer implements OnModuleInit {
 	server: Server;
 
 	roomsList: room[] = new Array<room>();
-
 
 	constructor(
 		private gameService: gameService,
@@ -150,7 +148,7 @@ export class gameServer implements OnModuleInit {
 			this.server.to(`${roomCheck.id}`).emit("leaveGame");
 			if (roomCheck.gameMode != "robot")
 			{
-				if (roomCheck.score1 >= roomCheck.score2)
+				if (roomCheck.firstClient == client)
 				{
 					match.winnerId = roomCheck.user1ID;
 					match.loserId = roomCheck.user2ID;
@@ -168,7 +166,7 @@ export class gameServer implements OnModuleInit {
 						}
 					});
 				}
-				else
+				else if (roomCheck.secondClient == client)
 				{
 					match.winnerId = roomCheck.user2ID;
 					match.loserId = roomCheck.user1ID;
@@ -224,33 +222,40 @@ export class gameServer implements OnModuleInit {
 			{
 				if (roomCheck.score1 > roomCheck.score2)
 				{
+					console.log("Right");
 					match.winnerId = roomCheck.user1ID;
 					match.loserId = roomCheck.user2ID;
 					match.endedAt = roomCheck.endTime;
 					match.mode = roomCheck.gameMode;
-					match.winnerStats = {score: roomCheck.score2, 
+					match.winnerStats = {score: roomCheck.score1, 
 										 name: roomCheck.secondName};
-					match.loserStats = {score: roomCheck.score1, 
+					match.loserStats = {score: roomCheck.score2, 
 										 name: roomCheck.firstName};
 					this.userService.findUserById(roomCheck.user2ID).then((user) => {
 						this.userService.setScore(user.id, user.score + (roomCheck.score1 - roomCheck.score2));
+						console.log("Score ", (roomCheck.score1 - roomCheck.score2));
 					});
+					this.server.to(`${roomCheck.firstClient.id}`).emit("winner", false);
 				}
-				else
+				else if (roomCheck.score1 < roomCheck.score2)
 				{
+					console.log("Left");
 					match.winnerId = roomCheck.user2ID;
 					match.loserId = roomCheck.user1ID;
 					match.mode = roomCheck.gameMode;
 					match.endedAt = roomCheck.endTime;
-					match.winnerStats = {score: roomCheck.score1, name: roomCheck.firstName};
-					match.loserStats = {score: roomCheck.score2, name: roomCheck.secondName};
+					match.winnerStats = {score: roomCheck.score2, name: roomCheck.firstName};
+					match.loserStats = {score: roomCheck.score1, name: roomCheck.secondName};
 					this.userService.findUserById(roomCheck.user1ID).then((user) => 
 					{
 						this.userService.setScore(user.id, user.score + (roomCheck.score2 - roomCheck.score1));
+						console.log("Score ", (roomCheck.score2 - roomCheck.score1));
 					});
+					this.server.to(`${roomCheck.secondClient.id}`).emit("winner", false);
 				}
 				this.gameService.matchesService.create(match);
 			}
+			this.roomsList.splice(this.roomsList.indexOf(roomCheck), 1);
 		}
 	}
 
