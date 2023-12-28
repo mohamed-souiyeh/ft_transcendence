@@ -20,12 +20,18 @@ export class MatchesService {
   async create(match: MatchDto) {
     await this.prismaService.user.update({
       where: { id: match.winnerId },
-      data: { matchesPlayed: { increment: 1 } },
+      data: { 
+        matchesPlayed: { increment: 1 } ,
+        wins: { increment: 1 }
+      },
     });
 
     await this.prismaService.user.update({
       where: { id: match.loserId },
-      data: { matchesPlayed: { increment: 1 } },
+      data: {
+        matchesPlayed: { increment: 1 },
+        loses: { increment: 1 }
+      },
     });
 
     return await this.prismaService.match.create({

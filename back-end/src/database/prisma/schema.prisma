@@ -14,9 +14,12 @@ enum UserStatus {
 }
 
 model user {
-  id            Int    @id @default(autoincrement())
-  username      String @unique
-  score         Int    @default(0)
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  score    Int    @default(0)
+  wins     Int    @default(0)
+  loses    Int    @default(0)
+
   matchesPlayed Int    @default(0)
   email         String @unique
   avatar        String
@@ -42,9 +45,6 @@ model user {
 
   blockedUsers user[] @relation("blockedUsers")
   blockedBy    user[] @relation("blockedUsers")
-
-  sentNotificatons      notification[] @relation(name: "sender")
-  receivedNotifications notification[] @relation(name: "receiver")
 
   channels      channel[]
   channelsState userState[] @relation(name: "channelsState")
@@ -80,8 +80,6 @@ model channel {
   channelPassword String? //NOTE - password of the channel need to be hashed
 
   ownerId Int //NOTE - id of the owner of the channel
-
-  modiratorIds Int[] //NOTE - ids of the modirators of the channel
 
   usersState userState[] //NOTE - state of the users in the channel
 
@@ -179,22 +177,6 @@ model match {
 
   loser   user @relation(name: "loser", fields: [loserId], references: [id])
   loserId Int
-}
-
-//!SECTION
-
-//SECTION - notification model
-
-model notification {
-  id Int @id @default(autoincrement())
-
-  sender   user @relation(name: "sender", fields: [senderId], references: [id])
-  senderId Int
-
-  receiver   user @relation(name: "receiver", fields: [receiverId], references: [id])
-  receiverId Int
-
-  createdAt DateTime @default(now())
 }
 
 //!SECTION
