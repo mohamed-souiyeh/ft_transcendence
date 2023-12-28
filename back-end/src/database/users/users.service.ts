@@ -4,7 +4,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { UserDto } from './User_DTO/User.dto';
 import * as crypto from 'crypto';
 import { MemoryStoredFile } from 'nestjs-form-data';
-import { Prisma, UserStatus, UserState, user } from '@prisma/client';
+import { Prisma, UserStatus, UserState, user, ChannelType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 
@@ -44,6 +44,38 @@ export class UsersService {
 
   //SECTION - READ OPERATIONS
 
+  async getUserFriends(userId: number): Promise<any> {
+    const friends = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        friends: true,
+      }
+    });
+
+    if (friends === null) null;
+
+    return friends;
+  }
+
+  async getUserConvs(userId: number): Promise<any> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        channels: true,
+        dms: true,
+      }
+    });
+
+    if (user === null) null;
+
+    return user;
+  }
+
+
   async getUserDataForHome(userId: number) {
 
 
@@ -52,8 +84,6 @@ export class UsersService {
         id: userId,
       },
       include: {
-        sentNotificatons: true,
-        receivedNotifications: true,
         channels: true,
         dms: true,
       }
@@ -76,15 +106,13 @@ export class UsersService {
       }
     });
 
-    if (userData === null) throw new NotFoundException('User not found');
+    if (userData === null) null;
 
     const user = {
       ...userData,
-      sentNotificatons: userRelations.sentNotificatons,
-      receivedNotifications: userRelations.receivedNotifications,
       channels: userRelations.channels,
       dms: userRelations.dms,
-      };
+    };
 
     return user;
   }
@@ -104,7 +132,7 @@ export class UsersService {
       }
     });
 
-    if (user === null) throw new NotFoundException('User not found');
+    if (user === null) null;
 
     return user;
   }
@@ -119,7 +147,7 @@ export class UsersService {
       }
     });
 
-    if (user === null) throw new NotFoundException('User not found');
+    if (user === null) null;
 
     return user.status;
   }
@@ -175,8 +203,6 @@ export class UsersService {
       }
     });
 
-    if (user === null) throw new NotFoundException('User not found');
-
     return user;
   }
 
@@ -189,8 +215,6 @@ export class UsersService {
         isProfileSetup: state,
       }
     });
-
-    if (user === null) throw new NotFoundException('User not found');
 
     return user;
   }
@@ -205,22 +229,46 @@ export class UsersService {
       }
     });
 
-    if (user === null) throw new NotFoundException('User not found');
+    return user;
+  }
+
+  async setBusyStatus(id: number): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: id,
+        status: UserStatus.online,
+      },
+      data: {
+        status: UserStatus.busy,
+      }
+    });
 
     return user;
   }
 
-  async setStatus(id: number, status: UserStatus): Promise<any> {
+  async setOnlineStatus(id: number): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: id,
+        status: UserStatus.offline,
+      },
+      data: {
+        status: UserStatus.online,
+      }
+    });
+
+    return user;
+  }
+
+  async setOfflineStatus(id: number): Promise<any> {
     const user = await this.prismaService.user.update({
       where: {
         id: id,
       },
       data: {
-        status: status,
+        status: UserStatus.offline,
       }
     });
-
-    if (user === null) throw new NotFoundException('User not found');
 
     return user;
   }
@@ -273,8 +321,6 @@ export class UsersService {
       }
     });
 
-    if (user === null) throw new NotFoundException('User not found');
-
     return user;
   }
 
@@ -302,8 +348,6 @@ export class UsersService {
         username: username,
       }
     });
-
-    if (user === null) throw new NotFoundException('User not found');
 
     return user;
   }

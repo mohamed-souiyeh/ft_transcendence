@@ -29,6 +29,7 @@ export const ConfigModuleOptions = {
     PUBLIC_CERT_PATH: joi.string().required(),
     TFA_URL: joi.string().required(),
     SETUP_URL: joi.string().required(),
+    LOADING_URL: joi.string().required(),
     DEFAULT_CHANNEL_AVATAR: joi.string().required(),
   }),
 };

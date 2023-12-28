@@ -1,10 +1,9 @@
-
 generator client {
   provider = "prisma-client-js" // biblio pour construire des requette SQL
 }
 
 datasource db {
-  provider = "postgresql"  // definition de systele de gestion
+  provider = "postgresql" // definition de systele de gestion
   url      = env("DATABASE_URL") // la connexion se fait via une variable d'nvironement nomee database_url
 }
 
@@ -15,18 +14,21 @@ enum UserStatus {
 }
 
 model user {
-  id Int @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   username String @unique
-  score Int @default(0)
-  matchesPlayed Int @default(0)
-  email String @unique
-  avatar String
+  score    Int    @default(0)
+  wins     Int    @default(0)
+  loses    Int    @default(0)
+
+  matchesPlayed Int    @default(0)
+  email         String @unique
+  avatar        String
 
   status UserStatus //NOTE - status of the user ["online", "offline", "busy"]
 
   // added from userDto
-  provider String
-  TFASecret String?
+  provider     String
+  TFASecret    String?
   TFAisEnabled Boolean @default(false)
 
   isAuthenticated Boolean @default(false)
@@ -38,24 +40,19 @@ model user {
   activeRefreshToken String? //NOTE - the refresh token that is currently active
   // use an enum with the power of 2 values to extract the specific bitflag that corresponds to the notification type
 
-  friends user[] @relation("friends")
+  friends  user[] @relation("friends")
   friendOf user[] @relation("friends")
 
   blockedUsers user[] @relation("blockedUsers")
-  blockedBy user[] @relation("blockedUsers")
+  blockedBy    user[] @relation("blockedUsers")
 
-
-  sentNotificatons notification[] @relation(name: "sender")
-  receivedNotifications notification[] @relation(name: "receiver")
-
-  channels channel[]
-  dms dm[]
-  
+  channels      channel[]
+  channelsState userState[] @relation(name: "channelsState")
+  dms           dms[]
 
   sentMessages message[] @relation(name: "sentMessages")
 
-  
-  wonMatches match[] @relation(name: "winner")
+  wonMatches  match[] @relation(name: "winner")
   lostMatches match[] @relation(name: "loser")
 
   achievements achievement[]
@@ -66,7 +63,8 @@ model user {
 enum ChannelType {
   public
   protected
-  private 
+  private
+  dm
 }
 
 //SECTION - conversation model
@@ -74,31 +72,32 @@ model channel {
   id Int @id @default(autoincrement())
 
   type ChannelType // type of channel
-  
-  channelName String // name of the channel
-  channelImage String // image of the channel
+
+  channelName        String // name of the channel
+  channelImage       String // image of the channel
   channelDescription String // description of the channel
-  
+
   channelPassword String? //NOTE - password of the channel need to be hashed
 
   ownerId Int //NOTE - id of the owner of the channel
 
-  modiratorIds Int[] //NOTE - ids of the modirators of the channel
-  
   usersState userState[] //NOTE - state of the users in the channel
-  
+
   users user[]
 
   messages message[]
-  
+
   createdAt DateTime @default(now())
 }
+
 //!SECTION
 
 //SECTION - dm model
 
-model dm {
+model dms {
   id Int @id @default(autoincrement())
+
+  type ChannelType @default(dm) // type of channel
 
   users user[]
 
@@ -106,6 +105,7 @@ model dm {
 
   createdAt DateTime @default(now())
 }
+
 //!SECTION
 
 enum UserState {
@@ -115,41 +115,48 @@ enum UserState {
 }
 
 //SECTION - userState model
+
+enum Role {
+  owner
+  modirator
+  user
+}
+
 model userState {
-  id Int @id @default(autoincrement())
+  id    Int       @id @default(autoincrement())
   state UserState //NOTE - state of the user in the conversation
 
-  // info Json //NOTE - a stringefied json object tha hold the info of the user in the conversation
+  role Role //NOTE - role of the user in the conversation
 
   untile DateTime? //NOTE - the time at which the user state will be changed to active again after being muted or banned
+  user   user      @relation(name: "channelsState", fields: [userId], references: [id])
   userId Int
 
-  channel channel @relation(fields: [channelId], references: [id])
+  channel   channel @relation(fields: [channelId], references: [id])
   channelId Int
 }
+
 //!SECTION
 
 //SECTION - message model
 model message {
-  id Int @id @default(autoincrement())
-  text String
+  id        Int      @id @default(autoincrement())
+  text      String
   createdAt DateTime @default(now())
 
-  sender user @relation(name: "sentMessages",fields: [senderId], references: [id])
+  sender   user @relation(name: "sentMessages", fields: [senderId], references: [id])
   senderId Int
 
-  channel channel? @relation(fields: [channelId], references: [id])
+  channel   channel? @relation(fields: [channelId], references: [id])
   channelId Int?
 
-  dm dm? @relation(fields: [dmId], references: [id])
+  dm   dms? @relation(fields: [dmId], references: [id])
   dmId Int?
 }
-//!SECTION
 
 //!SECTION
 
-
-
+//!SECTION
 
 //SECTION - match model and related models
 
@@ -157,7 +164,7 @@ model match {
   id Int @id @default(autoincrement())
 
   startedAt DateTime @default(now())
-  endedAt DateTime @default(now())
+  endedAt   DateTime @default(now())
 
   mode String //NOTE - mode of the match]
 
@@ -165,29 +172,13 @@ model match {
 
   loser_stats Json //NOTE - stringified json object with the key as (id or username) of the loser of the match and the value as an object with the state and info of the loser in the match
 
-  winner user @relation( name: "winner", fields: [winnerId], references: [id])
+  winner   user @relation(name: "winner", fields: [winnerId], references: [id])
   winnerId Int
 
-  loser user @relation(name: "loser", fields: [loserId], references: [id])
+  loser   user @relation(name: "loser", fields: [loserId], references: [id])
   loserId Int
 }
-//!SECTION
 
-
-//SECTION - notification model
-
-model notification {
-  id Int @id @default(autoincrement())
-
-
-  sender user @relation(name: "sender", fields: [senderId], references: [id])
-  senderId Int
-
-  receiver user @relation(name: "receiver", fields: [receiverId], references: [id])
-  receiverId Int
-
-  createdAt DateTime @default(now())
-}
 //!SECTION
 
 //SECTION - achievement model
@@ -196,9 +187,9 @@ model notification {
 model achievement {
   id Int @id @default(autoincrement())
 
-  name String
+  name        String
   description String
-  image String
+  image       String
 
   users user[]
 }

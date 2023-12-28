@@ -5,6 +5,7 @@ import { Response } from 'express';
 import { UsersService } from 'src/database/users/users.service';
 import { IRequestWithUser } from './Interfaces/IRequestWithUser';
 import { UserStatus } from '@prisma/client';
+import { UserDto } from 'src/database/users/User_DTO/User.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,7 @@ export class AuthService {
     const payload = await this.jwtAuthService.verifyJwtAccessToken(jwt);
     if (payload == null)
       return null;
-    const user = await this.userService.findUserById(payload.id);
+    const user = await this.userService.getUserConvs(payload.id);
     if (user == null)
       return null;
     if (user.activeRefreshToken !== refreshJwt)
@@ -36,6 +37,7 @@ export class AuthService {
       // secure: true,
     });
   }
+
 
   async refresh(req: IRequestWithUser) {
     if (!req.user) {
@@ -53,7 +55,7 @@ export class AuthService {
       await this.addTokenToCookie(req.res, '', process.env.ACCESS_TOKEN_KEY);
       await this.addTokenToCookie(req.res, '', process.env.REFRESH_TOKEN_KEY);
 
-      await this.userService.setStatus(req.user.id, UserStatus.offline);
+      await this.userService.setOfflineStatus(req.user.id);
       throw new UnauthorizedException('refresh token is not valid');
     }
 
@@ -155,7 +157,7 @@ export class AuthService {
     //reset refresh token in db
     await this.userService.replaceRefreshToken(req.user.id, null);
 
-    await this.userService.setStatus(req.user.id, UserStatus.offline);
+    await this.userService.setOfflineStatus(req.user.id);
 
     await this.userService.setAuthenticated(req.user.id, false);
     return {message: 'logged out successfully'};

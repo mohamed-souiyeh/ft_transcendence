@@ -37,7 +37,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
     if (!refreshTokenIsValid) {
       await this.userService.replaceRefreshToken(payload.id, null);
       await this.userService.setAuthenticated(payload.id, false);
-      await this.userService.setStatus(payload.id, 'offline');
+      await this.userService.setOfflineStatus(payload.id);
       throw new UnauthorizedException('refresh token is not valid');
     }
 

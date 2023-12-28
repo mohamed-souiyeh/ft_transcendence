@@ -1,26 +1,4 @@
 
-// events design
-messageEvent
-{
-  { authorUsername,
-    usersAutherBlockedBy,
-  },
-  message,
-  channelOrDm,
-  convId,
-}
-
-we need to include the users the auther is blocked by to hide the msgs from them (i am thinking of sending an actual object containing the auther username and the users he is blocked by instead of just the auther username)
-
-
-// gateway design
-i need to have a room for every conversation that at least have one user online
-
-on connection update the user status to online
-
-on desconnect update the user status to offline
-
-
 
 #201E2D
 #302C42
@@ -28,3 +6,171 @@ on desconnect update the user status to offline
 #C0B7E8
 #DFDAF6
 #EDE9FB
+
+
+// gateway design
+i need to have a room for every conversation that at least have one user online//NOTE - DONE
+
+on connection update the user status to online //NOTE - DONE
+
+on desconnect update the user status to offline //NOTE - DONE
+
+chat design
+
+when the client connect we retrieve all the conversations that he belong to
+and and make him join the room that belong for every cnversation by using the room identifier `${convType}.${convId}` if the room is already there socket io manages adding him to it and it it is not there it is created. //NOTE - DONE
+
+comunication protocol:
+we need to limit the length of msg in the client side and the gatway //NOTE - DONE
+
+server:
+channelmsg //NOTE - DONE
+{
+  userInfo: {
+    authorId,
+    authorUsername,
+    Role,
+    usersAuthorBlockedBy,
+  },
+  message: string,
+  convType: string,
+  convId: number,
+  bannedUsers,
+}
+
+dm //NOTE - DONE
+{
+  userInfo: {
+    authorId,
+    authorUsername,
+  },
+  message: string,
+  convType: "dm",
+  convId: number,
+}
+
+
+
+client
+
+{
+  authorUsername: string,
+  message: string,
+  convType: string,
+  convId: number,
+}
+
+
+events:
+
+channelGuard: make sure that the user belong and can send msgs to the channel and the channel room exist //NOTE - DONE
+
+dmGuard: make sure that the user belong and can send msgs to the dm and the dm room exist //NOTE - DONE
+
+checkpls: checks if the requisting user can participate in the current chat
+          checkDmpls: //NOTE - DONE
+          checkChannelpls: //NOTE - DONE
+
+
+Msg: event used by the client to send msgs to the server (aka the server subsecribe to it).
+          channelmsg: //NOTE - need to explore adding the acknoledgement 
+          //ANCHOR - 
+          dmmsg: //NOTE - need to explore adding the acknoledgement
+
+broadcast: event used by the server to broadcast duh the msg to all clients
+            in a room (aka the clients subsecribe to it). //NOTE - DONE
+
+
+
+getAllMsgsGuard: to make sure that the conv exist and the user requesting it's msg belong to the conv and is not banned from it aka can not see the conve (this is in the channel case) //NOTE - still needs testing
+
+getAllMsgs: event used by the server to retrieve all the msgs related a specific conversation (aka the server subsecribe to it). //NOTE - DONE for both dm and channels
+
+moderator events:
+
+moderatorGuard: make sure the user have permitions to do an operation //NOTE - DONE
+
+msg still need to persist in the database //NOTE - DONE
+
+
+msgBody for the following events
+{
+  targetedUserId: number,
+  convType: string,
+  convId: number,
+  until: Date,
+}
+
+kick // NOTE - DONE
+
+ban - unban //NOTE - DONE
+
+mute - unmute //NOTE - DONE
+
+giveAdminRole //NOTE - DONE
+
+removeAdminRole //NOTE - DONE
+
+
+
+msgBody for the leavChannelEvent
+{
+  convType: string,
+  convId: number,
+}
+
+leavChannel //NOTE - if the owner left the channel we need to set a new owner
+
+
+
+msgBody for add user event
+{
+  convType: string,
+  convId: number,
+  targetedUserId: number,
+}
+
+addUsers //NOTE - DONE
+
+
+
+
+msgBody for changeChannelType event
+{
+  convType: string,
+  convId: number,
+  newType: string,
+  password: string (required in case of changing the state of the channel to protected)
+}
+
+change the type of the channel to public or private or protected only by the oner of the channel // NOTE - DONE
+
+
+
+
+msgBody for change channel password event
+{
+  convType: string,
+  convId: number,
+  password: string,
+}
+change channel password //NOTE - DONE
+
+
+msgBody for join channel event 
+{
+  convType: string,
+  convId: number,
+  password: string,
+}
+join channel (only public and protected) // NOTE - DONE
+
+
+
+msgBody for leave channel event 
+{
+  convType: string,
+  convId: number,
+}
+removeChannel // NOTE - DONE
+

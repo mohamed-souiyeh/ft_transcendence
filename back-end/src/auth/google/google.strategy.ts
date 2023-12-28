@@ -53,10 +53,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     }
 
 
-    if (!found_user.isProfileSetup) 
-      found_user.redirectUrl = process.env.SETUP_URL;
-    else
-      found_user.redirectUrl = process.env.HOME_URL;
+    found_user.redirectUrl = process.env.LOADING_URL;
 
     if (found_user.TFAisEnabled) {
       //NOTE - if TFA is enabled, then we need to do something here

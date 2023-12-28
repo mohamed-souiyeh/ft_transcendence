@@ -6,10 +6,18 @@ import {
 } from './config/jwt.config';
 import { UserDto } from '../../database/users/User_DTO/User.dto';
 import { JwtPayload } from './JwtPayloadDto/JwtPayloadDto';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable()
 export class JwtAuthService {
   constructor(private jwtService: JwtService) { }
+
+
+  async decodetoken(token: string) {
+    const payload = jwtDecode<JwtPayload>(token);
+
+    return payload;
+  }
 
   async getJwtAcessToken(user: UserDto, TFAauthenticated: boolean = false) {
 
@@ -17,7 +25,6 @@ export class JwtAuthService {
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,
-      username: user.username,
       TFAisEnabled: user.TFAisEnabled,
       TFAauthenticated: TFAauthenticated,
     };
@@ -34,7 +41,6 @@ export class JwtAuthService {
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,
-      username: user.username,
       TFAisEnabled: user.TFAisEnabled,
       TFAauthenticated: TFAauthenticated,
     };
