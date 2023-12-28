@@ -45,9 +45,9 @@ function App() {
               <Route path="/setup" element={<Setup/>}/>
               <Route path="/confirmation" element={<TwoFAConfirmation/>}/>
               {/* Private Routes */}
-              <Route path="/home" element={<Home/>}/>
               <Route element={<RequireAuth/>}>
-                <Route path="/profile" element={<Profile name=""/>} />
+              <Route path="/home" element={<Home/>}/>
+                <Route path="/profile" element={<Profile/>} />
                 <Route path="/userprofile" element={<UserProfile/>} />
                 {/* <Route path="/game" element={<Game/>} /> */}
               </Route>

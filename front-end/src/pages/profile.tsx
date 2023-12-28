@@ -6,7 +6,8 @@ import trophy from "../assets/trophy.png";
 import star from "../assets/star.png";
 import games from "../assets/controller.png"
 import { Switch, ConfigProvider } from "antd";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UserContext } from "../App";
 
 
 
@@ -14,7 +15,8 @@ import { useState } from "react";
 function Profile () {
   const [switchValue, setSwitchValue] = useState(false);
   const [prompt, setPrompt] = useState(false);
-  const [qrCode, setCode] = useState(null);
+  // const [qrCode, setCode] = useState(null);
+  const {user} = useContext(UserContext)
 
   return(
     <>
@@ -38,7 +40,7 @@ function Profile () {
             <p className="text-2xl m-2"> 2fa state </p>
           </div>
           <div className=" m-6 grid place-content-center">
-            <p className="text-2xl m-2">:  Potatoo</p>
+            <p className="text-2xl m-2">:  {user.username}</p>
             <p className="text-2xl m-2">:  20</p>
             <p className="text-2xl m-2">:  05</p>
             <div className="flex ">
