@@ -4,21 +4,17 @@ import { ChatService } from '../chat.service';
 import { JwtAuthService } from 'src/auth/jwt/jwt.service';
 import { ConversationsService } from 'src/database/conversations/conversations.service';
 import Joi from 'joi';
-import { WsException } from '@nestjs/websockets';
 import { ChannelType } from '@prisma/client';
-
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
-export class ChannelGuard implements CanActivate {
-
+export class LeaveChannelGuard implements CanActivate {
   constructor(private readonly chatService: ChatService,
     private readonly jwtAuthService: JwtAuthService,
     private readonly convService: ConversationsService) { }
 
   async validateChannelMsg(msg: any) {
     const schema = Joi.object({
-      authorUsername: Joi.string().required(),
-      message: Joi.string().required().max(250).min(1),
       convType: Joi.string().required().valid(ChannelType.private, ChannelType.protected, ChannelType.public),
       convId: Joi.number().required(),
     });
@@ -51,14 +47,11 @@ export class ChannelGuard implements CanActivate {
 
     if (conv === null)
       throw new WsException({ error: 'Unauthorized operation', message: 'channel doenst exist' });
-  
+
     const userState = conv.usersState.find(userState => userState.userId === payload.id);
 
     if (userState === undefined)
       throw new WsException({ error: 'Unauthorized operation', message: 'you are not in this channel' });
-    if (userState.state !== 'active')
-      throw new WsException({ error: 'Unauthorized operation', message: 'your state is not active' });
-
     return true;
   }
 }

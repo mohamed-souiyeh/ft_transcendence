@@ -55,7 +55,7 @@ export class AuthService {
       await this.addTokenToCookie(req.res, '', process.env.ACCESS_TOKEN_KEY);
       await this.addTokenToCookie(req.res, '', process.env.REFRESH_TOKEN_KEY);
 
-      await this.userService.setStatus(req.user.id, UserStatus.offline);
+      await this.userService.setOfflineStatus(req.user.id);
       throw new UnauthorizedException('refresh token is not valid');
     }
 
@@ -157,7 +157,7 @@ export class AuthService {
     //reset refresh token in db
     await this.userService.replaceRefreshToken(req.user.id, null);
 
-    await this.userService.setStatus(req.user.id, UserStatus.offline);
+    await this.userService.setOfflineStatus(req.user.id);
 
     await this.userService.setAuthenticated(req.user.id, false);
     return {message: 'logged out successfully'};

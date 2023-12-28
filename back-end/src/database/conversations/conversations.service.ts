@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IRequestWithUser } from 'src/auth/Interfaces/IRequestWithUser';
 import { createChanneldto } from './channel.dto/channel.dto';
@@ -9,6 +10,282 @@ import { createDMdto } from './dmDTO/createDM.dto';
 export class ConversationsService {
   constructor(private readonly prismaService: PrismaService) { }
 
+
+  //SECTION - DELETE operations
+
+
+  async deleteChannel(channelId: number) {
+
+    const channel = await this.prismaService.channel.findUnique({
+      where: { id: channelId },
+      include: { users: true },
+    });
+
+    for (const user of channel.users) {
+      await this.prismaService.channel.update({
+        where: { id: channelId },
+        data: {
+          users: { disconnect: { id: user.id } },
+        },
+      });
+    }
+
+    // Delete all user states related to the channel
+    await this.prismaService.userState.deleteMany({
+      where: { channelId: channelId },
+    });
+
+    // Delete all messages related to the channel
+    await this.prismaService.message.deleteMany({
+      where: { channelId: channelId },
+    });
+
+
+    await this.prismaService.channel.delete({
+      where: {
+        id: channelId,
+      },
+    });
+    return;
+  }
+
+
+
+
+  //!SECTION - DELETE operations
+
+
+  //SECTION - UPDATE operations
+
+  async setChannelPassword(channelId: number, password: string) {
+    const hash = await bcrypt.hash(password, 10);
+    const channel = await this.prismaService.channel.update({
+      where: {
+        id: channelId,
+        type: ChannelType.protected,
+      },
+      data: {
+        channelPassword: hash,
+      },
+    });
+
+    return channel;
+  }
+
+  async setChanneltype(channelId: number, type: ChannelType, password: string | null = null) {
+
+    console.log("type => ", type);
+
+    if (type === ChannelType.protected && password) {
+      return await this.setChanneltoProtected(channelId, password);
+    }
+    else if (type === ChannelType.public) {
+      return await this.setChanneltoPublic(channelId);
+    }
+    else if (type === ChannelType.private) {
+      return await this.setChanneltoPrivate(channelId);
+    }
+
+    return null;
+  }
+
+  async setChanneltoProtected(channelId: number, password: string) {
+    const hash = await bcrypt.hash(password, 10);
+    const channel = await this.prismaService.channel.update({
+      where: {
+        id: channelId,
+      },
+      data: {
+        type: ChannelType.protected,
+        channelPassword: hash,
+      },
+    });
+
+    return channel;
+  }
+
+  async setChanneltoPublic(channelId: number) {
+    const channel = await this.prismaService.channel.update({
+      where: {
+        id: channelId,
+      },
+      data: {
+        type: ChannelType.public,
+        channelPassword: null,
+      },
+    });
+
+    return channel;
+  }
+
+  async setChanneltoPrivate(channelId: number) {
+    const channel = await this.prismaService.channel.update({
+      where: {
+        id: channelId,
+      },
+      data: {
+        type: ChannelType.private,
+        channelPassword: null,
+      },
+    });
+
+    return channel;
+  }
+
+  async updateUserRole(channelId: number, userId: number, role: Role) {
+    const userState = await this.prismaService.userState.findFirst({
+      where: {
+        userId: userId,
+        channelId: channelId,
+      },
+    });
+
+    const updatedUserState = await this.prismaService.userState.update({
+      where: {
+        id: userState.id,
+      },
+      data: {
+        role: role,
+      },
+    });
+
+    return updatedUserState;
+  }
+
+  async updateUserState(channelId: number, userId: number, state: UserState, until: Date | null = null) {
+    const userState = await this.prismaService.userState.findFirst({
+      where: {
+        userId: userId,
+        channelId: channelId,
+      },
+    });
+
+    const updatedUserState = await this.prismaService.userState.update({
+      where: {
+        id: userState.id,
+      },
+      data: {
+        state: state,
+        untile: until,
+      },
+    });
+
+    return updatedUserState;
+  }
+
+  async addUserToChannel(channelId: number, userId: number) {
+    const channel = await this.prismaService.channel.update({
+      where: {
+        id: channelId,
+      },
+      data: {
+        users: {
+          connect: {
+            id: userId,
+          },
+        },
+        usersState: {
+          create: {
+            userId: userId,
+            state: UserState.active,
+            role: Role.user,
+          },
+        },
+      },
+    });
+
+    return channel;
+  }
+
+  async removeUserFromChannel(channelId: number, userId: number) {
+
+    const userState = await this.prismaService.userState.findFirst({
+      where: {
+        userId: userId,
+        channelId: channelId,
+      },
+    });
+
+    const channel = await this.prismaService.channel.update({
+      where: {
+        id: channelId,
+      },
+      data: {
+        users: {
+          disconnect: {
+            id: userId,
+          },
+        },
+        usersState: {
+          delete: {
+            id: userState.id,
+          },
+        },
+      },
+    });
+    return channel;
+  }
+
+
+
+  //!SECTION - UPDATE operations
+
+
+  //SECTION - READ operations
+  async getDmMessages(dmId: number) {
+    const dm = await this.prismaService.dms.findUnique({
+      where: {
+        id: dmId,
+      },
+      include: {
+        messages: {
+          include: {
+            sender: {
+              select: {
+                id: true,
+                username: true,
+              },
+            },
+          }
+        },
+        users: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      }
+    });
+
+    if (dm === null) return null;
+
+    return dm;
+  }
+
+
+  async getChannelMessages(channelId: number) {
+    const channel = await this.prismaService.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+      include: {
+        messages: {
+          include: {
+            sender: {
+              include: {
+                blockedBy: true,
+              },
+            },
+          }
+        },
+        usersState: true,
+      }
+    });
+
+    if (channel === null) return null;
+
+    return channel;
+  }
 
   async getChannel(id: number, userId: number) {
     const channel = await this.prismaService.channel.findUnique({
@@ -35,15 +312,11 @@ export class ConversationsService {
             },
           },
         },
-        usersState: {
-          where: {
-            userId: userId,
-          }
-        },
+        usersState: true,
       }
     });
 
-    if (channel === null) throw new NotFoundException('Channel not found');
+    if (channel === null) return null;
 
     return channel;
   }
@@ -69,9 +342,26 @@ export class ConversationsService {
       }
     });
 
-    if (dm === null) throw new NotFoundException('DM not found');
+    if (dm === null) return null;
 
     return dm;
+  }
+  //!SECTION - READ operations
+
+
+  //SECTION - create operations
+
+  async createMessage(msg: any) {
+    const message = await this.prismaService.message.create({
+      data: {
+        text: msg.text,
+        senderId: msg.senderId,
+        dmId: msg.dmId ? msg.dmId : null,
+        channelId: msg.channelId ? msg.channelId : null,
+      },
+    });
+
+    return message;
   }
 
 
@@ -120,7 +410,6 @@ export class ConversationsService {
         channelPassword: channelData.channelPassword,
 
         ownerId: req.user.id,
-        modiratorIds: [req.user.id],
         usersState: {
           create: {
             userId: req.user.id,
@@ -134,4 +423,5 @@ export class ConversationsService {
       }
     })
   }
+  //!SECTION - create operations
 }

@@ -4,44 +4,46 @@ import { ChatService } from '../chat.service';
 import { JwtAuthService } from 'src/auth/jwt/jwt.service';
 import { ConversationsService } from 'src/database/conversations/conversations.service';
 import Joi from 'joi';
+import { ChannelType, Role } from '@prisma/client';
 import { WsException } from '@nestjs/websockets';
-import { ChannelType } from '@prisma/client';
 
 
 @Injectable()
-export class ChannelGuard implements CanActivate {
+export class ChangeChannelTypeGuard implements CanActivate {
 
   constructor(private readonly chatService: ChatService,
     private readonly jwtAuthService: JwtAuthService,
     private readonly convService: ConversationsService) { }
 
-  async validateChannelMsg(msg: any) {
+
+  async validaGuardData(data: any) {
     const schema = Joi.object({
-      authorUsername: Joi.string().required(),
-      message: Joi.string().required().max(250).min(1),
       convType: Joi.string().required().valid(ChannelType.private, ChannelType.protected, ChannelType.public),
       convId: Joi.number().required(),
+      newType: Joi.string().required().valid(ChannelType.private, ChannelType.protected, ChannelType.public),
+      password: Joi.string().optional(),
     });
 
-    const { error } = schema.validate(msg);
+    const { error } = schema.validate(data);
 
     if (error) {
-      console.log("error => ", error);
       throw new WsException(error.message);
     }
 
-    msg.convId = Number(msg.convId);
+    data.convId = Number(data.convId);
   }
+
+
 
   async canActivate(
     context: ExecutionContext,
-  ): Promise<boolean> {
+  ): Promise<boolean>{
 
     const client = await context.switchToWs().getClient();
 
     const data = await context.switchToWs().getData();
 
-    await this.validateChannelMsg(data);
+    await this.validaGuardData(data)
 
     const { jwt } = await this.chatService.getTokensFromSocket(client);
 
@@ -50,14 +52,30 @@ export class ChannelGuard implements CanActivate {
     const conv = await this.convService.getChannel(data.convId, payload.id);
 
     if (conv === null)
-      throw new WsException({ error: 'Unauthorized operation', message: 'channel doenst exist' });
-  
+      throw new WsException({
+        error: 'Unauthorized operation'
+        , message: 'the channel doesnt exist'
+      });
+    
     const userState = conv.usersState.find(userState => userState.userId === payload.id);
 
-    if (userState === undefined)
-      throw new WsException({ error: 'Unauthorized operation', message: 'you are not in this channel' });
-    if (userState.state !== 'active')
-      throw new WsException({ error: 'Unauthorized operation', message: 'your state is not active' });
+    if (userState === undefined || userState.role !== Role.owner)
+      throw new WsException({
+        error: 'Unauthorized operation'
+        , message: 'you are not the owner of the channel'
+      });
+
+    if (conv.type === data.newType)
+      throw new WsException({
+        error: 'Unauthorized operation'
+        , message: 'the channel is already of this type'
+      });
+    
+    if (data.newType === ChannelType.protected && data.password === undefined)
+      throw new WsException({
+        error: 'Unauthorized operation'
+        , message: 'the new channel type is protected and you didnt provide a password'
+      });
 
     return true;
   }
