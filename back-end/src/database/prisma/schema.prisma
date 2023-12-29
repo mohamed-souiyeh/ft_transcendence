@@ -43,6 +43,9 @@ model user {
   friends  user[] @relation("friends")
   friendOf user[] @relation("friends")
 
+  sentNotificatons      notification[] @relation(name: "sender")
+  receivedNotifications notification[] @relation(name: "receiver")
+
   blockedUsers user[] @relation("blockedUsers")
   blockedBy    user[] @relation("blockedUsers")
 
@@ -57,6 +60,20 @@ model user {
 
   achievements achievement[]
 }
+
+//SECTION - notification model
+
+model notification {
+  id Int @id @default(autoincrement())
+  sender   user @relation(name: "sender", fields: [senderId], references: [id])
+  senderId Int
+  receiver   user @relation(name: "receiver", fields: [receiverId], references: [id])
+  receiverId Int
+  createdAt DateTime @default(now())
+}
+
+//!SECTION
+
 
 //SECTION - conversation model and related models
 
