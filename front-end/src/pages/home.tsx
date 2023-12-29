@@ -16,7 +16,7 @@ function Home () {
   console.log(user)
   return (
     <>
-      <div className="w-screen h-screen grid justify-center ">
+      <div className="grid justify-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
         {<SideBar/>}
         {<NavBar 
           // name={user.profilePicture}

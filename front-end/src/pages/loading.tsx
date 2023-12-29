@@ -41,7 +41,7 @@ function Loading() {
   )
   return (
     <>
-      <div className="w-screen h-screen grid place-content-center">
+      <div className="grid place-content-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
         <div className="h-14 w-14">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
             <circle fill="#C0B7E8" stroke="#C0B7E8" strokeWidth="15" r="15" cx="40" cy="65">

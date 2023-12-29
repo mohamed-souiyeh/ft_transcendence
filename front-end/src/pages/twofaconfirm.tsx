@@ -4,7 +4,7 @@ function TwoFAConfirmation () {
   return (
     <>
 
-      <div className="w-screen h-screen grid place-content-center">
+      <div className="grid place-content-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
         <div className="grid place-content-center">
           <img className='w-32 h-32' src={logo}/>
         </div>

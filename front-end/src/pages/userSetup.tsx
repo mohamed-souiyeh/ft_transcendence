@@ -90,8 +90,7 @@ function Setup()
   }
 
   return <>
-    <div className="w-screen h-screen grid place-content-center gap-5">
-
+      <div className="grid place-content-center gap-5 w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
       <div className="grid place-content-center" >
         <div className="flex" >
           <p className="text-4xl text-purple mr-2"> Welcome! </p>
