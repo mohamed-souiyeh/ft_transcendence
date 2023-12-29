@@ -2,8 +2,8 @@ import pic from '../../assets/taha.jpg'
 
 //so.. this function should be taking args, bc we gon use them in showing Player's infos
 
-function Profile({score, score2}: 
-    {score:number, score2:number})
+function Profile({score, score2, pic1, pic2}: 
+    {score:number, score2:number, pic1:string, pic2:string})
 {
   return(
   <>
@@ -36,7 +36,7 @@ function Profile({score, score2}:
                             float:"left"
                         }
                     } 
-                    src={pic}/>
+                    src={pic2}/>
                 <h1 style={
                         {
                             borderRadius:"50%",

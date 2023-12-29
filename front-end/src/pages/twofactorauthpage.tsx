@@ -21,7 +21,6 @@ function TwoFactorAuthCode () {
           withCredentials: true
         }).
         then((res)=>{
-          console.log("l7waaaa");
         }).
         catch(
           (e)=>

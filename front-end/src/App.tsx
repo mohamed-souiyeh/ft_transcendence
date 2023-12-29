@@ -9,6 +9,7 @@ import Game from "./pages/game/game";
 import FinishProfile from "./pages/finishprofile";
 import Setup from "./pages/userSetup";
 import LandingPage from "./pages/landingpage";
+import { GameModeProvider } from "./clientSocket";
 
 function App() {
 
@@ -18,11 +19,11 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login/>} />
           <Route path="/signup" element={<SingUp/>} />
-          <Route path="/home" element={<Home/>}/>
+          <Route path="/home" element={<GameModeProvider><Home/></GameModeProvider>}/>
+          <Route path="/game" element={<GameModeProvider><Game/></GameModeProvider>} />
           <Route path="/profile" element={<Profile/>} />
           <Route path="/userprofile" element={<UserProfile/>} />
           <Route path="*" element={<NotFound/>} />
-          <Route path="/game" element={<Game/>} />
           <Route path="/finishprofile" element={<FinishProfile/>} />
           <Route path="/setup" element={<Setup/>}/>
           <Route path="/" element={<LandingPage/>} />

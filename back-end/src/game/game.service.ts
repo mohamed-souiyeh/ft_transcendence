@@ -94,90 +94,85 @@ export class gameService
             room.velocityAngle *= -1;
         }
     }
-    async gameLoop(server:Server, rooms: room[])
+    async gameLoop(server:Server, rooms: Map<number, room>)
     {
         setInterval(() => {
 			// Game Logic
-			for (var i: number = 0; i < rooms.length; i++) {
-				if (rooms[i].roomState == "ready")
+			for (let room of rooms.values()) {
+				if (room.roomState == "ready")
 				{ 
-					this.paddleCollision(rooms[i]);
-					if (!rooms[i].ballLaunched) {
-						if (rooms[i].firstPlayerHaveTheBall) {
-							rooms[i].ballPosX = 0.94 - 0.05;
-							rooms[i].ballPosY = rooms[i].firstPaddlePos;
-							rooms[i].velocityAngle = 0;
-							rooms[i].ballVelocityX = 1;
-							rooms[i].ballVelocityY = 1;
+					this.paddleCollision(room);
+					if (!room.ballLaunched) {
+						if (room.firstPlayerHaveTheBall) {
+							room.ballPosX = 0.94 - 0.05;
+							room.ballPosY = room.firstPaddlePos;
+							room.velocityAngle = 0;
+							room.ballVelocityX = 1;
+							room.ballVelocityY = 1;
 						}
-						if (rooms[i].secondPlayerHaveTheBall) {
-							rooms[i].ballPosX = -0.94 + 0.05;
-							rooms[i].ballPosY = rooms[i].secondPaddlePos;
-							rooms[i].ballVelocityX = -1;
-							rooms[i].ballVelocityY = -1;
-							if (rooms[i].gameMode == "robot")
+						if (room.secondPlayerHaveTheBall) {
+							room.ballPosX = -0.94 + 0.05;
+							room.ballPosY = room.secondPaddlePos;
+							room.ballVelocityX = -1;
+							room.ballVelocityY = -1;
+							if (room.gameMode == "robot")
 							{
-								rooms[i].ballLaunched = true; 
+								room.ballLaunched = true; 
 							}
 						}
 					}
 					else {
-						if (rooms[i].firstPlayerHaveTheBall)
-							server.to("room" + i).emit('balllaunched', true);
-						if (rooms[i].secondPlayerHaveTheBall)
-							server.to("room" + i).emit('balllaunched', true); 
-	
-						this.updateBallDIrection(server, rooms[i]);
+						this.updateBallDIrection(server, room);
 					}
-					if (rooms[i].firstPaddlePos + rooms[i].firstPaddleSpeed * rooms[i].firstvelocity < 7 / 10 - 1 / 10
-						&& rooms[i].firstPaddlePos + rooms[i].firstPaddleSpeed * rooms[i].firstvelocity > -7 / 10 + 1 / 10)
+					if (room.firstPaddlePos + room.firstPaddleSpeed * room.firstvelocity < 7 / 10 - 1 / 10
+						&& room.firstPaddlePos + room.firstPaddleSpeed * room.firstvelocity > -7 / 10 + 1 / 10)
 						{
-							rooms[i].firstPaddlePos += rooms[i].firstPaddleSpeed * rooms[i].firstvelocity;
+							room.firstPaddlePos += room.firstPaddleSpeed * room.firstvelocity;
 						}
-					if (rooms[i].secondPaddlePos + rooms[i].secondPaddleSpeed * rooms[i].secondvelocity < 7 / 10 - 1 / 10
-						&& rooms[i].secondPaddlePos + rooms[i].secondPaddleSpeed * rooms[i].secondvelocity > -7 / 10 + 1 / 10)
+					if (room.secondPaddlePos + room.secondPaddleSpeed * room.secondvelocity < 7 / 10 - 1 / 10
+						&& room.secondPaddlePos + room.secondPaddleSpeed * room.secondvelocity > -7 / 10 + 1 / 10)
 						{
-							rooms[i].secondPaddlePos += rooms[i].secondPaddleSpeed * rooms[i].secondvelocity; 
+							room.secondPaddlePos += room.secondPaddleSpeed * room.secondvelocity; 
 						}
 	 
-					if (rooms[i].gameMode == "robot")
+					if (room.gameMode == "robot")
 					{
-						rooms[i].secondPaddleSpeed = 0.005;
-						if (rooms[i].ballPosX < 0.0)
+						room.secondPaddleSpeed = 0.005;
+						if (room.ballPosX < 0.0)
 						{
-							if (rooms[i].ballPosY > rooms[i].secondPaddlePos + 0.1)
-								rooms[i].secondvelocity = 1;
-							if (rooms[i].ballPosY < rooms[i].secondPaddlePos - 0.1)
-								rooms[i].secondvelocity = -1;
+							if (room.ballPosY > room.secondPaddlePos + 0.1)
+								room.secondvelocity = 1;
+							if (room.ballPosY < room.secondPaddlePos - 0.1)
+								room.secondvelocity = -1;
 						}
 						else
 						{
-							rooms[i].secondvelocity = 0;
+							room.secondvelocity = 0;
 						}
 					}
                     else
                     {
-                        if (rooms[i].score1 >= 6 || rooms[i].score2 >= 6) 
+                        if (room.score1 >= 1 || room.score2 >= 1) 
                         {
-                            server.to(i + '').emit('gameover');
-                            rooms[i].endTime = new Date();
-                            rooms[i].roomState = "ended";
+                            server.to(room.id + '').emit('gameover');
+                            room.endTime = new Date();
+                            room.roomState = "ended";
                         }
                     }
 	
-					rooms[i].ballPosX += (rooms[i].speed
-                                        * Math.cos(rooms[i].velocityAngle * Math.PI/180) 
-                                        * rooms[i].ballVelocityX);
-					rooms[i].ballPosY += (rooms[i].speed
-                                        * Math.sin(rooms[i].velocityAngle * Math.PI/180) 
-                                        * rooms[i].ballVelocityY);
-					server.to(i + '').emit('ballPosX', (rooms[i].ballPosX));
-					server.to(i + '').emit('ballPosY', (rooms[i].ballPosY));
-					server.to(i + '').emit('score', rooms[i].score1, rooms[i].score2);
-					server.to(i + '').emit('left', rooms[i].firstPaddlePos);
-					server.to(i + '').emit('right', rooms[i].secondPaddlePos); 
-					server.to(i + '').emit('matchFound', true);
-					server.to(i + '').emit('ballPosetion', rooms[i].firstPlayerHaveTheBall, rooms[i].secondPlayerHaveTheBall);
+					room.ballPosX += (room.speed
+                                        * Math.cos(room.velocityAngle * Math.PI/180) 
+                                        * room.ballVelocityX);
+					room.ballPosY += (room.speed
+                                        * Math.sin(room.velocityAngle * Math.PI/180) 
+                                        * room.ballVelocityY);
+					server.to(room.id + '').emit('ballPosX', (room.ballPosX));
+					server.to(room.id + '').emit('ballPosY', (room.ballPosY));
+					server.to(room.id + '').emit('score', room.score1, room.score2);
+					server.to(room.id + '').emit('left', room.firstPaddlePos);
+					server.to(room.id + '').emit('right', room.secondPaddlePos); 
+					server.to(room.id + '').emit('matchFound', true);
+					server.to(room.id + '').emit('ballPosetion', room.firstPlayerHaveTheBall, room.secondPlayerHaveTheBall);
 				}
 			}
 		}, 1000 / 60);

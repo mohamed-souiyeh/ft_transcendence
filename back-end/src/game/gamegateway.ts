@@ -26,7 +26,7 @@ export class gameServer implements OnModuleInit {
 	@WebSocketServer()
 	server: Server;
 
-	roomsList: room[] = new Array<room>();
+	roomsList: Map<number, room> = new Map<number, room>();
 
 	constructor(
 		private gameService: gameService,
@@ -39,32 +39,32 @@ export class gameServer implements OnModuleInit {
 
 	async handleConnection(client: Socket) {
 		console.log("Client connected", client.id);
-		try {
-			let user = await this.gameService.chatService.getUserFromSocket(client);
-			if (await this.userService.getStatus(user.id) == "busy")
-			{
-				this.server.to(`${client.id}`).emit("alreadyQueuing");
-				client.disconnect();
-				return ;
-			}
-		}
-		catch (e) {
-			console.log(e);
-		}
+		// try {
+		// 	let user = await this.gameService.chatService.getUserFromSocket(client);
+		// 	if (await this.userService.getStatus(user.id) == "busy")
+		// 	{
+		// 		this.server.to(`${client.id}`).emit("alreadyQueuing");
+		// 		client.disconnect();
+		// 		return ;
+		// 	}
+		// }
+		// catch (e) {
+		// 	console.log(e);
+		// }
 	}
 
 	async handleDisconnect(client: Socket) {
 		console.log("Client disconnected", client.id);
-		console.log("Rooms length", this.roomsList.length);
-		let roomCheck = await this.roomsList.find(room => room.firstClient === client || room.secondClient === client);
+		console.log("Rooms length", this.roomsList.size);
+		let roomCheck = Array.from(this.roomsList.values()).find(room => room.firstClient === client || room.secondClient === client);
 		if (roomCheck)
 		{
 			this.server.to(`${roomCheck.id}`).emit("leaveGame");
-			this.roomsList.splice(this.roomsList.indexOf(roomCheck), 1);
+			this.roomsList.delete(roomCheck.id);
 		} 
 		try {
 			let user = await this.gameService.chatService.getUserFromSocket(client);
-			this.userService.setStatus(user.id, "online");
+			// this.userService.setOfflineStatus(user.id);
 		}
 		catch (e) {
 			console.log(e);
@@ -78,23 +78,23 @@ export class gameServer implements OnModuleInit {
 		{
 			let user = await this.gameService.chatService.getUserFromSocket(client);
 
-			if(await this.userService.getStatus(user.id) == "busy")
-			{
-				this.server.to(`${client.id}`).emit("alreadyQueuing");
-				return ;
-			}
+			// if(await this.userService.getStatus(user.id) == "busy")
+			// {
+			// 	this.server.to(`${client.id}`).emit("alreadyQueuing");
+			// 	return ;
+			// }
 
-			this.userService.setStatus(user.id, "busy");
+			this.userService.setBusyStatus(user.id);
 			this.userService.setScore(user.id, 0);
 
 			let room_= await new room();
 			room_.firstClient = client;
 			room_.gameMode = "robot";
 			room_.roomState = "ready";
-			room_.id = this.roomsList.length;
-			await this.roomsList.push(room_);
+			room_.id = this.roomsList.size;
+			this.roomsList.set(room_.id, room_);
 			client.join(`${room_.id}`);
-			console.log("Rooms L ", this.roomsList.length);
+			console.log("Rooms L ", this.roomsList.size);
 			this.server.to(`${room_.id}`).emit("botGame");
 		}
 		catch (e)
@@ -121,10 +121,10 @@ export class gameServer implements OnModuleInit {
 			return ;
 		}
 		let room_ = new room();
-		room_.id = this.roomsList.length + 1;
+		room_.id = this.roomsList.size + 1;
 		room_.firstClient = client;
 		room_.roomState = "invite";
-		this.roomsList.push(room_);
+		this.roomsList.set(room_.id, room_);
 	}
 	// The triggered event once the user accepts the invite
 	@SubscribeMessage('acceptPlayingInvite')
@@ -134,15 +134,14 @@ export class gameServer implements OnModuleInit {
 	@SubscribeMessage('declinePlayingInvite')
 	async declineMatchInvite(client: Socket, roomID: number) {
 		// The invited user will decline the invite and the room will be deleted and both users will be disconnected
-		let roomToDelete = this.roomsList.find(room => room.id === roomID);
-		if (roomToDelete) {
-			this.roomsList.splice(this.roomsList.indexOf(roomToDelete), 1);
+		if (this.roomsList.has(roomID)) {
+			this.roomsList.delete(roomID);
 		}
 	}
 	@SubscribeMessage('leaveRoom')
 	async leaveMatch(client: Socket) {
 		let match = new MatchDto();
-		let roomCheck = await this.roomsList.find(room => room.firstClient === client || room.secondClient === client);
+		let roomCheck = Array.from(this.roomsList.values()).find(room => room.firstClient === client || room.secondClient === client);
 		if (roomCheck)
 		{
 			this.server.to(`${roomCheck.id}`).emit("leaveGame");
@@ -197,14 +196,14 @@ export class gameServer implements OnModuleInit {
 						console.log("Scoreeee ", score);
 						this.userService.setScore(user.id, score);
 					}
-					this.userService.setStatus(user.id, "online"); 
+					// this.userService.setOfflineStatus(user.id);
 				}
 				catch (e)
 				{
 					console.log(e);
 				}
 				// this.server.to(`${roomCheck.id}`).emit("leaveGame");
-				this.roomsList.splice(this.roomsList.indexOf(roomCheck), 1);
+				this.roomsList.delete(roomCheck.id);
 			}
 		}
 		// Emit an event to all players connected to the room that the match is done
@@ -213,8 +212,8 @@ export class gameServer implements OnModuleInit {
 	@SubscribeMessage('gameOver')
 	async gameOver(client: Socket) {
 		let match = new MatchDto();
-		let roomCheck = await this.roomsList.find(room => room.firstClient === client ||
-												  room.secondClient === client);
+		let roomCheck = Array.from(this.roomsList.values()).find(room => room.secondClient === client ||
+			room.firstClient === client);
 		console.log("Game over"); 
 		if (roomCheck)
 		{
@@ -255,87 +254,76 @@ export class gameServer implements OnModuleInit {
 				}
 				this.gameService.matchesService.create(match);
 			}
-			this.roomsList.splice(this.roomsList.indexOf(roomCheck), 1);
+			this.roomsList.delete(roomCheck.id);
 		}
 	}
 
 	@SubscribeMessage('queuing')
 	async waitingForRandomOponent(client: Socket) {
 		console.log("Player queuing");
-		try{
-			let user = await this.gameService.chatService.getUserFromSocket(client);
-			let userStatus:string = await this.userService.getStatus(user.id);
-			if (userStatus == "busy")
-			{
-				this.server.to(`${client.id}`).emit("alreadyQueuing");
-				client.disconnect();
-				return ;
-			}
-		}
-		catch (e)	{
-			console.log(e);
-			client.disconnect();
-			return ;
-		}
-		for (let i = 0 ; i < this.roomsList.length; i++)
-		{
-			if (this.roomsList[i].roomState != "invite" && this.roomsList[i].gameMode != "robot")
-			{
-				if (!this.roomsList[i].firstClient)
-				{
-					this.roomsList[i].firstClient = client;
-					try
-					{
-						let user = await this.gameService.chatService.getUserFromSocket(client);
-						this.roomsList[i].firstName = user.username;
-						this.roomsList[i].user1ID = user.id;
-						this.userService.setStatus(user.id, "busy");
-						console.log("player " + this.roomsList[i].user1ID + "here");
-					}
-					catch (e)
-					{
-						console.log(e);
-						client.disconnect();
-						return ;
-					}
-					return ;
+		// try{
+		// 	let user = await this.gameService.chatService.getUserFromSocket(client);
+		// 	let userStatus:string = await this.userService.getStatus(user.id);
+		// 	if (userStatus == "busy")
+		// 	{
+		// 		this.server.to(`${client.id}`).emit("alreadyQueuing");
+		// 		client.disconnect();
+		// 		return ;
+		// 	}
+		// }
+		// catch (e)	{
+		// 	console.log(e);
+		// 	client.disconnect();
+		// 	return ;
+		// }
+		for (let room of this.roomsList.values()) {
+			if (room.roomState != "invite" && room.gameMode != "robot") {
+			  if (!room.firstClient) {
+				room.firstClient = client;
+				try {
+				  let user = await this.gameService.chatService.getUserFromSocket(client);
+				  room.firstName = user.username;
+				  room.user1ID = user.id;
+				  this.userService.setBusyStatus(user.id);
+				  console.log("player " + room.user1ID + "here");
+				} catch (e) {
+				  console.log(e);
+				  client.disconnect();
+				  return;
 				}
-				else if (!this.roomsList[i].secondClient)
-				{
-					client.join(`${this.roomsList[i].id}`);
-					this.roomsList[i].secondClient = client;
-					this.roomsList[i].roomState = "ready";
-					try
-					{
-						let user = await this.gameService.chatService.getUserFromSocket(client);
-						this.roomsList[i].secondName = user.username;
-						this.roomsList[i].user2ID = user.id;
-						this.userService.setStatus(user.id, "busy");
-						console.log("player " + this.roomsList[i].user2ID + "here");
-					}
-					catch (e)
-					{
-						console.log(e);
-						client.disconnect();
-						return ;
-					}
-					this.server.to(`${this.roomsList[i].id}`).emit("matchFound", true);
-					return ;
+				return;
+			  } else if (!room.secondClient) {
+				client.join(`${room.id}`);
+				room.secondClient = client;
+				room.roomState = "ready";
+				try {
+				  let user = await this.gameService.chatService.getUserFromSocket(client);
+				  room.secondName = user.username;
+				  room.user2ID = user.id;
+				  this.userService.setBusyStatus(user.id);
+				  console.log("player " + room.user2ID + "here");
+				} catch (e) {
+				  console.log(e);
+				  client.disconnect();
+				  return;
 				}
+				this.server.to(`${room.id}`).emit("matchFound", true);
+				return;
+			  }
 			}
-		}
+		  }
 		let room_ = new room();
-		room_.id = this.roomsList.length;
+		room_.id = this.roomsList.size;
 		client.join(`${room_.id}`);
 		room_.firstClient = client;
 		room_.gameMode = "random";
-		this.roomsList.push(room_);
+		this.roomsList.set(room_.id, room_);
 		try
 		{
 			let user = await this.gameService.chatService.getUserFromSocket(client);
 			room_.firstName = user.username;
 			room_.user1ID = user.id;
-			this.userService.setStatus(user.id, "busy");
+			this.userService.setBusyStatus(user.id);
 			console.log("player " + room_.user1ID + "here");
 		}
 		catch (e)
@@ -345,28 +333,28 @@ export class gameServer implements OnModuleInit {
 			return ;
 		}
 		// this.connectedUsers.push(user.username);
-		console.log("Rooms count ", this.roomsList.length);
+		console.log("Rooms count ", this.roomsList.size);
 	}
 	@SubscribeMessage('left')
 	async leftMove(client: Socket, vel: number) {
-		const room = this.roomsList.find(room => room.firstClient === client);
+		let room = Array.from(this.roomsList.values()).find(room => room.firstClient === client);
 		if (room) {
-			console.log("LEFT");
+			console.log("LEFT to room ", room.id);
 			room.firstvelocity = vel;
 		}
 	}
 	@SubscribeMessage('right')
 	async rightMove(client: Socket, vel: number) {
-		const room = this.roomsList.find(room => room.secondClient === client);
+		const room = Array.from(this.roomsList.values()).find(room => room.secondClient === client);
 		if (room) {
-			console.log("RIGHT");
+			console.log("RIGHT to room ", room.id);
 			room.secondvelocity = vel;
 		}
 	}
 	@SubscribeMessage('balllaunch')
 	async ballLaunch(client: Socket, launched: boolean) {
-		const room = this.roomsList.find(room => room.firstClient === client
-			|| room.secondClient === client);
+		const room = Array.from(this.roomsList.values()).find(room => room.secondClient === client ||
+			room.firstClient === client);
 		if (room) {
 			if (room.firstPlayerHaveTheBall && client == room.firstClient) {
 				console.log("One");
