@@ -1,13 +1,13 @@
-import { useState , useRef, useEffect} from "react";
+import { useState , useRef, useContext} from "react";
 import camera from "../assets/camera.svg"
-import { apiGlobal } from "./interceptor";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
-import def from "../assets/star.png"
+import { UserContext } from "../App";
 
 
 function Setup()
 {
+  const {user} = useContext(UserContext)
 
   //NOTE - from here start the code comunicationg with the back_end
   let inputRef = useRef(null);
@@ -40,6 +40,9 @@ function Setup()
     if(event.target.files && event.target.files.length > 0 && event.target.files[0].type != "image/png" && event.target.files[0].type != "image/jpeg"){
       console.log(event.target.files[0].type)
       setErrMsg("Bad file format! please use a .jpeg or .png file")
+    }
+    else if(event.target.files && event.target.files.length > 0 && event.target.files[0].size >=  1024 * 1024 * 5){
+      setErrMsg("File Too large, we're not Nasa plz choose a smaller file")
     }
     else
       setProfilePic(event.target.files[0]);
@@ -88,6 +91,13 @@ function Setup()
       );
     // setBadUserName(true);
   }
+
+  if (Object.keys(user).length)
+  return(
+    <>
+      { <Navigate to='/home' />}
+    </>
+  )
 
   return <>
       <div className="grid place-content-center gap-5 w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">

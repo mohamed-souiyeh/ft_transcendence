@@ -23,6 +23,7 @@ function Profile () {
   
   //--------------The Code below is for testing purpose:
 
+  console.log('hi')
       axios.get("http://localhost:1337/auth/refresh", {
         withCredentials: true
       })
