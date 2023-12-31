@@ -15,8 +15,9 @@ function Loading() {
         withCredentials: true
       })
         .then((resp) => {
-          setUser(resp.data)
-               Cookies.set('user', JSON.stringify(resp.data) );
+          setUser(JSON.stringify(resp.data))
+          Cookies.set('user', JSON.stringify(resp.data) );
+          console.log(JSON.stringify(resp.data))
         })
         .catch((err)=> {
           console.log('SIKE~!', err)

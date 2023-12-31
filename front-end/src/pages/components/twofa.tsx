@@ -1,7 +1,10 @@
 import axios from "axios";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { UserContext } from "../../App";
+import Cookies from 'js-cookie'
 
 function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: boolean, prompt:boolean, setSwitchValue: Dispatch<SetStateAction<boolean>>, setPrompt: Dispatch<SetStateAction<boolean>>}) {
+  const  {user} = useContext(UserContext)
   const [enable, setEnable] = useState(false);
   const [qrCode, setCode] = useState('');
   const [codeFetched, setStatus] = useState(false);
@@ -35,6 +38,9 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
     console.log("send request here");
     setSwitchValue(!switchValue);
     setPrompt(!prompt)
+    user.TFAisEnabled = false
+    Cookies.remove('user')
+    Cookies.set('user',JSON.stringify(user));
   }
   const handleEnable = () => {
     // setEnable(true);
@@ -52,11 +58,22 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
     const Code = e.target.verfCode.value; 
     formdata.set("code", Code);
 
-    axios.post("http://localhost:1337/2fa/activate", formdata)
+    axios.post("http://localhost:1337/2fa/activate", formdata ,{
+      withCredentials: true, 
+      headers:{
+        'Content-Type' : 'multipart/formdata'
+      }
+    })
       .then((res) => {
         if (res.status === 200) {
           console.log('the code is correct')
           setEnable(true)
+          user.TFAisEnabled = true;
+          console.log(user)
+          console.log(JSON.stringify(user))
+
+          Cookies.remove('user')
+          Cookies.set('user',JSON.stringify(user));
         }
         else {
           console.log('code is rong', res.status)
@@ -68,6 +85,8 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
         // setConfirmed(false)
       })
     console.log('Code inserted by user is:', Code);
+
+     
   }
 
   return (
