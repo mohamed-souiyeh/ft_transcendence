@@ -1,5 +1,5 @@
 import { NotificationsService } from './notifications.service';
-import { Body, Controller, HttpCode, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
 import { NotificationDto } from './notifications.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
 import { IRequestWithUser } from 'src/auth/Interfaces/IRequestWithUser';
@@ -19,7 +19,7 @@ export class NotificationsController {
   @Post('friend-request/accept')
   async acceptFriendRequest(@Req() req: IRequestWithUser, @Body() notificationDto: NotificationDto) {
     if (notificationDto.receiverId !== req.user.id)
-      throw new UnauthorizedException("You can't accept a friend request that is not yours");
+      throw new BadRequestException("You can't accept a friend request that is not yours");
     await this.notificationService.acceptFriendRequest(notificationDto);
     return { message: "Friend request accepted" };
   }
@@ -29,7 +29,7 @@ export class NotificationsController {
   @Post('friend-request/refuse')
   async refuseFriendRequest(@Req() req: IRequestWithUser, @Body() notificationDto: NotificationDto) {
     if (notificationDto.receiverId !== req.user.id)
-      throw new UnauthorizedException("You can't refuse a friend request that is not yours");
+      throw new BadRequestException("You can't refuse a friend request that is not yours");
     await this.notificationService.refuseFriendRequest(notificationDto);
     return { message: "Friend request refused" };
   }

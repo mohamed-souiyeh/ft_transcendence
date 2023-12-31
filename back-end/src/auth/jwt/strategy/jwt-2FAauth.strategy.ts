@@ -45,7 +45,7 @@ export class Jwt2FAStrategy extends PassportStrategy(Strategy, '2FAauth') {
     //NOTE - check if refresh token is valid
     if (!refreshTokenIsValid) {
       await this.userService.replaceRefreshToken(payload.id, null);
-      throw new UnauthorizedException('refresh token is not valid');
+      throw new UnauthorizedException('2 refresh token is not valid');
     }
 
     //TODO - fetch the user fromt he database or the caching service to get acurret info about the user

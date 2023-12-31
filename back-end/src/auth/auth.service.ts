@@ -56,7 +56,7 @@ export class AuthService {
       await this.addTokenToCookie(req.res, '', process.env.REFRESH_TOKEN_KEY);
 
       await this.userService.setOfflineStatus(req.user.id);
-      throw new UnauthorizedException('refresh token is not valid');
+      throw new UnauthorizedException('1 refresh token is not valid');
     }
 
     //NOTE - get signed tokens

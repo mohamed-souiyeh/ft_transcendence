@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -7,7 +8,6 @@ import {
   Post,
   Req,
   Res,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { TwoFaService } from './two-fa.service';
@@ -59,7 +59,7 @@ export class TwoFaController {
 
     console.log('code => ', code.code);
 
-    if (!isVerified) throw new UnauthorizedException('code is not valid');
+    if (!isVerified) throw new BadRequestException('code is not valid');
 
     await this.twoFaService.turnOn2FA(req.user.id);
     await this.authService.refresh(req);
@@ -81,7 +81,7 @@ export class TwoFaController {
         req.user.id,
       );
 
-    if (!isVerified) throw new UnauthorizedException('code is not valid');
+    if (!isVerified) throw new BadRequestException('code is not valid');
 
     await this.authService.refresh(req);
     await this.usersService.setAuthenticated(req.user.id, true);
