@@ -8,7 +8,6 @@ import games from "../assets/controller.png"
 import { Switch, ConfigProvider } from "antd";
 import { useContext, useState } from "react";
 import { UserContext } from "../App";
-import axios from "axios";
 
 
 
@@ -19,30 +18,6 @@ function Profile () {
 
   const [switchValue, setSwitchValue] = useState(false);
   const [prompt, setPrompt] = useState(false);
-  // const [qrCode, setCode] = useState(null);
-  
-  //--------------The Code below is for testing purpose:
-
-  console.log('hi')
-      axios.get("http://localhost:1337/auth/refresh", {
-        withCredentials: true
-      })
-        .then((resp) => {
-            console.log("we have as a resp:", resp)
-        })
-        .catch((err)=> {
-          console.log('SIKE~!', err)
-            if (err.response) {
-              if(err.response.status == 401){
-              console.log("this user is not Authenticated")
-            }
-          }
-        })
-  //----------------------------
-
-
-
-
   const {user} = useContext(UserContext)
 
   return(
@@ -80,11 +55,6 @@ function Profile () {
                     onChange={() => setPrompt(true)}
                   />
                 </ConfigProvider>
-                {
-                  //here, we should show the popup if the switch was clicked.
-                  //based on the popup buttons, either just hide the pop(No is clicked) or confirm the state changing (yes clicked), to change the state, switchValue will change to !switchValue
-                  //in other words, popup component will take 'switchValue' and setSwitchValue to change in the case of clicking on yes.
-                }
               </div>
             </div>
           </div>

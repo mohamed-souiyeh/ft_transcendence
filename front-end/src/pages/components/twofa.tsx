@@ -1,6 +1,5 @@
 import axios from "axios";
-import { relative } from "path";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: boolean, prompt:boolean, setSwitchValue: Dispatch<SetStateAction<boolean>>, setPrompt: Dispatch<SetStateAction<boolean>>}) {
   const [enable, setEnable] = useState(false);
@@ -10,24 +9,26 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
   let formdata = new FormData();
 
 
-  if (!codeFetched)
-{
+  if (!codeFetched) {
     axios.get("http://localhost:1337/2fa/generate",
       {
         withCredentials: true,
         responseType: 'arraybuffer'
-      }
-    )
+      })
       .then((response) => {
-        let image = btoa(
-          new Uint8Array(response.data)
-            .reduce((data, byte) => data + String.fromCharCode(byte), '')
-        );
+        if (response.status == 200) {
 
-        console.log(`data:${response.headers['content-type'].toLowerCase()};base64,${image}`);
-        setCode(`data:${response.headers['content-type'].toLowerCase()};base64,${image}`);
-      });
-    setStatus(true);
+          let image = btoa(
+            new Uint8Array(response.data)
+              .reduce((data, byte) => data + String.fromCharCode(byte), '')
+          );
+
+          console.log('teeeeeeeeeeest', `data:${response.headers['content-type'].toLowerCase()};base64,${image}`);
+          setCode(`data:${response.headers['content-type'].toLowerCase()};base64,${image}`);
+          setStatus(true);
+        }
+      })
+    // setStatus(true);
   }
 
   const handleDisable = () => {
@@ -50,23 +51,23 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
     e.preventDefault();
     const Code = e.target.verfCode.value; 
     formdata.set("code", Code);
+
     axios.post("http://localhost:1337/2fa/activate", formdata)
-    .then((res) => {
-          if (res.status === 200) {
-            console.log('the code is correct')
-            setEnable(true)
-          }
-          else {
-            console.log('code is rong', res.status)
-            setConfirmed(false)
-          }
+      .then((res) => {
+        if (res.status === 200) {
+          console.log('the code is correct')
+          setEnable(true)
         }
-      )
-    .catch((e) => {
-        console.log('an Error occured!!', e.response.data.message);
-        setConfirmed(false)
+        else {
+          console.log('code is rong', res.status)
+          setConfirmed(false)
+        }
       })
-    // console.log('Code inserted by user is:', Code);
+      .catch((e) => {
+        console.log('an Error occured!!', e.response.data.message);
+        // setConfirmed(false)
+      })
+    console.log('Code inserted by user is:', Code);
   }
 
   return (
