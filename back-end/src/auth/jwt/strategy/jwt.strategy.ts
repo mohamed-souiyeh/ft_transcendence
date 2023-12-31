@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
     const extractJwtFromCookie = (req) => {
       let token = null;
 
-      console.log('jwt strategy req.cookies =>', req.cookies);
+      // console.log('jwt strategy req.cookies =>', req.cookies);
       if (req && req.cookies) {
         token = req.cookies[process.env.ACCESS_TOKEN_KEY];
       }
@@ -45,7 +45,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myJwt') {
     if (!refreshTokenIsValid) {
       console.log('refresh token is not valid');
       await this.userService.replaceRefreshToken(payload.id, null);
-      throw new UnauthorizedException('refresh token is not valid');
+      throw new UnauthorizedException('4 refresh token is not valid');
     }
 
     if (payload.TFAisEnabled && !payload.TFAauthenticated) {
