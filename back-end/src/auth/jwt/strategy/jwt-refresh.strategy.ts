@@ -33,24 +33,25 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
 
     const refreshTokenIsValid = await this.userService.validatRefreshToken(payload.id, refreshToken);
 
+    console.log("refreshtokenuisvalid => ", refreshTokenIsValid);
     //NOTE - check if refresh token is valid
     if (!refreshTokenIsValid) {
       await this.userService.replaceRefreshToken(payload.id, null);
       await this.userService.setAuthenticated(payload.id, false);
       await this.userService.setOfflineStatus(payload.id);
-      throw new UnauthorizedException('refresh token is not valid');
+      throw new UnauthorizedException('3 refresh token is not valid');
     }
 
     if (payload.TFAisEnabled && !payload.TFAauthenticated) {
       throw new UnauthorizedException('TFA is enabled but not authenticated');
     }
-    console.log("refresh token is valid => ", refreshTokenIsValid);
+    // console.log("refresh token is valid => ", refreshTokenIsValid);
 
     const user = {
       ...refreshTokenIsValid,
       TFAauthenticated: payload.TFAauthenticated,
     }
-    console.log('jwt refresh strategy user =>', user);
+    // console.log('jwt refresh strategy user =>', user);
     return user;
   }
 }
