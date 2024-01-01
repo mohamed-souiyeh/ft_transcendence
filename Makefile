@@ -19,9 +19,11 @@ volumes:
 down:
 	@docker compose -f ./dev-ops/docker-compose.yml down
 
-clean: down
+vclean:
 	@docker volume rm -f sharedv
 	@docker volume rm -f postgres
+
+clean: down vclean
 	@docker system prune -af
 
 # deploy:
