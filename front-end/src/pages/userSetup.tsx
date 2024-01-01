@@ -3,11 +3,12 @@ import camera from "../assets/camera.svg"
 import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../App";
+import Cookies from 'js-cookie';
 
 
 function Setup()
 {
-  const {user} = useContext(UserContext)
+  const {user, setUser} = useContext(UserContext)
 
   //NOTE - from here start the code comunicationg with the back_end
   let inputRef = useRef(null);
@@ -30,37 +31,17 @@ function Setup()
     setName(e.target.value);
   };
 
-  //   const onUserInput = (e)=>
-  // {
-  //     setName(e.target.value);
-  //   };
 
   const change = (event: React.ChangeEvent<HTMLInputElement>): void =>
 {
     if(event.target.files && event.target.files.length > 0 && event.target.files[0].type != "image/png" && event.target.files[0].type != "image/jpeg"){
-      console.log(event.target.files[0].type)
       setErrMsg("Bad file format! please use a .jpeg or .png file")
     }
     else if(event.target.files && event.target.files.length > 0 && event.target.files[0].size >=  1024 * 1024 * 5){
       setErrMsg("File Too large, we're not Nasa plz choose a smaller file")
     }
     else
-      setProfilePic(event.target.files[0]);
-    // apiGlobal.interceptors.response.use(
-    // 	response => response,
-    // 	async error => {
-    // 		const status = error.response ?.status;
-    // 		if (status === 401) {
-    // 			console.log("hoooo");
-    // 			await apiGlobal.get("/auth/refresh",
-    // 			{
-    // 				withCredentials: true
-    // 			})
-    // 			return apiGlobal(error.config);
-    // 		}
-    // 		return Promise.reject(error);
-    // 	}
-    // );
+    setProfilePic(event.target.files[0]);
   };
 
 
@@ -80,19 +61,36 @@ function Setup()
       .then( (res)=> {
         setUsername("");
         if (res.status == 200) {
-          navigate("/home");
+          // navigate("/home");
+          // ----------------------
+
+          axios.get("http://localhost:1337/users/allforhome", {
+            withCredentials: true
+          })
+            .then((resp) => {
+              setUser(resp.data)
+              Cookies.remove('user')
+              Cookies.set('user', JSON.stringify(resp.data) );
+            })
+            .catch((err)=> {
+              console.log("My sad potato we have an error:", err)
+              navigate("/login")
+            })
+
+          // ----------------------
+          navigate("/home")
         }
       })
       . catch((e)=>{
         console.log(e.response.data.message);
         setErrMsg(e.response.data.message)
         setUsername(e.response);
-      }
-      );
+      });
+
     // setBadUserName(true);
   }
 
-  if (Object.keys(user).length)
+  if (!Object.keys(user).length || user.isProfileSetup)
   return(
     <>
       { <Navigate to='/home' />}
@@ -100,7 +98,7 @@ function Setup()
   )
 
   return <>
-      <div className="grid place-content-center gap-5 w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
+    <div className="grid place-content-center gap-5 w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
       <div className="grid place-content-center" >
         <div className="flex" >
           <p className="text-4xl text-purple mr-2"> Welcome! </p>

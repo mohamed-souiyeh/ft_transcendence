@@ -15,7 +15,6 @@ import TwoFAConfirmation from "./pages/twofaconfirm";
 import Loading from "./pages/loading";
 import Cookies from 'js-cookie'
 
-export const AuthContext = createContext({auth: false, setAuth : React.Dispatch<React.SetStateAction<boolean>> });
 export const UserContext = createContext({user: {}, setUser : React.Dispatch<React.SetStateAction<boolean>> });
 
 
@@ -29,7 +28,6 @@ function App() {
   // }
 
 
-  const [auth, setAuth] = useState(false)
   const [user, setUser] = useState({})
 
   //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
@@ -46,7 +44,6 @@ function App() {
 
   return (
     <>
-      <AuthContext.Provider value={{auth, setAuth}}>
         <UserContext.Provider value={{user, setUser}}>
           <BrowserRouter>
             <Routes>
@@ -57,7 +54,7 @@ function App() {
               <Route path="*" element={<NotFound/>} />
 
               <Route path="/setup" element={<Setup/>}/>
-              <Route path="/confirmation" element={<TwoFAConfirmation/>}/>
+              <Route path="/2fa" element={<TwoFAConfirmation/>}/>
               {/* Private Routes */}
               <Route element={<RequireAuth/>}>
               <Route path="/home" element={<Home/>}/>
@@ -68,7 +65,6 @@ function App() {
             </Routes>
           </BrowserRouter>
         </UserContext.Provider>
-      </AuthContext.Provider>
     </>
   )
 }

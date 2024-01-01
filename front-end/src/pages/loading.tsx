@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react"
 import { UserContext } from "../App"
 import axios from "axios"
-import { Navigate, useNavigate} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
 import Cookies from 'js-cookie';
 
 function Loading() {
@@ -9,37 +9,24 @@ function Loading() {
   const {user, setUser}  = useContext(UserContext)
   const navigate = useNavigate();
 
-  useEffect( () => {
-    if (!Object.keys(user).length){ 
-      axios.get("http://localhost:1337/users/allforhome", {
-        withCredentials: true
-      })
-        .then((resp) => {
-          setUser(JSON.stringify(resp.data))
-          Cookies.set('user', JSON.stringify(resp.data) );
-          console.log(JSON.stringify(resp.data))
-        })
-        .catch((err)=> {
-          console.log('SIKE~!', err)
-            if (err.response) {
-              if(err.response.status == 401){
-              console.log("this user is not Authenticated")
-              navigate("/home")
-            }
-          }
-          else 
-              navigate("/home")
-        })
-    }
-  }, [user] 
-  )
+  axios.get("http://localhost:1337/users/allforhome", {
+    withCredentials: true
+  })
+    .then((resp) => {
+      setUser(resp.data)
+      Cookies.set('user', JSON.stringify(resp.data) );
+      if (!user.isProfileSetup){
+        console.log('hhhhhhh')
+        navigate("/setup")
+      }
+      else
+        navigate("/home")
+    })
+    .catch((err)=> {
+      console.log("My sad potato we have an error:", err)
+      navigate("/login")
+    })
 
-  if (Object.keys(user).length)
-  return(
-    <>
-      { <Navigate to="/home" />}
-    </>
-  )
   return (
     <>
       <div className="grid place-content-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
@@ -54,7 +41,6 @@ function Loading() {
       </div>
     </>
   )
-
 }
 
 export default Loading
