@@ -26,7 +26,6 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
               .reduce((data, byte) => data + String.fromCharCode(byte), '')
           );
 
-          console.log('teeeeeeeeeeest', `data:${response.headers['content-type'].toLowerCase()};base64,${image}`);
           setCode(`data:${response.headers['content-type'].toLowerCase()};base64,${image}`);
           setStatus(true);
         }
