@@ -35,9 +35,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
 
   const handleDisable = () => {
     console.log("send request here");
-    //========
-
-    axios.post("http://localhost:1337/2fa/deactivate", {
+    axios.get("http://localhost:1337/2fa/deactivate", {
       withCredentials: true
     })
       .then((resp) => {
@@ -54,19 +52,9 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
     .catch( (err) => {
         console.log("dang an error: ", err)
       })
-
-
-    //========
-    // setSwitchValue(!switchValue);
-    // setPrompt(!prompt)
-    // user.TFAisEnabled = false
-    // Cookies.remove('user')
-    // Cookies.set('user',JSON.stringify(user));
   }
+
   const handleClose = () => {
-    if (switchValue == true)
-  {
-    }
     setSwitchValue(!switchValue)
     setPrompt(!prompt)
   }
