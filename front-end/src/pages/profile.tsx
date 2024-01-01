@@ -19,7 +19,6 @@ function Profile () {
   const {user} = useContext(UserContext)
   const [switchValue, setSwitchValue] = useState(user.TFAisEnabled);
   const [prompt, setPrompt] = useState(false);
-  console.log('so.. tfa is:', user.TFAisEnabled)
 
   return(
     <>

@@ -35,14 +35,33 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
 
   const handleDisable = () => {
     console.log("send request here");
-    setSwitchValue(!switchValue);
-    setPrompt(!prompt)
-    user.TFAisEnabled = false
-    Cookies.remove('user')
-    Cookies.set('user',JSON.stringify(user));
-  }
-  const handleEnable = () => {
-    // setEnable(true);
+    //========
+
+    axios.post("http://localhost:1337/2fa/deactivate", {
+      withCredentials: true
+    })
+      .then((resp) => {
+        if (resp.status == 200){
+          console.log("2fa is off")
+
+          setSwitchValue(!switchValue);
+          setPrompt(!prompt)
+          user.TFAisEnabled = false
+          Cookies.remove('user')
+          Cookies.set('user',JSON.stringify(user));
+        }
+      })
+    .catch( (err) => {
+        console.log("dang an error: ", err)
+      })
+
+
+    //========
+    // setSwitchValue(!switchValue);
+    // setPrompt(!prompt)
+    // user.TFAisEnabled = false
+    // Cookies.remove('user')
+    // Cookies.set('user',JSON.stringify(user));
   }
   const handleClose = () => {
     if (switchValue == true)
@@ -85,7 +104,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
       })
     console.log('Code inserted by user is:', Code);
 
-     
+
   }
 
   return (
@@ -117,7 +136,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
                   { !confirmed && <p className="ml-12 text-sm text-[#D9534F] font-extrabold"> Wrong code! Try again. </p> }
                 </div>
                 <div className="flex place-content-center gap-3 pt-1">
-                  <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2"  type="submit" value="Send" onClick={() => handleEnable()}> Confirm </button>
+                  <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2"  type="submit" value="Send" > Confirm </button>
                   <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2" onClick={() => setPrompt(!prompt)}> Cancel </button>
                 </div>
               </form>
@@ -140,5 +159,3 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
 }
 
 export default Popup
-
-
