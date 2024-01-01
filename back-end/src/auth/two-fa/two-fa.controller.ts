@@ -70,6 +70,16 @@ export class TwoFaController {
     return { message: '2FA activated successfully' };
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('deactivate')
+  async deactivate2FA(@Req() req: IRequestWithUser) {
+    await this.twoFaService.turnOff2FA(req.user.id);
+    await this.authService.refresh(req);
+    
+    
+    return { message: '2FA deactivated successfully' };
+  }
+
   @UseGuards(Jwt2FAAuthGuard)
   @Post('verify')
   @HttpCode(200)
