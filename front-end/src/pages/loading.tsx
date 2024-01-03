@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react"
+import { useContext } from "react"
 import { UserContext } from "../App"
 import axios from "axios"
 import {useNavigate} from "react-router-dom"
@@ -13,9 +13,9 @@ function Loading() {
     withCredentials: true
   })
     .then((resp) => {
-      setUser(resp.data)
+      setUser(prevUser => ({ ...prevUser, data: resp.data }))
       Cookies.set('user', JSON.stringify(resp.data) );
-      if (!user.isProfileSetup){
+      if (!user.data.isProfileSetup){
         console.log('hhhhhhh')
         navigate("/setup")
       }

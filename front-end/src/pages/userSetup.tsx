@@ -41,17 +41,23 @@ function Setup()
       setErrMsg("File Too large, we're not Nasa plz choose a smaller file")
     }
     else
-    setProfilePic(event.target.files[0]);
+      setProfilePic(event.target.files[0]);
   };
 
 
   const changeBoth = () =>
 {
-    formdata.set("username", userName);
+    console.log("username is :", `|${userName}|`);
+    console.log("image is :", `|${srcImg}|`);
+
+
+    if (userName.length)
+      formdata.set("username", userName);
     // I need mohamad to test if this is working ..
     // if(!srcImg)
     //   setProfilePic("../assets/star.png")
-    formdata.set("avatar", srcImg);
+    if (srcImg.length)
+      formdata.set("avatar", srcImg);
 
     axios.
       post("http://localhost:1337/users/update", formdata,
@@ -59,6 +65,8 @@ function Setup()
           withCredentials: true
         })
       .then( (res)=> {
+        console.log("type of res :", typeof res );
+        console.log("response from the back-end after update in user setup :", res);
         setUsername("");
         if (res.status == 200) {
           // navigate("/home");
@@ -68,21 +76,21 @@ function Setup()
             withCredentials: true
           })
             .then((resp) => {
-              setUser(resp.data)
+              setUser(prevUser => ({ ...prevUser, data: resp.data }))
               Cookies.remove('user')
-              Cookies.set('user', JSON.stringify(resp.data) );
+              Cookies.set('user', JSON.stringify(resp.data));
             })
             .catch((err)=> {
-              console.log("My sad potato we have an error:", err)
-              navigate("/login")
+              console.log("My sad potato we have an error:", err);
             })
 
           // ----------------------
           navigate("/home")
         }
       })
-      . catch((e)=>{
-        console.log(e.response.data.message);
+      .catch((e)=>{
+        console.log("My sad potato we have an error:", e);
+        // console.log(e.response.data.message);
         setErrMsg(e.response.data.message)
         setUsername(e.response);
       });
@@ -90,7 +98,7 @@ function Setup()
     // setBadUserName(true);
   }
 
-  if (!Object.keys(user).length || user.isProfileSetup)
+  if (!Object.keys(user.data).length || user.data.isProfileSetup)
   return(
     <>
       { <Navigate to='/home' />}

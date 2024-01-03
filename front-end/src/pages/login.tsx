@@ -19,11 +19,13 @@ function ftSignUp() {
 function SignUp () {
   const {user}  = useContext(UserContext)
 
+
+  console.log("this is the user in signup => ", user)
   const location = useLocation()
 
   var redirectTo
   location.state ? redirectTo = location.state.from : redirectTo='/home';
-  if (Object.keys(user).length)
+  if (Object.keys(user.data).length)
   return(
     <>
       { <Navigate to={redirectTo} />}
