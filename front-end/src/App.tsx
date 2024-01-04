@@ -14,6 +14,7 @@ import { createContext } from "react";
 import TwoFAConfirmation from "./pages/twofaconfirm";
 import Loading from "./pages/loading";
 import Cookies from 'js-cookie'
+import Chat from "./pages/chat";
 
 export const UserContext = createContext({user: {}, setUser : React.Dispatch<React.SetStateAction<boolean>> });
 
@@ -57,7 +58,8 @@ function App() {
               <Route path="/2fa" element={<TwoFAConfirmation/>}/>
               {/* Private Routes */}
               <Route element={<RequireAuth/>}>
-              <Route path="/home" element={<Home/>}/>
+                <Route path="/home" element={<Home/>}/>
+                <Route path="/chat" element={<Chat/>}/>
                 <Route path="/profile" element={<Profile/>} />
                 <Route path="/userprofile" element={<UserProfile/>} />
                 {/* <Route path="/game" element={<Game/>} /> */}
