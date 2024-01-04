@@ -80,6 +80,8 @@ export class UsersController {
       await this.userService.updateAvatar(req.user.id, data.avatar as any);
     }
     await this.userService.setProfileSetup(req.user.id, true);
+
+    console.log("updatd successfully");
     return true;
   }
 

@@ -3,6 +3,8 @@ import App, { UserContext } from './App.tsx'
 import './index.css'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { eventBus } from './eventBus.tsx';
+
 
 
 axios.interceptors.response.use(
@@ -10,43 +12,33 @@ axios.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+
+    console.log("response interceptor :", error.response);
+    console.log("original config :", error.config);
+    const isRefreshRequest = error.request.responseURL === "http://localhost:1337/auth/refresh";
+
+    if (isRefreshRequest) {
+      console.log("isRefreshRequest :", isRefreshRequest);
+      return Promise.reject(error);
+    }
+    console.log("isRefreshRequest :", isRefreshRequest);
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      try {
-        // Trying to refresh the Token:
-        console.log("Trying to refresh Token..")
-        await axios.get("http://localhost:1337/auth/refresh", {
-          withCredentials: true
-        })
-        .then(() => {
+      // Trying to refresh the Token:
+      console.log("Trying to refresh Token..")
+      return axios.get("http://localhost:1337/auth/refresh", {
+        withCredentials: true
+      }).then(() => {
           console.log("Token refreshed ma nigga!")
-        })
-        .catch((err) => {
-          console.log("my sad shit, an err occured, it's :", err)
-        })
+          //FIXME - this bastard is mostlikly is the root of the problem
+          return axios(originalRequest);
+        }).catch((err) => {
+          console.log("my sad shit, an err occured, it's :", err);
 
-        // retrying the req
-        return axios(originalRequest);
-      } catch (refreshError) {
-        console.error('Error refreshing token:', refreshError);
-        //here, we should logout the user.
-
-        axios.get("http://localhost:1337/auth/logout", {
-          withCredentials: true
+          eventBus.emit('unauthorized');
+          return Promise.reject(error);
         })
-          .then((resp) => {
-            if (resp.status == 200){
-              console.log("user successfully logged out")
-            }
-          })
-          .catch( (err) => {
-            console.log("there's nowhere to run", err)
-          })
-
-        Cookies.remove('user')
-        return Promise.reject(error);
-      }
     }
     return Promise.reject(error);
   }

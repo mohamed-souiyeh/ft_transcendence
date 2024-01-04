@@ -17,7 +17,7 @@ function Profile () {
 
 
   const {user} = useContext(UserContext)
-  const [switchValue, setSwitchValue] = useState(user.TFAisEnabled);
+  const [switchValue, setSwitchValue] = useState(user.data.TFAisEnabled);
   const [prompt, setPrompt] = useState(false);
 
   return(
@@ -42,7 +42,7 @@ function Profile () {
             <p className="text-2xl m-2"> 2fa state </p>
           </div>
           <div className=" m-6 grid place-content-center">
-            <p className="text-2xl m-2">:  {user.username}</p>
+            <p className="text-2xl m-2">:  {user.data.username}</p>
             <p className="text-2xl m-2">:  20</p>
             <p className="text-2xl m-2">:  05</p>
             <div className="flex ">

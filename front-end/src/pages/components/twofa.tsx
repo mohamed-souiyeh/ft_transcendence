@@ -29,7 +29,9 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
           setCode(`data:${response.headers['content-type'].toLowerCase()};base64,${image}`);
           setStatus(true);
         }
-      })
+      }).catch((err) => {
+        console.log("an error occured: ", err)
+      });
     // setStatus(true);
   }
 
@@ -44,9 +46,9 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
 
           setSwitchValue(!switchValue);
           setPrompt(!prompt)
-          user.TFAisEnabled = false
+          user.data.TFAisEnabled = false
           Cookies.remove('user')
-          Cookies.set('user',JSON.stringify(user));
+          Cookies.set('user',JSON.stringify(user.data));
         }
       })
     .catch( (err) => {
@@ -74,12 +76,12 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
         if (res.status === 200) {
           console.log('the code is correct')
           setEnable(true)
-          user.TFAisEnabled = true;
+          user.data.TFAisEnabled = true;
           console.log(user)
-          console.log(JSON.stringify(user))
+          console.log(JSON.stringify(user.data))
 
           Cookies.remove('user')
-          Cookies.set('user',JSON.stringify(user));
+          Cookies.set('user',JSON.stringify(user.data));
         }
         else {
           console.log('code is rong', res.status)

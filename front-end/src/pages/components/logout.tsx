@@ -8,7 +8,7 @@ import { UserContext } from "../../App";
 function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
 
   const nav = useNavigate()
-  const {setUser} = useContext(UserContext)
+  const {user, setUser} = useContext(UserContext)
 
   const logout = () => {
     axios.get("http://localhost:1337/auth/logout", {
@@ -18,7 +18,8 @@ function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
         if (resp.status == 200){
           console.log("user successfully logged out")
           Cookies.remove('user')
-          setUser({})
+          user.chat.disconnect();
+          setUser({ data: {} })
           nav("/login")
         }
       })

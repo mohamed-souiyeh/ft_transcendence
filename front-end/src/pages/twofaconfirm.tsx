@@ -37,7 +37,7 @@ function TwoFAConfirmation () {
       })
   }
 
-  if (user.isAuthenticated){
+  if (user.data.isAuthenticated){
     return( nav("/home") )
   }
 
