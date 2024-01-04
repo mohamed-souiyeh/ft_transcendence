@@ -25,6 +25,36 @@ export class UsersService {
 
   //SECTION - CREATE OPERATIONS
 
+  async createFriendship(userId: number, friendId: number): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        friends: {
+          connect: {
+            id: friendId,
+          }
+        }
+      }
+    });
+
+    await this.prismaService.user.update({
+      where: {
+        id: friendId,
+      },
+      data: {
+        friends: {
+          connect: {
+            id: userId,
+          }
+        }
+      }
+    });
+
+    return user;
+  }
+
   async addUser(user: UserDto): Promise<any> {
 
     user.username = user.email.split('.')[0];

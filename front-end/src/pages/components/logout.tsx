@@ -1,6 +1,33 @@
+import axios from "axios";
 import Logo from "../../assets/Logo.svg"
+import Cookies from 'js-cookie'
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { UserContext } from "../../App";
 
 function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
+
+  const nav = useNavigate()
+  const {user, setUser} = useContext(UserContext)
+
+  const logout = () => {
+    axios.get("http://localhost:1337/auth/logout", {
+      withCredentials: true
+    })
+    .then((resp) => {
+        if (resp.status == 200){
+          console.log("user successfully logged out")
+          Cookies.remove('user')
+          user.chat.disconnect();
+          setUser({ data: {} })
+          nav("/login")
+        }
+      })
+    .catch( (err) => {
+        console.log("there's no where to run", err)
+      })
+  }
+
   if (!open) return null
   return (
     <>
@@ -13,7 +40,7 @@ function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
             <p className="text-3xl text-center font-bold px-2">Are you sure you want to logout?</p>
           </div>
           <div className="flex flex-row place-content-center pt-10 gap-3">
-            <button className="w-32 rounded-lg bg-purple focus:outline-none border-none hover:bg-purple-sh-2">Yes</button>
+            <button onClick={logout} className="w-32 rounded-lg bg-purple focus:outline-none border-none hover:bg-purple-sh-2">Yes</button>
             <button onClick={onClose} className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2">No</button>
           </div>
         </div>

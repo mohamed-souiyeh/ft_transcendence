@@ -59,7 +59,7 @@ export class JwtAuthService {
       });
       return payload;
     } catch (error) {
-      console.log("this error is in verifyJwtAccessToken => ", error);
+      // console.log("this error is in verifyJwtAccessToken => ", error);
       return null;
     }
   }

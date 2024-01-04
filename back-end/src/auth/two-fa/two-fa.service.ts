@@ -18,13 +18,6 @@ export class TwoFaService {
   ): Promise<secretAndOtpauthUrl> {
     const secret = authenticator.generateSecret();
 
-
-    const options = {
-      window: 2,
-    };
-
-    authenticator.options = options;
-
     const otpauthUrl = authenticator.keyuri(
       userEmail,
       process.env.TWO_FACTOR_AUTHENTICATION_APP_NAME,
@@ -55,12 +48,6 @@ export class TwoFaService {
     const user = await this.usersService.findUserById(userid);
 
     if (!user) return false;
-
-    const options = {
-      window: 2,
-    };
-
-    authenticator.options = options;
 
     if (!user.TFASecret)
       throw new UnauthorizedException('User does not have 2FA enabled');

@@ -6,17 +6,21 @@ import trophy from "../assets/trophy.png";
 import star from "../assets/star.png";
 import games from "../assets/controller.png"
 import { Switch, ConfigProvider } from "antd";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UserContext } from "../App";
 
 
 function Profile () {
-  const [switchValue, setSwitchValue] = useState(false);
+
+
+
+  const {user} = useContext(UserContext)
+  const [switchValue, setSwitchValue] = useState(user.data.TFAisEnabled);
   const [prompt, setPrompt] = useState(false);
-  const [qrCode, setCode] = useState(null);
 
   return(
     <>
-      <div className="w-screen h-screen grid justify-center">
+      <div className="grid justify-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
         <SideBar/>
         <NavBar/>
 
@@ -36,7 +40,7 @@ function Profile () {
             <p className="text-2xl m-2"> 2fa state </p>
           </div>
           <div className=" m-6 grid place-content-center">
-            <p className="text-2xl m-2">:  Potatoo</p>
+            <p className="text-2xl m-2">:  {user.data.username}</p>
             <p className="text-2xl m-2">:  20</p>
             <p className="text-2xl m-2">:  05</p>
             <div className="flex ">
@@ -49,11 +53,6 @@ function Profile () {
                     onChange={() => setPrompt(true)}
                   />
                 </ConfigProvider>
-                {
-                  //here, we should show the popup if the switch was clicked.
-                  //based on the popup buttons, either just hide the pop(No is clicked) or confirm the state changing (yes clicked), to change the state, switchValue will change to !switchValue
-                  //in other words, popup component will take 'switchValue' and setSwitchValue to change in the case of clicking on yes.
-                }
               </div>
             </div>
           </div>

@@ -2,7 +2,8 @@ import { GatewayMetadata } from "@nestjs/websockets";
 
 export const baseGateWayConfig: GatewayMetadata = {
   cors: {
-    origin: true,
+    origin: "http://localhost:8082",
     credentials: true,
   },
+  transports: ['websocket', 'polling'],
 };
