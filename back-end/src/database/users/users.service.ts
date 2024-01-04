@@ -278,7 +278,7 @@ export class UsersService {
     const user = await this.prismaService.user.update({
       where: {
         id: id,
-        status: UserStatus.online,
+        // status: UserStatus.online,
       },
       data: {
         status: UserStatus.busy,
@@ -292,7 +292,7 @@ export class UsersService {
     const user = await this.prismaService.user.update({
       where: {
         id: id,
-        status: UserStatus.offline,
+        // status: UserStatus.offline,
       },
       data: {
         status: UserStatus.online,

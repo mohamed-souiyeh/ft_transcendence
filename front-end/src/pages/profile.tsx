@@ -6,9 +6,10 @@ import trophy from "../assets/trophy.png";
 import star from "../assets/star.png";
 import games from "../assets/controller.png"
 import { Switch, ConfigProvider } from "antd";
-import { useContext, useState } from "react";
-import { UserContext } from "../App";
-
+import { useState } from "react";
+import newComerPic from "../assets/newcomer.png";
+import playerPic from "../assets/player.png";
+import veteranPic from "../assets/veteran.png";
 
 function Profile () {
 
@@ -17,6 +18,10 @@ function Profile () {
   const {user} = useContext(UserContext)
   const [switchValue, setSwitchValue] = useState(user.data.TFAisEnabled);
   const [prompt, setPrompt] = useState(false);
+  const [qrCode, setCode] = useState(null);
+  const isNewComer = true;
+  const isPlayer = false;
+  const isVeteran = false;
 
   return(
     <>
@@ -79,8 +84,27 @@ function Profile () {
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-100">acheivements:</p>
                 </div>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img style={{
+                      width: '60px',
+                      filter: !isNewComer ? 'sepia(100%)': 'none',
+                    }} src={newComerPic} />
+                    {isNewComer && (<h1 style={{fontSize:"35px"}}>New comer</h1>)}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img style={{
+                      width: '60px',
+                      filter: !isPlayer ? 'sepia(100%)': 'none',
+                    }} src={playerPic} />
+                    {isPlayer && (<h1 style={{fontSize:"35px"}}>Player</h1>)}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img style={{
+                      width: '60px',
+                      filter: !isVeteran ? 'sepia(100%)': 'none',
+                    }} src={veteranPic} />
+                    {isVeteran && (<h1 style={{fontSize:"35px"}}>Veteran</h1>)}
+                  </div>
               </div>
             </div>
           </div>
