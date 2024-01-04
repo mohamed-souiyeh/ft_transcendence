@@ -22,14 +22,14 @@ function Chat() {
             <p className='text-4xl' >Network </p>
           </div>
 
-          <div className='bg-purple-sh-1 my-5 rounded-lg h-[500px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]' onClick={() => setSelectedState(2)}>
+          <div className={`${selected === 2 ? 'bg-[#48435E]' :'bg-purple-sh-1'} my-5 rounded-lg h-[500px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} onClick={() => setSelectedState(2)}>
             <div className="sticky top-0 bg-opacity-70 backdrop-blur-sm px-4 py-2" >
               <p className="text-4xl ">Messages</p>
             </div>
             <p className='text-l' >guess we need a component here :') </p>
           </div>
 
-          <div className='bg-purple-sh-1 my-5 rounded-lg h-[325px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]' onClick={() => setSelectedState(3)}>
+          <div className={`${selected === 3 ? 'bg-[#48435E]' :'bg-purple-sh-1'} my-5 rounded-lg h-[325px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} onClick={() => setSelectedState(3)}>
             <div className="sticky top-0 bg-opacity-70 backdrop-blur-sm px-4 py-2" >
               <p className="text-4xl ">Rooms</p>
             </div>
@@ -39,7 +39,6 @@ function Chat() {
         </div>
         <div className='basis-2/3 m-5 bg-purple-sh-1'>
           {selected === 1 ? <Network/> : (selected === 2 ? <Messages/> : <Rooms/>)}
-
         </div>
 
       </div>
