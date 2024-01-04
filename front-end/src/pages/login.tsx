@@ -1,21 +1,52 @@
 import logo from '../assets/Logo.svg'
 import google from '../assets/google.svg'
 import intra from '../assets/42.svg'
-import { Link } from 'react-router-dom';
+import { UserContext } from '../App';
+import { useContext } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 
-function Login () {
+
+function googleSignUp()
+{
+  window.location.href = 'http://localhost:1337/auth/google';
+}
+
+function ftSignUp() {
+  window.location.href = 'http://localhost:1337/auth/42';
+}
+
+
+function SignUp () {
+  const {user}  = useContext(UserContext)
+
+
+  console.log("this is the user in signup => ", user)
+  const location = useLocation()
+
+  var redirectTo
+  location.state ? redirectTo = location.state.from : redirectTo='/home';
+  if (Object.keys(user.data).length)
+  return(
+    <>
+      { <Navigate to={redirectTo} />}
+    </>
+  )
   return (
     <>
-      <div className="w-screen h-screen grid place-content-center">
+      <div className="grid place-content-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
         <div className="grid place-content-center">
           <img src={logo}/>
         </div>
-        <div className="grid place-content-center py-2">
-          <h1 className='text-impure-white'>Sign in</h1>
+        <div className="grid place-content-center pt-2">
+          <h1 className='text-purple-tone-1'>Welcome</h1>
+        </div>
+        <div className="grid place-content-end pb-2">
+          <p className='text-purple-tone-2 text-sm'> Please choose how to authenticate </p>
         </div>
 
         <div className='py-2'>
-          <button  className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1">
+          <button onClick = { ()=> { googleSignUp(); } }
+            className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1 focus:outline-none">
             <div>
               <img className='flex-none pr-3' src={google} />
             </div>
@@ -27,7 +58,13 @@ function Login () {
         </div>
 
         <div className='py-2'>
-          <button  className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1">
+          <button 
+            onClick = {
+              () => {
+                ftSignUp();
+              }
+            }
+            className="flex border-purple-tone-1 bg-transparent rounded-lg border-2 w-l-card-w hover:border-purple-tone-1 focus:outline-none">
             <div>
               <img className='flex-none pr-3' src={intra} />
             </div>
@@ -38,19 +75,12 @@ function Login () {
           </button>
         </div>
 
-        <div className='py-2 w-l-card-w flex flex-row-reverse'>
-            <div>
-              <Link className=' px-1 text-white font-bold hover:text-purple-sh-2' to="/signup"> Sign up! </Link>
-              {/* <p > Sign Up!</p> */}
-            </div>
-            <div>
-              <p className='text-purple-tone-1'> don't have an account?</p>
-            </div>
-
-        </div>
       </div>     
     </>
   )
 }
 
-export default Login;
+
+export default SignUp;
+
+

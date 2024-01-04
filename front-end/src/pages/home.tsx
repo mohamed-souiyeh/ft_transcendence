@@ -2,69 +2,91 @@ import NavBar from "./components/navbar";
 import SideBar from "./components/sidebar";
 import hi from "../assets/hi.svg"
 import bot from "../assets/bot.png";
-import controllers  from "../assets/controllers.png";
+import controllers from "../assets/controllers.png";
 import Ranked from "./components/ranked";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../App";
+import { io } from 'socket.io-client';
+import { eventBus } from "../eventBus";
+import axios from 'axios'
 
-function Home () {
-  const [user, setUser] = useState({});
+
+
+function Home() {
   const navigate = useNavigate();
-  const [fetched, setFetchState] = useState(false);
 
-  useEffect( 
-    ()=>
-    {
-      if (!fetched)
+  const { user, setUser } = useContext(UserContext)
+
+  useEffect(() => {
+    console.log("we are in the home page socket useEffect")
+    const socket = io("http://localhost:1337/chat",
       {
-        axios.
-        get("http://localhost:1337/users/whoami",
-          {
-            withCredentials: true
-          }
-        ).
-        then((res)=>
-          {
-            
-            setUser(res.data);
-          }
-          ).catch((e)=>{
-            console.log(e);
-          }).
-          catch(
-            (e)=>
-            {
-              console.log(e);
-            }
-            );
-            setFetchState(true);
-          }
-        }
-    )
+        withCredentials: true,
+        transports: ['websocket', 'polling'],
+      });
 
-    console.log(user);
+      console.log("this is the socket in home => ", socket)
+    socket.on("401", (err) => {
+      // Handle the error here
+      axios.get("http://localhost:1337/auth/refresh", {
+        withCredentials: true
+      }).then(() => {
+        console.log("Token refreshed ma nigga!")
+        //FIXME - this bastard is mostlikly is the root of the problem
+      }).catch((err) => {
+        console.log("my sad shit, an err occured, it's :", err);
+
+        eventBus.emit('unauthorized');
+      })
+      console.log("this is the 401 socket event error : ", err); // Prints the error message
+    });
+
+    socket.on("exception", (err) => {
+      // Handle the error here
+      setUser(prevUser => ({
+        ...prevUser,
+        chatException: err,
+      }));
+      console.log(err); // Prints the error message
+    });
+    
+    socket.emit("checkChannelpls", { 
+      authorUsername: "ksjgkshdfk",
+      message: "yoooooo wassupp",
+      convType: "private",
+   });
+    setUser(prevUser => ({
+      ...prevUser,
+      chat: socket,
+    }));
+  }, [])
+
+  useEffect(() => {
+    console.log("this is the user in home => ", user)
+  }
+    , [user]);
   return (
     <>
-      <div className="w-screen h-screen grid justify-center ">
-        {<SideBar/>}
-        {<NavBar 
-          name={user.profilePicture}
+      <div className="grid justify-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
+        {<SideBar />}
+        {<NavBar
+        // name={user.profilePicture}
         />}
 
         <div className="w-[850px] h-[50%]">
           <div className="my-16 bg-purple-sh-2 h-[120px] w-[850px] flex border-4 border-purple-tone-1 rounded-3xl ">
-            <div className="grid place-content-center h-100"> 
-              <img className="h-24 w-24 mr-4 ml-2" src={hi}/> 
+            <div className="grid place-content-center h-100">
+              <img className="h-24 w-24 mr-4 ml-2" src={hi} />
             </div>
             <div className="grid place-content-center">
               <div className="flex">
-                <h1>Welcome,</h1> 
+                <h1>Welcome,</h1>
                 <h1 className="text-purple">
-                  {user.username}
+                  {user.data.username}
                 </h1>
               </div>
-              <p className="text-2xl"> Pick a game mode and have unlimited fun!!</p> 
+              <p className="text-2xl"> Pick a game mode and have unlimited fun!!</p>
             </div>
           </div>
 
@@ -72,15 +94,14 @@ function Home () {
           <div className="h-[120px] w-[850px] flex place-content-between">
             <div className="bg-purple w-[400px] h-[120px] rounded-3xl border-[1px] border-purple-tone-1 bg-opacity-30 backdrop-blur-lg flex place-content-between">
               <div onClick={
-                  ()=> 
-                  {
-                    navigate("/game");
-                  }
-                } className="">
+                () => {
+                  navigate("/game");
+                }
+              } className="">
                 <p className="p-2 text-2xl"> Random matching </p>
                 <p className="p-2"> In this mode, players will be randomly matched with each other.</p>
               </div>
-              <img className="mt-4 mr-4 mb-4 h-[86px] w-[86px]" src={controllers}/>
+              <img className="mt-4 mr-4 mb-4 h-[86px] w-[86px]" src={controllers} />
             </div>
 
             <div className="bg-purple w-[400px] h-[120px] rounded-3xl border-[1px] border-purple-tone-1 bg-opacity-30 backdrop-blur-lg flex place-content-between">
@@ -88,7 +109,7 @@ function Home () {
                 <p className="p-2 text-2xl"> Against Bot </p>
                 <p className="p-2"> In this mode, players will play against a bot.</p>
               </div>
-              <img className="mt-4 mr-4 mb-4 h-[86px] w-[86px]" src={bot}/>
+              <img className="mt-4 mr-4 mb-4 h-[86px] w-[86px]" src={bot} />
             </div>
           </div>
 
@@ -104,8 +125,8 @@ function Home () {
               <p className="text-xl text-purple text-opacity-50">Matches</p>
               <p className="text-xl text-purple text-opacity-50">Rank</p>
             </div>
-            <Ranked/>
-            <Ranked/>
+            <Ranked />
+            <Ranked />
             {/* we need some data in here, top players and their amount, so we could loop on them, put their names and number of matches they played and render them using a an element i will code later */}
           </div>
 

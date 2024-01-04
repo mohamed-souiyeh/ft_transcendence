@@ -42,6 +42,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   afterInit(server: Server) {
     this.server = server;
+    console.log('chat gateway configured', chatGatewayConfig);
     console.log('chat gateway initialized');
   }
 
@@ -61,8 +62,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
 
   async handleConnection(client: Socket) {
-    try {
+    // try {
       const user = await this.chatService.getUserFromSocket(client);
+
+      if (user == null)
+        return;
 
       if (await this.usersService.getStatus(user.id) === UserStatus.offline)
         await this.usersService.setOnlineStatus(user.id);
@@ -71,14 +75,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       console.log('client connected');
       console.log("user => ", user);
 
-    } catch (error) {
-      console.log("error in chat gatway connect => ", error);
-      client.disconnect();
-    }
+    // } catch (error) {
+    //   console.log("error in chat gatway connect => ", error);
+    //   client.disconnect();
+    // }
   }
 
   async handleDisconnect(client: Socket) {
     const { jwt } = await this.chatService.getTokensFromSocket(client);
+
+    if (jwt == null)
+      return;
 
     const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
     await this.usersService.setOfflineStatus(payload.id);
