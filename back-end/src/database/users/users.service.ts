@@ -8,6 +8,7 @@ import { Prisma, UserStatus, UserState, user, ChannelType } from '@prisma/client
 import { PrismaService } from '../prisma/prisma.service';
 
 
+
 //FIXME - dont forget to handle the error thrown by the postgresql database
 //LINK - https://www.postgresql.org/docs/9.3/errcodes-appendix.html
 
@@ -428,6 +429,18 @@ export class UsersService {
 
 
   //! Jojo's section
-  // walo '-'
+  async searchUsersByUsernamePrefix(prefix: string): Promise<UserDto[]> {
+    const users = await this.prismaService.user.findMany({
+      where: {
+        username: {
+          startsWith: prefix,
+        },
+      },
+    });
+
+    // Mapper les utilisateurs à UserDto
+    return users.map(user => new UserDto(user));
+  }
+
   // !
 }
