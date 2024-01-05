@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards , Query, Get} from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
 import { IRequestWithUser } from 'src/auth/Interfaces/IRequestWithUser';
@@ -26,5 +26,9 @@ export class ConversationsController {
   }
 
 
-  // 
+
+  @Get('search')
+  async searchChannels(@Query('prefix') prefix: string): Promise<createChanneldto[]> {
+    const channels = await this.conversationService.searchChannels(prefix);
+  return channels;
 }
