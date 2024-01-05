@@ -38,6 +38,7 @@ function Chat() {
 
         </div>
         <div className='basis-2/3 m-5 bg-purple-sh-1'>
+
           {selected === 1 ? <Network/> : (selected === 2 ? <Messages/> : <Rooms/>)}
         </div>
 
