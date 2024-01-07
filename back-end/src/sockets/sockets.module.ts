@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { FriendRequestsGateway } from './friend-requests/friend-requests.gateway';
 import { ChatModule } from './chat/chat.module';
 import { AdminUiModule } from './admin-ui/admin-ui.module';
+import { MainNameSpaceModule } from './main-name-space/main-name-space.module';
 
 @Module({
-  providers: [FriendRequestsGateway],
-  imports: [ChatModule, AdminUiModule]
+  imports: [ChatModule, AdminUiModule, MainNameSpaceModule],
+  providers: [],
 })
 export class SocketsModule {}
