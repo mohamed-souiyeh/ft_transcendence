@@ -30,6 +30,15 @@ import { UserDto } from './User_DTO/User.dto';
 export class UsersController {
   constructor(private userService: UsersService) {}
 
+
+  @Get('network')
+  @UseGuards(JwtAuthGuard)
+  async getUserNetwork(@Req() req: IRequestWithUser) {
+    const user = await this.userService.getNetworkData(req.user.id);
+
+    return user;
+  }
+
   @Get('allforhome')
   @UseGuards(JwtAuthGuard)
   async getUserDataForHome(@Req() req: IRequestWithUser) {
