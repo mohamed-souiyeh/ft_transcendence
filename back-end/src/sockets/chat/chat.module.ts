@@ -10,6 +10,6 @@ import { ConversationsModule } from 'src/database/conversations/conversations.mo
   imports: [AuthModule, UsersModule, JwtAuthModule, ConversationsModule],
   controllers: [],
   providers: [ChatGateway, ChatService],
-  exports: [ChatGateway],
+  exports: [ChatGateway, ChatService],
 })
 export class ChatModule {}

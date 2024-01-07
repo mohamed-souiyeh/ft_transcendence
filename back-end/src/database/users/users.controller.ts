@@ -10,6 +10,7 @@ import {
   Req,
   UseGuards,
   UseInterceptors,
+  Query
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
@@ -22,10 +23,21 @@ import {
 } from './FormDataInterceptorConfig/UploadConfig';
 import { UpdateUsernameDTO, UploadDTO } from './uploadDTO/uploadDTO';
 
+import { UserDto } from './User_DTO/User.dto';
+
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private userService: UsersService) {}
+
+
+  @Get('network')
+  @UseGuards(JwtAuthGuard)
+  async getUserNetwork(@Req() req: IRequestWithUser) {
+    const user = await this.userService.getNetworkData(req.user.id);
+
+    return user;
+  }
 
   @Get('allforhome')
   @UseGuards(JwtAuthGuard)
@@ -97,4 +109,16 @@ export class UsersController {
     //REVIEW - under construction
     return {message: "under construction"};
   }
+
+
+
+
+
+
+  @Get('search')
+  async searchUsersByUsernamePrefix(@Query('prefix') prefix: string): Promise<UserDto[]> {
+    return this.userService.searchUsersByUsernamePrefix(prefix);
+  }
+
+
 }

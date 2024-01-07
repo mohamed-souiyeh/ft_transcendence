@@ -8,6 +8,7 @@ import { Prisma, UserStatus, UserState, user, ChannelType } from '@prisma/client
 import { PrismaService } from '../prisma/prisma.service';
 
 
+
 //FIXME - dont forget to handle the error thrown by the postgresql database
 //LINK - https://www.postgresql.org/docs/9.3/errcodes-appendix.html
 
@@ -84,6 +85,38 @@ export class UsersService {
     if (user === null) throw new NotFoundException('User not found');
 
     return user.score;
+  }
+
+
+  async getNetworkData(userId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        blockedUsers: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
+        friends: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
+        receivedNotifications: true,
+      }
+    });
+
+    if (user === null) null;
+
+    return {
+      blockedUsers: user.blockedUsers,
+      friends: user.friends,
+      friendRequests: user.receivedNotifications,
+    };
   }
 
   async getUserFriends(userId: number): Promise<any> {
@@ -278,7 +311,6 @@ export class UsersService {
     const user = await this.prismaService.user.update({
       where: {
         id: id,
-        // status: UserStatus.online,
       },
       data: {
         status: UserStatus.busy,
@@ -292,7 +324,6 @@ export class UsersService {
     const user = await this.prismaService.user.update({
       where: {
         id: id,
-        // status: UserStatus.offline,
       },
       data: {
         status: UserStatus.online,
@@ -440,6 +471,18 @@ export class UsersService {
 
 
   //! Jojo's section
-  // walo '-'
+  async searchUsersByUsernamePrefix(prefix: string): Promise<UserDto[]> {
+    const users = await this.prismaService.user.findMany({
+      where: {
+        username: {
+          startsWith: prefix,
+        },
+      },
+    });
+
+    // Mapper les utilisateurs à UserDto
+    return users.map(user => new UserDto(user));
+  }
+
   // !
 }

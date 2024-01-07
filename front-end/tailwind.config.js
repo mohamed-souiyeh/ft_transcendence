@@ -11,6 +11,8 @@ export default {
         'blue': '#00FF00',
         'purple-sh-2': '#201E2D',
         'purple-sh-1': '#302C42',
+        'purple-sh-0': '#48435E',
+
         'purple': '#8176AF',
         'purple-tone-1': '#C0B7E8' ,
         'purple-tone-2': '#DFDAF6' ,

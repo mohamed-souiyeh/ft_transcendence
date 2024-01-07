@@ -1,5 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { WsException } from '@nestjs/websockets';
+import { Injectable } from '@nestjs/common';
 import { parse } from 'cookie';
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
@@ -12,7 +11,15 @@ export class ChatService {
   async getTokensFromSocket(socket: Socket) {
     const cookie = socket.handshake.headers.cookie;
 
+    // console.log('cookie is in get tokens from socket ', cookie);
+
+    if (!cookie)
+      return { jwt: null, refreshJwt: null };
+
     const { jwt, refreshJwt } = parse(cookie);
+
+    if (!jwt || !refreshJwt)
+      return { jwt: null, refreshJwt: null };
 
     return { jwt, refreshJwt };
   }

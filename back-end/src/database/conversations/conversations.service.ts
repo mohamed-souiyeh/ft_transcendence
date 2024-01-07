@@ -6,6 +6,7 @@ import { createChanneldto } from './channel.dto/channel.dto';
 import { ChannelType, Role, UserState } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { createDMdto } from './dmDTO/createDM.dto';
+import { channel } from 'diagnostics_channel';
 @Injectable()
 export class ConversationsService {
   constructor(private readonly prismaService: PrismaService) { }
@@ -424,4 +425,31 @@ export class ConversationsService {
     })
   }
   //!SECTION - create operations
+
+
+
+
+
+
+
+
+  async searchChannels(prefix: string): Promise<createChanneldto[]> {
+    const channels = await this.prismaService.channel.findMany({
+      where: {
+        channelName : {
+          startsWith: prefix,
+        },
+        OR: [
+          {
+            type : 'public' ,
+          },
+          {
+            type : 'protected' ,
+          },
+        ],
+      },
+    });
+
+    return channels.map(channel => new createChanneldto(channel));
+  }
 }

@@ -1,6 +1,7 @@
 import { ChannelType } from "@prisma/client";
-import { Transform } from "class-transformer";
+import { Exclude} from "class-transformer";
 import { IsNotEmpty } from "class-validator";
+
 
 export class createChanneldto {
 
@@ -11,10 +12,9 @@ export class createChanneldto {
   channelName: string;
   
 
-  @Transform(({ value }) => value ? value : "")
   channelDescription: string;
   
-  @Transform(({ value }) => console.log("value =>", value))
+  @Exclude()
   channelPassword: string | null;
 
   constructor(partial: Partial<createChanneldto>) {
