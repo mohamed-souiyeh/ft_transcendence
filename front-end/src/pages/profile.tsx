@@ -6,10 +6,11 @@ import trophy from "../assets/trophy.png";
 import star from "../assets/star.png";
 import games from "../assets/controller.png"
 import { Switch, ConfigProvider } from "antd";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import newComerPic from "../assets/newcomer.png";
 import playerPic from "../assets/player.png";
 import veteranPic from "../assets/veteran.png";
+import { UserContext } from "../App";
 
 function Profile () {
 

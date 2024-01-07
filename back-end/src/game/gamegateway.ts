@@ -60,10 +60,8 @@ export class gameServer implements OnModuleInit {
 		let roomCheck = Array.from(this.roomsList.values()).find(room => room.firstClient === client || room.secondClient === client);
 		if (roomCheck)
 		{
-			// this.server.to(`${roomCheck.id}`).emit("leaveGame");
-			this.roomsList.delete(roomCheck.id);
-			// if (await this.userService.getStatus(user.id) != "busy")
-			// 	this.userService.setOnlineStatus(user.id);
+			this.server.to(`${roomCheck.id}`).emit("leaveGame"); 
+			this.userService.setOnlineStatus(user.id);
 		}
 	}
 
@@ -142,7 +140,7 @@ export class gameServer implements OnModuleInit {
 					match.loserStats = {score: roomCheck.score1, 
 										 name: roomCheck.firstName};
 				}
-				else if (roomCheck.secondClient == client)
+				else if (roomCheck.secondClient == client) 
 				{
 					match.winnerId = roomCheck.user2ID;
 					match.loserId = roomCheck.user1ID;

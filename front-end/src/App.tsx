@@ -4,21 +4,19 @@ import NotFound from "./pages/not_found";
 import Home from "./pages/home";
 import Profile from "./pages/profile";
 import UserProfile from "./pages/user";
-// import Game from "./pages/game";
+import Game from "./pages/game/game";
 import LandingPage from "./pages/landingpage";
 import Setup from "./pages/userSetup";
 import RequireAuth from "./pages/components/requireAuth";
 import React, { useContext, useEffect, useState } from "react";
 import { createContext } from "react";
-// import { apiGlobal } from "./pages/interceptor";
 import TwoFAConfirmation from "./pages/twofaconfirm";
 import Loading from "./pages/loading";
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
 import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
 import { setupSocket } from "./pages/setupSocket";
-
-
+import BotMode from "./pages/game/botmode";
 
 
 export const UserContext = createContext({

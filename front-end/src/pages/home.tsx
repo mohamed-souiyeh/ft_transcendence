@@ -58,9 +58,7 @@ function Home() {
               <div onClick={
                   ()=> 
                   {
-                    // socket.emit("botMode");
-                    setMode("botMode");
-                    navigate("/game");
+                    navigate("/bot");
                   }}
                   className="">
                 <p className="p-2 text-2xl"> Against Bot </p>

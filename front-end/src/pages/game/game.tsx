@@ -1,12 +1,9 @@
 import React , {useRef, useEffect, useState} from 'react';
-import ReactDOM from 'react-dom/client';
 import axios from 'axios';
 import Profile from "../components/userProfileIcone";
-import {io} from 'socket.io-client';
 import {Cube} from './cube';
 import quitButton from './exitGame.png';
-import { useMode, useSocket } from '../../clientSocket';
-import botPic from '../../assets/bot.png'
+import { useSocket } from '../../clientSocket';
 import pic from '../../assets/taha.jpg'
 import './spinner.css';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +28,6 @@ function Game()
   let [foundMatch, setMatchState] = useState(false);
   let navigate = useNavigate();
   const frameRef = useRef<number>(0);
-  let gameMode = useMode();
   let formdata = new FormData();
   console.log(gameState);
   
@@ -41,20 +37,14 @@ function Game()
     if (socket)
     socket.emit("leaveRoom")
   }
-  
-  console.log(gameMode.mode);
-  
-  // socket.emit(gameMode.mode);
+
   useEffect(() => 
   {
-  {
-    if (socket && gameMode.mode)
     {
-        socket.emit(gameMode.mode);
+      if (socket)
+      {
+        socket.emit("queuing");
         socket.on("winner", (v:boolean)=>{setWinState(v);});
-        socket.on("botGame", ()=>{
-          setLeftPic(botPic);
-        })
         socket.on("leaveGame", ()=>{
           navigate("/home");
         })
@@ -68,7 +58,6 @@ function Game()
             if (!gameState)
             {
               socket.emit("gameOver");
-              // navigate("/home");
               setState(true);
             }
           });
@@ -288,7 +277,7 @@ function Game()
     window.addEventListener("resize", handle);
     return () => {cancelAnimationFrame(frameRef.current);
     }
-  }, [socket, gameMode.mode]);
+  }, [socket]);
 
   return (<>
           <div className="w-screen grid justify-center ">
@@ -383,8 +372,4 @@ function Game()
           );
 }
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-
-export default Game
+export default Game;
