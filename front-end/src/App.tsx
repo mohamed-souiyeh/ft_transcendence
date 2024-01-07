@@ -12,13 +12,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { createContext } from "react";
 import TwoFAConfirmation from "./pages/twofaconfirm";
 import Loading from "./pages/loading";
-import Cookies from 'js-cookie';
+import Cookies from 'js-cookie';;
 import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
 import { setupSocket } from "./pages/setupSocket";
 import BotMode from "./pages/game/botmode";
-
-
+import BotMode from "./pages/game/botmode";
 export const UserContext = createContext({
   user: {
     data: {},
