@@ -3,6 +3,7 @@ import SideBar from './components/sidebar'
 import Messages from './components/messages'
 import Rooms from './components/rooms'
 import Network from './components/network'
+import Contacts from './components/contacts'
 
 function Chat() {
   const [selected, setSelected] = useState(1)
@@ -10,7 +11,15 @@ function Chat() {
   const setSelectedState = (id: number) => {
     setSelected(id)
   }
-  console.log("hello from here")
+
+  const friends = [
+    { name : 'lennie', id : 1 , message: 'ata7adaak fi lo3batti lpingpong', },
+    { name : 'kennie', id : 2 , message: 'Hellooooooo!', },
+    { name : 'bennie', id : 3 , message: 'all of my demons are my friends are my frieeeends yeaaaa ya, thats a song btw', },
+    { name : 'dennie', id : 4 , message: 'brb', },
+    { name : 'jennie', id : 5 , message: 'darling you re my best friend', },
+  ]
+
 
   return (
     <>
@@ -22,11 +31,11 @@ function Chat() {
             <p className='text-4xl' >Network </p>
           </div>
 
-          <div className={`${selected === 2 ? 'bg-[#48435E]' :'bg-purple-sh-1'} my-5 rounded-lg h-[500px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} onClick={() => setSelectedState(2)}>
+          <div className={`${selected === 2 ? 'bg-[#48435E]' :'bg-purple-sh-1'} my-5 rounded-lg h-[500px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} /* onClick={() => setSelectedState(2)} */>
             <div className="sticky top-0 bg-opacity-70 backdrop-blur-sm px-4 py-2" >
               <p className="text-4xl ">Messages</p>
             </div>
-            <p className='text-l' >guess we need a component here :') </p>
+           { (friends.length ? friends.map((user)=> < Contacts id={user.id} message={user.message} name={user.name} key={user.id}/>) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p> ) }
           </div>
 
           <div className={`${selected === 3 ? 'bg-[#48435E]' :'bg-purple-sh-1'} my-5 rounded-lg h-[325px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} onClick={() => setSelectedState(3)}>

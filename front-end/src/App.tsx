@@ -16,6 +16,7 @@ import Loading from "./pages/loading";
 import Cookies from 'js-cookie'
 import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
+import { UserProvider } from "./contexts/chatContext";
 
 
 
@@ -94,6 +95,7 @@ function App() {
         <UserContext.Provider value={{user, setUser}}>
           <BrowserRouter>
             <KickTheBastard/>
+              <UserProvider>
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<LandingPage/>} />
@@ -106,12 +108,13 @@ function App() {
               <Route element={<RequireAuth/>}>
                 <Route path="/home" element={<Home/>}/>
                 <Route path="/chat" element={<Chat/>}/>
-                <Route path="/setup" element={<Setup/>}/>
+              <Route path="/setup" element={<Setup/>}/>
                 <Route path="/profile" element={<Profile/>} />
                 <Route path="/userprofile" element={<UserProfile/>} />
                 {/* <Route path="/game" element={<Game/>} /> */}
               </Route>
             </Routes>
+              </UserProvider>
           </BrowserRouter>
         </UserContext.Provider>
     </>
