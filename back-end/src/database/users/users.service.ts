@@ -94,7 +94,22 @@ export class UsersService {
             username: true,
           }
         },
-        receivedNotifications: true,
+        receivedNotifications: {
+          include: {
+            sender: {
+              select: {
+                id: true,
+                username: true,
+              }
+            },
+            receiver: {
+              select: {
+                id: true,
+                username: true,
+              }
+            },
+          },
+        },
       }
     });
 
@@ -254,6 +269,23 @@ export class UsersService {
 
 
   //SECTION - UPDATE OPERATIONS
+
+  async blockUser(userId: number, blockedUserId: number): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        blockedUsers: {
+          connect: {
+            id: blockedUserId,
+          }
+        }
+      }
+    });
+
+    return user;
+  }
 
 
   async setScore(id: number, score: number): Promise<any> {

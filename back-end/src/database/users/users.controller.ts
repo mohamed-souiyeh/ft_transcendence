@@ -88,12 +88,12 @@ export class UsersController {
     if (data.username !== undefined)
       await this.userService.updateUserUsername(req.user.id, data.username);
     if (data.avatar !== undefined){
-      console.log("data.avatar => ", data.avatar);
+      // console.log("data.avatar => ", data.avatar);
       await this.userService.updateAvatar(req.user.id, data.avatar as any);
     }
     await this.userService.setProfileSetup(req.user.id, true);
 
-    console.log("updatd successfully");
+    // console.log("updatd successfully");
     return true;
   }
 

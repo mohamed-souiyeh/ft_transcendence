@@ -18,10 +18,10 @@ axios.interceptors.response.use(
     const isRefreshRequest = error.request.responseURL === "http://localhost:1337/auth/refresh";
 
     if (isRefreshRequest) {
-      console.log("isRefreshRequest :", isRefreshRequest);
+      // console.log("isRefreshRequest :", isRefreshRequest);
       return Promise.reject(error);
     }
-    console.log("isRefreshRequest :", isRefreshRequest);
+    // console.log("isRefreshRequest :", isRefreshRequest);
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 

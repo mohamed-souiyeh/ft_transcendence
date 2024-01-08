@@ -19,7 +19,7 @@ export class NotificationsController {
   @Post('friend-request/accept')
   async acceptFriendRequest(@Req() req: IRequestWithUser, @Body() notificationDto: NotificationDto) {
     if (notificationDto.receiverId !== req.user.id)
-      throw new BadRequestException("You can't accept a friend request that is not yours");
+      throw new BadRequestException("opertion not permited, friend request is not yours");
     await this.notificationService.acceptFriendRequest(notificationDto);
     return { message: "Friend request accepted" };
   }
@@ -29,8 +29,18 @@ export class NotificationsController {
   @Post('friend-request/refuse')
   async refuseFriendRequest(@Req() req: IRequestWithUser, @Body() notificationDto: NotificationDto) {
     if (notificationDto.receiverId !== req.user.id)
-      throw new BadRequestException("You can't refuse a friend request that is not yours");
+      throw new BadRequestException("opertion not permited, friend request is not yours");
     await this.notificationService.refuseFriendRequest(notificationDto);
     return { message: "Friend request refused" };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('friend-request/block')
+  async blockAndDeleteFriendRequest(@Req() req: IRequestWithUser, @Body() notificationDto: NotificationDto) {
+    if (notificationDto.receiverId !== req.user.id)
+      throw new BadRequestException("opertion not permited, friend request is not yours");
+    await this.notificationService.blockAndDeleteFriendRequest(notificationDto);
+    return { message: "Friend request blocked and deleted" };
   }
 }

@@ -24,10 +24,7 @@ export class NotificationsService {
 
     await this.usersService.createFriendship(notification.senderId, notification.receiverId);
 
-
-    return await this.prismaService.notification.delete({
-      where: { id: notification.id },
-    });
+    return await this.deleteNotification(notification.id);
   }
 
   async refuseFriendRequest(notification: NotificationDto) {
@@ -42,9 +39,31 @@ export class NotificationsService {
     if (!notificationToDelete)
       throw new NotFoundException("Notification not found");
 
-    return await this.prismaService.notification.delete({
-      where: { id: notification.id },
+    return await this.deleteNotification(notification.id);
+  }
+
+  async blockAndDeleteFriendRequest(notification: NotificationDto) {
+    const notificationToDelete = await this.prismaService.notification.findUnique({
+      where: {
+        id: notification.id,
+        senderId: notification.senderId,
+        receiverId: notification.receiverId,
+      },
+      include: {
+        sender: true,
+        receiver: true,
+      },
     });
+    
+    if (!notificationToDelete)
+      throw new NotFoundException("Notification not found");
+
+    const sender = notificationToDelete.sender;
+    const receiver = notificationToDelete.receiver;
+
+    await this.usersService.blockUser(receiver.id, sender.id);
+
+    return await this.deleteNotification(notification.id);
   }
 
   // ! jojo's section

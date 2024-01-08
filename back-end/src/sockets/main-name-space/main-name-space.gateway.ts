@@ -33,13 +33,13 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
       scheduledLogoutMap.delete(user.id);
     }
 
-    console.log("client is online now");
+    // console.log("client is online now");
   }
 
   async handleDisconnect(client: Socket) {
     const { jwt } = await this.chatService.getTokensFromSocket(client);
 
-    console.log("jwt is in the main gatway disconnect", jwt);
+    // console.log("jwt is in the main gatway disconnect", jwt);
     if (jwt === null)
       return;
 
@@ -48,11 +48,15 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
     scheduledLogoutMap.set(payload.id, setTimeout(() => {
       
       this.usersService.setOfflineStatus(payload.id)
-      .then(() => {console.log("client is offline now")})
-      .catch(err => console.log("error happened in handel disconnect of the main gateway in set offline" ,err));
+      .then(() => {
+        // console.log("client is offline now")
+      })
+      .catch(err => {
+        // console.log("error happened in handel disconnect of the main gateway in set offline" ,err);
+      });
     }, LOGOUT_TIMEOUT));
 
-    console.log("client is going to be offline in 5 minutes");
+    // console.log("client is going to be offline in 5 minutes");
   }
 
   @SubscribeMessage('ping')
