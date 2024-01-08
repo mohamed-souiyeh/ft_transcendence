@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import SideBar from './components/sidebar'
 import Messages from './components/messages'
 import Rooms from './components/rooms'
 import Network from './components/network'
 import Contacts from './components/contacts'
+import { useUserContext } from '../contexts/chatContext'
 
 function Chat() {
   const [selected, setSelected] = useState(1)
+  const {user} = useUserContext()
 
   const setSelectedState = (id: number) => {
     setSelected(id)
@@ -20,6 +22,11 @@ function Chat() {
     { name : 'jennie', id : 5 , message: 'darling you re my best friend', },
   ]
 
+  useEffect(() => {
+    console.log("changes in User detected..", user)
+    if (Object.keys(user).length)
+      setSelected(2)
+  }, [user])
 
   return (
     <>
@@ -31,7 +38,7 @@ function Chat() {
             <p className='text-4xl' >Network </p>
           </div>
 
-          <div className={`${selected === 2 ? 'bg-[#48435E]' :'bg-purple-sh-1'} my-5 rounded-lg h-[500px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} /* onClick={() => setSelectedState(2)} */>
+          <div className={`bg-purple-sh-1 my-5 rounded-lg h-[500px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} /* onClick={() => setSelectedState(2)} */>
             <div className="sticky top-0 bg-opacity-70 backdrop-blur-sm px-4 py-2" >
               <p className="text-4xl ">Messages</p>
             </div>
@@ -46,8 +53,7 @@ function Chat() {
           </div>
 
         </div>
-        <div className='basis-2/3 m-5 bg-purple-sh-1'>
-
+        <div className='relative basis-2/3 m-5 '>
           {selected === 1 ? <Network/> : (selected === 2 ? <Messages/> : <Rooms/>)}
         </div>
 
