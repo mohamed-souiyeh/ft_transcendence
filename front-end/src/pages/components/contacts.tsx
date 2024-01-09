@@ -1,14 +1,13 @@
 import Icons from "./icons"
 import img from "../../assets/taha.jpg"
-import {useUserContext} from "../../contexts/chatContext.tsx"
+import {useDmContext} from "../../contexts/chatContext.tsx"
 
-function Contacts(contact:object ) {
+function Contacts(contact:object) {
 
-  const {user, setUser} = useUserContext()
+  const {setDm} = useDmContext()
 
   const clicked = () => {
-    setUser(contact)
-    console.log("clicked and should be assigned!", user)
+    setDm(contact)
   }
 
   return (

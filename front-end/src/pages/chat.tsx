@@ -4,11 +4,11 @@ import Messages from './components/messages'
 import Rooms from './components/rooms'
 import Network from './components/network'
 import Contacts from './components/contacts'
-import { useUserContext } from '../contexts/chatContext'
+import { useDmContext } from '../contexts/chatContext'
 
 function Chat() {
   const [selected, setSelected] = useState(1)
-  const {user} = useUserContext()
+  const {dm} = useDmContext()
 
   const setSelectedState = (id: number) => {
     setSelected(id)
@@ -23,10 +23,10 @@ function Chat() {
   ]
 
   useEffect(() => {
-    console.log("changes in User detected..", user)
-    if (Object.keys(user).length)
+    console.log("changes in Dm detected..", dm)
+    if (Object.keys(dm).length)
       setSelected(2)
-  }, [user])
+  }, [dm])
 
   return (
     <>
@@ -42,7 +42,7 @@ function Chat() {
             <div className="sticky top-0 bg-opacity-70 backdrop-blur-sm px-4 py-2" >
               <p className="text-4xl ">Messages</p>
             </div>
-           { (friends.length ? friends.map((user)=> < Contacts id={user.id} message={user.message} name={user.name} key={user.id}/>) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p> ) }
+           { (friends.length ? friends.map((user)=> <Contacts id={user.id} message={user.message} name={user.name} key={user.id}/>) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p> ) }
           </div>
 
           <div className={`${selected === 3 ? 'bg-[#48435E]' :'bg-purple-sh-1'} my-5 rounded-lg h-[325px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} onClick={() => setSelectedState(3)}>
@@ -51,7 +51,6 @@ function Chat() {
             </div>
             <p className='text-l' >and another here here :') </p>
           </div>
-
         </div>
         <div className='relative basis-2/3 m-5 '>
           {selected === 1 ? <Network/> : (selected === 2 ? <Messages/> : <Rooms/>)}

@@ -1,15 +1,16 @@
 import img from "../../assets/taha.jpg"
 import { useEffect } from "react"
-import { useUserContext } from "../../contexts/chatContext"
+import { useDmContext } from "../../contexts/chatContext"
 import Icons from "./icons"
+import Bubble from "./bubble"
 
 function Messages() {
 
-  const {user} = useUserContext()
+  const {dm} = useDmContext()
   useEffect(() => {
-    user ? console.log("we hav smth") : console.log("we ain't got shit")
+    dm ? console.log("we hav smth") : console.log("we ain't got shit")
 
-  }, [user])
+  }, [dm])
 
 
   return (
@@ -18,7 +19,7 @@ function Messages() {
         <div className="basis-11/12 flex">
           <img src={img} className="h-14 w-14 rounded-full" />
           <div className="grid px-3 ">
-            <p className="text-xl font-bold text-purple-tone-2"> {user.name} </p>
+            <p className="text-xl font-bold text-purple-tone-2"> {dm.name} </p>
             <p className="text-impure-white/40  truncate"> status </p>
           </div>
         </div>
@@ -28,7 +29,7 @@ function Messages() {
       </div>
 
       <div className="h-[87%] overflow-scroll scrollbar-thin scrollbar-thumb-purple-sh-0 ">
-        {user.message}
+        <Bubble/>
       </div>
       <div className="fixed bottom-5 bg-purple-sh-0 w-[66%] h-12 m-2 rounded-lg px-2">
         <form >
