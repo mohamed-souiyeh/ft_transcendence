@@ -32,3 +32,4 @@ export class ConversationsController {
     const channels = await this.conversationService.searchChannels(prefix);
   return channels;
 }
+}
