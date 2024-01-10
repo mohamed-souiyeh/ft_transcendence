@@ -19,7 +19,7 @@ function Messages() {
         <div className="basis-11/12 flex">
           <img src={img} className="h-14 w-14 rounded-full" />
           <div className="grid px-3 ">
-            <p className="text-xl font-bold text-purple-tone-2"> {dm.name} </p>
+            <p className="text-xl font-semibold text-purple-tone-2"> {dm.name} </p>
             <p className="text-impure-white/40  truncate"> status </p>
           </div>
         </div>

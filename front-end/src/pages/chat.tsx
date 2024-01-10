@@ -50,6 +50,7 @@ function Chat() {
               <p className="text-4xl ">Rooms</p>
             </div>
             <p className='text-l' >and another here here :') </p>
+           {/* { (friends.length ? friends.map((user)=> <Channels id={user.id} message={user.message} name={user.name} key={user.id}/>) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p> ) } */}
           </div>
         </div>
         <div className='relative basis-2/3 m-5 '>
