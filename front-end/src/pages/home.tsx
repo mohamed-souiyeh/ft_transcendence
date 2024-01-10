@@ -7,65 +7,15 @@ import Ranked from "./components/ranked";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
-import { io } from 'socket.io-client';
-import { eventBus } from "../eventBus";
-import axios from 'axios'
+
 
 
 
 function Home() {
   const navigate = useNavigate();
-
+  
   const { user, setUser } = useContext(UserContext)
-
-  useEffect(() => {
-    console.log("we are in the home page socket useEffect")
-    const socket = io("http://localhost:1337/chat",
-      {
-        withCredentials: true,
-        transports: ['websocket', 'polling'],
-      });
-
-      console.log("this is the socket in home => ", socket)
-    socket.on("401", (err) => {
-      // Handle the error here
-      axios.get("http://localhost:1337/auth/refresh", {
-        withCredentials: true
-      }).then(() => {
-        console.log("Token refreshed ma nigga!")
-        //FIXME - this bastard is mostlikly is the root of the problem
-      }).catch((err) => {
-        console.log("my sad shit, an err occured, it's :", err);
-
-        eventBus.emit('unauthorized');
-      })
-      console.log("this is the 401 socket event error : ", err); // Prints the error message
-    });
-
-    socket.on("exception", (err) => {
-      // Handle the error here
-      setUser(prevUser => ({
-        ...prevUser,
-        chatException: err,
-      }));
-      console.log(err); // Prints the error message
-    });
-    
-    socket.emit("checkChannelpls", { 
-      authorUsername: "ksjgkshdfk",
-      message: "yoooooo wassupp",
-      convType: "private",
-   });
-    setUser(prevUser => ({
-      ...prevUser,
-      chat: socket,
-    }));
-  }, [])
-
-  useEffect(() => {
-    console.log("this is the user in home => ", user)
-  }
-    , [user]);
+  
   return (
     <>
       <div className="grid justify-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">

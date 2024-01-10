@@ -75,6 +75,38 @@ export class UsersService {
 
   //SECTION - READ OPERATIONS
 
+
+  async getNetworkData(userId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        blockedUsers: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
+        friends: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
+        receivedNotifications: true,
+      }
+    });
+
+    if (user === null) null;
+
+    return {
+      blockedUsers: user.blockedUsers,
+      friends: user.friends,
+      friendRequests: user.receivedNotifications,
+    };
+  }
+
   async getUserFriends(userId: number): Promise<any> {
     const friends = await this.prismaService.user.findUnique({
       where: {
@@ -267,7 +299,6 @@ export class UsersService {
     const user = await this.prismaService.user.update({
       where: {
         id: id,
-        status: UserStatus.online,
       },
       data: {
         status: UserStatus.busy,
@@ -281,7 +312,6 @@ export class UsersService {
     const user = await this.prismaService.user.update({
       where: {
         id: id,
-        status: UserStatus.offline,
       },
       data: {
         status: UserStatus.online,
