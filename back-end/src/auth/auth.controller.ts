@@ -46,7 +46,7 @@ export class AuthController {
   async ftAuthRedirect(
     @Req() req: IRequestWithUser
   ) {
-    console.log('ftAuthRedirect');
+    // console.log('ftAuthRedirect');
     return this.authService.ftLogin(req);
   }
 

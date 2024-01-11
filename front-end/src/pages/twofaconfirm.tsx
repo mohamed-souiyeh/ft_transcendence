@@ -25,12 +25,12 @@ function TwoFAConfirmation () {
     })
       .then((res) => {
         if (res.status == 200){
-          console.log("success")
+          // console.log("success")
           nav("/loading")
         }
       })
       .catch((err) => {
-        console.log("errororor; ", err)
+        // console.log("errororor; ", err)
         if (err.status != 401){
           setErrMsg("Error! Wrong code.")
         }

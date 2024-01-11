@@ -31,7 +31,7 @@ export const UserContext = createContext({
 function KickTheBastard() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
-  console.log("the user context is in kick the bastard :", user);
+  // console.log("the user context is in kick the bastard :", user);
 
   useEffect(() => {
 
@@ -40,9 +40,9 @@ function KickTheBastard() {
         user.chat.disconnect();
 
       setUser({ data: {} });
-      console.log("the user context is after seting it :", user);
+      // console.log("the user context is after seting it :", user);
       Cookies.remove('user');
-      console.log("kicking the bastard")
+      // console.log("kicking the bastard")
       navigate('/login');
     };
 
@@ -68,7 +68,7 @@ function SetupSockets() {
         ...prevUser,
         chatException: err,
       }));
-      console.log(err); // Prints the error message
+      // console.log(err); // Prints the error message
     });
 
     const ping_socket = setupSocket("http://localhost:1337");
@@ -79,7 +79,7 @@ function SetupSockets() {
         ...prevUser,
         chatException: err,
       }));
-      console.log(err); // Prints the error message
+      // console.log(err); // Prints the error message
     });
 
     const setIntervalId = setInterval(() => {

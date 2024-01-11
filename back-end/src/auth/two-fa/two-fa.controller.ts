@@ -57,16 +57,16 @@ export class TwoFaController {
         req.user.id,
       );
 
-    console.log('code => ', code.code);
+    // console.log('code => ', code.code);
 
     if (!isVerified) throw new BadRequestException('code is not valid');
 
     await this.twoFaService.turnOn2FA(req.user.id);
     await this.authService.refresh(req);
-    console.log(
-      'the user after 2FA activation => ',
-      await this.usersService.findUserById(req.user.id),
-    );
+    // console.log(
+    //   'the user after 2FA activation => ',
+    //   await this.usersService.findUserById(req.user.id),
+    // );
     return { message: '2FA activated successfully' };
   }
 

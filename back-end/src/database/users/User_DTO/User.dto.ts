@@ -1,5 +1,5 @@
 
-import { Prisma, UserStatus } from '@prisma/client';
+import { UserStatus } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { IsEmail } from 'class-validator';
 

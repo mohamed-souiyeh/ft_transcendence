@@ -9,20 +9,21 @@ export function setupSocket(url: string) {
       transports: ['websocket', 'polling'],
     });
 
-  console.log("this is the socket in home => ", socket)
+  // console.log("this is the socket in home => ", socket)
   socket.on("401", (err) => {
     // Handle the error here
+    console.log("this is the 401 socket event error : ", err);
+
     axios.get("http://localhost:1337/auth/refresh", {
       withCredentials: true
     }).then(() => {
-      console.log("Token refreshed ma nigga!")
+      console.log("Token refreshed in socket!")
       //FIXME - this bastard is mostlikly is the root of the problem
     }).catch((err) => {
-      console.log("my sad shit, an err occured, it's :", err);
-
+      console.log("Error while refreshing token in socket => ", err);
       eventBus.emit('unauthorized');
     })
-    console.log("this is the 401 socket event error : ", err); // Prints the error message
+    // console.log("this is the 401 socket event error : ", err); // Prints the error message
   });
   return socket;
 }
