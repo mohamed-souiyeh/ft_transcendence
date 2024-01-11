@@ -1,14 +1,10 @@
 import Icons from "./icons"
 import img from "../../assets/taha.jpg"
 import {useDmContext} from "../../contexts/chatContext.tsx"
-import { useEffect } from "react"
 
 function Contacts(contact:object) {
 
   const {dm, setDm} = useDmContext()
-
-  // useEffect( () => {
-  // }, [dm])
 
   const clicked = () => {
     setDm(contact)
