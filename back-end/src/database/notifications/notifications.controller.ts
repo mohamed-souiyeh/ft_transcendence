@@ -10,8 +10,12 @@ export class NotificationsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('friend-request')
-  async createNotification(@Body() notificationDto: NotificationDto) {
-    return await this.notificationService.createNotification(notificationDto);
+  async createNotification(@Req() req: IRequestWithUser, @Body() notificationDto: NotificationDto) {
+    if (notificationDto.senderId !== req.user.id)
+      throw new BadRequestException("what do u think u are doing?");
+    if (notificationDto.receiverId === notificationDto.senderId)
+      throw new BadRequestException("You can't send a friend request to yourself");
+    return await this.notificationService.createNotification(notificationDto, req.user);
   }
 
   @UseGuards(JwtAuthGuard)

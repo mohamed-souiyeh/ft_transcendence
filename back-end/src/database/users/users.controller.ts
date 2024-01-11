@@ -23,8 +23,6 @@ import {
 } from './FormDataInterceptorConfig/UploadConfig';
 import { UpdateUsernameDTO, UploadDTO } from './uploadDTO/uploadDTO';
 
-import { UserDto } from './User_DTO/User.dto';
-
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
@@ -98,26 +96,42 @@ export class UsersController {
   }
 
 
-  // @Get('test')
-  // async test() {
-  //   return this.userService.setScore(1, 1000);
-  // }
 
-  @UseGuards()
-  @Get('avatar')
-  async getAvatar() {
-    //REVIEW - under construction
-    return {message: "under construction"};
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('block')
+  async blockUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+    await this.userService.blockUser(req.user.id, id);
+
+    return { message: 'user blocked successfully' };
   }
 
 
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('unblock')
+  async unblockUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+    await this.userService.unblockUser(req.user.id, id);
 
-
-
+    return { message: 'user unblocked successfully' };
+  }
 
   @Get('search')
-  async searchUsersByUsernamePrefix(@Query('prefix') prefix: string): Promise<UserDto[]> {
-    return this.userService.searchUsersByUsernamePrefix(prefix);
+  async searchUsersByUsernamePrefix(@Query('prefix') prefix: string): Promise<any> {
+    const users = await this.userService.searchUsersByUsernamePrefix(prefix);
+
+    const finalUsers = users.map((user) => {
+      return {
+        id: user.id,
+        username: user.username,
+        score: user.score,
+        machesPlayed: user.machesPlayed,
+        status: user.status,
+        //TODO add avatar;
+      };
+    });
+
+    return finalUsers;
   }
 
 

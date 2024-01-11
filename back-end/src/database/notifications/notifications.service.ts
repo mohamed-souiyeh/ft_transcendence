@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationDto } from './notifications.dto';
 import { UsersService } from '../users/users.service';
+import { eventBus } from 'src/eventBus';
+import { UserDto } from '../users/User_DTO/User.dto';
 
 @Injectable()
 export class NotificationsService {
@@ -67,16 +69,28 @@ export class NotificationsService {
   }
 
   // ! jojo's section
-  async createNotification(notificationDto: NotificationDto) {
-    const createdNotification = await this.prismaService.notification.create({
-      data: {
+  async createNotification(notificationDto: NotificationDto, user: UserDto) {
+    const notification = await this.prismaService.notification.findFirst({
+      where: {
         senderId: notificationDto.senderId,
         receiverId: notificationDto.receiverId,
-        // createdAt est géré automatiquement par la base de données, pas besoin de le spécifier ici
       },
     });
 
-    return createdNotification;
+    if (notification)
+      return notification;
+
+    // const createdNotification = await this.prismaService.notification.create({
+    //   data: {
+    //     senderId: notificationDto.senderId,
+    //     receiverId: notificationDto.receiverId,
+    //     // createdAt est géré automatiquement par la base de données, pas besoin de le spécifier ici
+    //   },
+    // });
+
+    eventBus.emit('newNotification', notificationDto.receiverId, user.username);
+    // this.usersService.updatefriendRequests(notificationDto.receiverId, true);
+    // return createdNotification;
   }
 
   async getNotificationById(id: number) {

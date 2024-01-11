@@ -22,6 +22,8 @@ import { ChangeChannelTypeGuard } from './change-channel-type/change-channel-typ
 import { ChangeChannelPasswordGuard } from './change-channel-password/change-channel-password.guard';
 import { JoinChannelGuard } from './join-channel/join-channel.guard';
 import { RemoveChannelGuard } from './remove-channel/remove-channel.guard';
+import { eventBus } from 'src/eventBus';
+import { UserDto } from 'src/database/users/User_DTO/User.dto';
 
 const chatGatewayConfig = {
   ...baseGateWayConfig,
@@ -42,6 +44,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   afterInit(server: Server) {
     this.server = server;
+
     // console.log('chat gateway configured', chatGatewayConfig);
     // console.log('chat gateway initialized');
   }
@@ -76,6 +79,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     // console.log('client disconnected from chat');
   }
 
+  //SECTION - game invites
+
+  @UseGuards()
+
+
+  //!SECTION - game invites
 
 
   //SECTION - Channels
