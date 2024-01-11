@@ -15,6 +15,7 @@ import { room } from './Room';
 import { MatchDto } from 'src/database/matches/matches.dto';
 import { JwtAuthService } from 'src/auth/jwt/jwt.service';
 import { JwtPayload } from 'src/auth/jwt/JwtPayloadDto/JwtPayloadDto';
+import { eventBus } from 'src/eventBus';
 
 // Managing the sockets
 @WebSocketGateway({
@@ -120,15 +121,15 @@ export class gameServer implements OnModuleInit {
 
 
 	@SubscribeMessage('invite')
-	async invitePlayer(client: Socket, invitedUserID: Number) {
+	async invitePlayer(client: Socket, invitedUserID: number) {
 
 		let user = await this.gameService.chatService.getUserFromSocket(client);
 		if (!user)
 			return;
-		if (await this.userService.getStatus(user.id) == "busy") {
-			this.server.to(`${client.id}`).emit("alreadyQueuing");
+		if (await this.userService.getStatus(invitedUserID) == "busy") {
 			return;
 		}
+		eventBus.emit("privateGame", user.id, invitedUserID);
 		let room_ = new room();
 		room_.id = this.roomsList.size;
 		room_.firstClient = client;
