@@ -4,7 +4,7 @@ import { baseGateWayConfig } from '../baseGateWayConfig/baseGateWay.config';
 import { ChatService } from './chat.service';
 import { UsersService } from 'src/database/users/users.service';
 import { JwtAuthService } from 'src/auth/jwt/jwt.service';
-import { ChannelType, Role, UserState, UserStatus } from '@prisma/client';
+import { ChannelType, Role, UserState} from '@prisma/client';
 import { JwtPayload } from 'src/auth/jwt/JwtPayloadDto/JwtPayloadDto';
 import { Server, Socket } from 'socket.io';
 import Joi from 'joi';
@@ -22,6 +22,8 @@ import { ChangeChannelTypeGuard } from './change-channel-type/change-channel-typ
 import { ChangeChannelPasswordGuard } from './change-channel-password/change-channel-password.guard';
 import { JoinChannelGuard } from './join-channel/join-channel.guard';
 import { RemoveChannelGuard } from './remove-channel/remove-channel.guard';
+import { eventBus } from 'src/eventBus';
+import { UserDto } from 'src/database/users/User_DTO/User.dto';
 
 const chatGatewayConfig = {
   ...baseGateWayConfig,
@@ -42,8 +44,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   afterInit(server: Server) {
     this.server = server;
-    console.log('chat gateway configured', chatGatewayConfig);
-    console.log('chat gateway initialized');
+
+    // console.log('chat gateway configured', chatGatewayConfig);
+    // console.log('chat gateway initialized');
   }
 
 
@@ -62,38 +65,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
 
   async handleConnection(client: Socket) {
-    // try {
-      const user = await this.chatService.getUserFromSocket(client);
+    const user = await this.chatService.getUserFromSocket(client);
 
-      if (user == null)
-        return;
-
-      if (await this.usersService.getStatus(user.id) === UserStatus.offline)
-        await this.usersService.setOnlineStatus(user.id);
-
-      await this.addToRooms(user, client);
-      console.log('client connected');
-      console.log("user => ", user);
-
-    // } catch (error) {
-    //   console.log("error in chat gatway connect => ", error);
-    //   client.disconnect();
-    // }
-  }
-
-  async handleDisconnect(client: Socket) {
-    const { jwt } = await this.chatService.getTokensFromSocket(client);
-
-    if (jwt == null)
+    if (user == null)
       return;
 
-    const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
-    await this.usersService.setOfflineStatus(payload.id);
-
-    // console.log("payload => ", payload);
-    console.log('client disconnected');
+    await this.addToRooms(user, client);
+    // console.log('chat client connected');
+    // console.log("user => ", user);
   }
 
+  async handleDisconnect() {
+    // console.log('client disconnected from chat');
+  }
+
+  //SECTION - game invites
+
+  @UseGuards()
+
+
+  //!SECTION - game invites
 
 
   //SECTION - Channels
@@ -107,7 +98,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     const { error } = schema.validate(msg);
 
     if (error) {
-      console.log("error => ", error);
+      // console.log("error => ", error);
       throw new WsException(error.message);
     }
 
@@ -143,7 +134,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     const { error } = schema.validate(msg);
 
     if (error) {
-      console.log("error => ", error);
+      // console.log("error => ", error);
       throw new WsException(error.message);
     }
 
@@ -205,7 +196,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
     const newOwnerProspects = conv.usersState.filter(userState => userState.role === Role.modirator);
 
-    console.log("newOwnerProspects => ", newOwnerProspects);
+    // console.log("newOwnerProspects => ", newOwnerProspects);
     if (newOwnerProspects.length !== 0) {
       await this.convService.updateUserRole(convId, newOwnerProspects[0].userId, Role.owner);
       return true;
@@ -213,7 +204,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
     const newOwner = conv.usersState.find(userState => userState.role === Role.user);
 
-    console.log("newOwner => ", newOwner);
+    // console.log("newOwner => ", newOwner);
     if (newOwner === undefined) {
       await this.convService.deleteChannel(convId);
       return false;
@@ -369,7 +360,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     const { error } = schema.validate(msg);
 
     if (error) {
-      console.log("error => ", error);
+      // console.log("error => ", error);
       throw new WsException(error.message);
     }
 
@@ -394,7 +385,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
     const isBlocked = (User1.blockedUsers.find(user => user.id === User2.id) || User2.blockedUsers.find(user => user.id === User1.id)) === undefined ? false : true;
 
-    console.log("isBlocked => ", isBlocked);
+    // console.log("isBlocked => ", isBlocked);
 
     return { isBlocked: isBlocked };
   }
@@ -410,7 +401,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     const { error } = schema.validate(msg);
 
     if (error) {
-      console.log("error => ", error);
+      // console.log("error => ", error);
       throw new WsException(error.message);
     }
 

@@ -74,7 +74,7 @@ export class ConversationsService {
 
   async setChanneltype(channelId: number, type: ChannelType, password: string | null = null) {
 
-    console.log("type => ", type);
+    // console.log("type => ", type);
 
     if (type === ChannelType.protected && password) {
       return await this.setChanneltoProtected(channelId, password);
@@ -395,7 +395,7 @@ export class ConversationsService {
       throw new BadRequestException("channelPassword is required for protected channels");
     }
 
-    console.log("channel Data => ", channelData);
+    // console.log("channel Data => ", channelData);
     if (channelData.channelPassword) {
       const hash = await bcrypt.hash(channelData.channelPassword, 10);
       channelData.channelPassword = hash;
@@ -424,4 +424,31 @@ export class ConversationsService {
     })
   }
   //!SECTION - create operations
+
+
+
+
+
+
+
+
+  async searchChannels(prefix: string): Promise<createChanneldto[]> {
+    const channels = await this.prismaService.channel.findMany({
+      where: {
+        channelName : {
+          startsWith: prefix,
+        },
+        OR: [
+          {
+            type : 'public' ,
+          },
+          {
+            type : 'protected' ,
+          },
+        ],
+      },
+    });
+
+    return channels.map(channel => new createChanneldto(channel));
+  }
 }

@@ -16,7 +16,7 @@ function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
     })
     .then((resp) => {
         if (resp.status == 200){
-          console.log("user successfully logged out")
+          // console.log("user successfully logged out")
           Cookies.remove('user')
           user.chat.disconnect();
           setUser({ data: {} })

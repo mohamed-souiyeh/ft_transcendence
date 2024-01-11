@@ -1,4 +1,4 @@
-import { BrowserRouter , Routes, Route, useNavigate} from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import SignUp from "./pages/login";
 import NotFound from "./pages/not_found";
 import Home from "./pages/home";
@@ -17,32 +17,36 @@ import Cookies from 'js-cookie'
 import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
 import { DmProvider } from "./contexts/chatContext";
+import { setupSocket } from "./pages/setupSocket";
 
 
 
 
-export const UserContext = createContext({user: {
-  data: {},
-  chat: {},
-  chatException: {},
-  requests: {},
-}, setUser : React.Dispatch<React.SetStateAction<boolean>> });
+export const UserContext = createContext({
+  user: {
+    data: {},
+    chat: {},
+    chatException: {},
+    requests: {},
+    ping: {},
+  }, setUser: React.Dispatch<React.SetStateAction<boolean>>
+});
 
 function KickTheBastard() {
   const navigate = useNavigate();
-  const {user, setUser} = useContext(UserContext);
-  console.log("the user context is in kick the bastard :", user);
+  const { user, setUser } = useContext(UserContext);
+  // console.log("the user context is in kick the bastard :", user);
 
   useEffect(() => {
 
     const kick = () => {
       if (typeof user.chat.disconnect === 'function')
-        user.chat.disconnect();
+      user.chat.disconnect();
 
-      setUser({data: {}});
-      console.log("the user context is after seting it :", user);
+      setUser({ data: {} });
+      // console.log("the user context is after seting it :", user);
       Cookies.remove('user');
-      console.log("kicking the bastard")
+      // console.log("kicking the bastard")
       navigate('/login');
     };
 
@@ -56,16 +60,65 @@ function KickTheBastard() {
   return null;
 }
 
+function SetupSockets() {
+  const { user, setUser } = useContext(UserContext);
+
+  useEffect(() => {
+
+    const chat_socket = setupSocket("http://localhost:1337/chat");
+    chat_socket.on("exception", (err) => {
+      // Handle the error here
+      setUser(prevUser => ({
+        ...prevUser,
+        chatException: err,
+      }));
+      // console.log(err); // Prints the error message
+    });
+
+    const ping_socket = setupSocket("http://localhost:1337");
+
+    ping_socket.on("exception", (err) => {
+      // Handle the error here
+      setUser(prevUser => ({
+        ...prevUser,
+        chatException: err,
+      }));
+      // console.log(err); // Prints the error message
+    });
+
+    const setIntervalId = setInterval(() => {
+      ping_socket.emit('ping');
+    }, 3 * 60 * 1000);
+
+
+    setUser(prevUser => ({
+      ...prevUser,
+      ping: ping_socket,
+      chat: chat_socket,
+    }));
+
+    return () => {
+      ping_socket.disconnect();
+      chat_socket.disconnect();
+      clearInterval(setIntervalId);
+    };
+  }, []);
+
+  return null;
+}
+
+
+
 function App() {
 
   // interface User {
-    //   id: number;
-    //   name: string;
-    //   authed: boolean;
-    // }
-    
+  //   id: number;
+  //   name: string;
+  //   authed: boolean;
+  // }
 
-  const [ user, setUser ] = useState({
+
+  const [user, setUser] = useState({
     data: {},
     chat: {},
     chatException: {},
@@ -74,14 +127,14 @@ function App() {
 
   //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
 
-    // const navigate = useNavigate();
+  // const navigate = useNavigate();
   useEffect(() => {
     const userData = Cookies.get('user');
 
 
     if (userData) {
       //prevUser => ({...prevUser, data: resp.data})
-      
+
       setUser(prevUser => ({ ...prevUser, data: JSON.parse(userData) }));
     }
 
@@ -92,10 +145,10 @@ function App() {
 
   return (
     <>
-        <UserContext.Provider value={{user, setUser}}>
-          <BrowserRouter>
-            <KickTheBastard/>
-              <DmProvider>
+      <UserContext.Provider value={{user, setUser}}>
+        <BrowserRouter>
+          <KickTheBastard/>
+          <DmProvider>
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<LandingPage/>} />
@@ -108,15 +161,15 @@ function App() {
               <Route element={<RequireAuth/>}>
                 <Route path="/home" element={<Home/>}/>
                 <Route path="/chat" element={<Chat/>}/>
-              <Route path="/setup" element={<Setup/>}/>
+                <Route path="/setup" element={<Setup/>}/>
                 <Route path="/profile" element={<Profile/>} />
                 <Route path="/userprofile" element={<UserProfile/>} />
                 {/* <Route path="/game" element={<Game/>} /> */}
               </Route>
             </Routes>
-              </DmProvider>
-          </BrowserRouter>
-        </UserContext.Provider>
+          </DmProvider>
+        </BrowserRouter>
+      </UserContext.Provider>
     </>
   )
 }

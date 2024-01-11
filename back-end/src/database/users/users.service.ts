@@ -8,6 +8,7 @@ import { Prisma, UserStatus, UserState, user, ChannelType } from '@prisma/client
 import { PrismaService } from '../prisma/prisma.service';
 
 
+
 //FIXME - dont forget to handle the error thrown by the postgresql database
 //LINK - https://www.postgresql.org/docs/9.3/errcodes-appendix.html
 
@@ -73,6 +74,56 @@ export class UsersService {
 
 
   //SECTION - READ OPERATIONS
+
+
+  async getNetworkData(userId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        blockedUsers: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
+        friends: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
+        receivedNotifications: {
+          include: {
+            sender: {
+              select: {
+                id: true,
+                username: true,
+              }
+            },
+            receiver: {
+              select: {
+                id: true,
+                username: true,
+              }
+            },
+          },
+        },
+      }
+    });
+
+    if (user === null) null;
+
+    this.updatefriendRequests(userId, false);
+
+    return {
+      blockedUsers: user.blockedUsers,
+      friends: user.friends,
+      friendRequests: user.receivedNotifications,
+    };
+  }
+
 
   async getUserFriends(userId: number): Promise<any> {
     const friends = await this.prismaService.user.findUnique({
@@ -223,6 +274,54 @@ export class UsersService {
   //SECTION - UPDATE OPERATIONS
 
 
+  async updatefriendRequests(id: number, state: boolean): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        friendRequests: state,
+      }
+    });
+
+    return user;
+  }
+
+  async blockUser(userId: number, blockedUserId: number): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        blockedUsers: {
+          connect: {
+            id: blockedUserId,
+          }
+        }
+      }
+    });
+
+    return user;
+  }
+
+  async unblockUser(userId: number, blockedUserId: number): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        blockedUsers: {
+          disconnect: {
+            id: blockedUserId,
+          }
+        }
+      }
+    });
+
+    return user;
+  }
+
+
   async setScore(id: number, score: number): Promise<any> {
     const user = await this.prismaService.user.update({
       where: {
@@ -266,7 +365,6 @@ export class UsersService {
     const user = await this.prismaService.user.update({
       where: {
         id: id,
-        status: UserStatus.online,
       },
       data: {
         status: UserStatus.busy,
@@ -280,7 +378,6 @@ export class UsersService {
     const user = await this.prismaService.user.update({
       where: {
         id: id,
-        status: UserStatus.offline,
       },
       data: {
         status: UserStatus.online,
@@ -428,6 +525,18 @@ export class UsersService {
 
 
   //! Jojo's section
-  // walo '-'
+  async searchUsersByUsernamePrefix(prefix: string): Promise<UserDto[]> {
+    const users = await this.prismaService.user.findMany({
+      where: {
+        username: {
+          startsWith: prefix,
+        },
+      },
+    });
+
+    // Mapper les utilisateurs à UserDto
+    return users.map(user => new UserDto(user));
+  }
+
   // !
 }

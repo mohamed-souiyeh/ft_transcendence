@@ -43,13 +43,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     };
 
 
-    console.log('google strategy user =>', user);
+    // console.log('google strategy user =>', user);
     let found_user: UserDto = await this.usersService.findUserByEmail(user.email);
 
     if (!found_user) {
       found_user = await this.usersService.addUser(user);
 
-      console.log('google strategy found user =>', found_user);
+      // console.log('google strategy found user =>', found_user);
     }
 
 

@@ -17,6 +17,11 @@ export class AdminUiGateway implements OnGatewayInit {
       auth: false,
       mode: "development",
     });
-    console.log('admin gateway initialized');
+    // console.log('admin gateway initialized');
   }
+
+  // @SubscribeMessage('message')
+  // handleMessage(client: any, payload: any): string {
+  //   return 'Hello world!';
+  // }
 }

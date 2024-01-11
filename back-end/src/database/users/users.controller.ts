@@ -10,6 +10,7 @@ import {
   Req,
   UseGuards,
   UseInterceptors,
+  Query
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
@@ -26,6 +27,15 @@ import { UpdateUsernameDTO, UploadDTO } from './uploadDTO/uploadDTO';
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private userService: UsersService) {}
+
+
+  @Get('network')
+  @UseGuards(JwtAuthGuard)
+  async getUserNetwork(@Req() req: IRequestWithUser) {
+    const user = await this.userService.getNetworkData(req.user.id);
+
+    return user;
+  }
 
   @Get('allforhome')
   @UseGuards(JwtAuthGuard)
@@ -76,25 +86,53 @@ export class UsersController {
     if (data.username !== undefined)
       await this.userService.updateUserUsername(req.user.id, data.username);
     if (data.avatar !== undefined){
-      console.log("data.avatar => ", data.avatar);
+      // console.log("data.avatar => ", data.avatar);
       await this.userService.updateAvatar(req.user.id, data.avatar as any);
     }
     await this.userService.setProfileSetup(req.user.id, true);
 
-    console.log("updatd successfully");
+    // console.log("updatd successfully");
     return true;
   }
 
 
-  // @Get('test')
-  // async test() {
-  //   return this.userService.setScore(1, 1000);
-  // }
 
-  @UseGuards()
-  @Get('avatar')
-  async getAvatar() {
-    //REVIEW - under construction
-    return {message: "under construction"};
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('block')
+  async blockUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+    await this.userService.blockUser(req.user.id, id);
+
+    return { message: 'user blocked successfully' };
   }
+
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('unblock')
+  async unblockUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+    await this.userService.unblockUser(req.user.id, id);
+
+    return { message: 'user unblocked successfully' };
+  }
+
+  @Get('search')
+  async searchUsersByUsernamePrefix(@Query('prefix') prefix: string): Promise<any> {
+    const users = await this.userService.searchUsersByUsernamePrefix(prefix);
+
+    const finalUsers = users.map((user) => {
+      return {
+        id: user.id,
+        username: user.username,
+        score: user.score,
+        machesPlayed: user.machesPlayed,
+        status: user.status,
+        //TODO add avatar;
+      };
+    });
+
+    return finalUsers;
+  }
+
+
 }
