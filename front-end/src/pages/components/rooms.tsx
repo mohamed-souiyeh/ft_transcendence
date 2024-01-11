@@ -1,9 +1,16 @@
-import React from 'react'
+import { useDmContext } from "../../contexts/chatContext"
 
-function Rooms() {
+function Rooms(channel : object) {
+  // const {dm, setDm} = useDmContext()
+
+  // if (Object.keys(dm).length)
+  //   setDm({})
+
   return (
-    <div>Rooms</div>
+
+    <div> hi</div> 
   )
 }
 
 export default Rooms
+

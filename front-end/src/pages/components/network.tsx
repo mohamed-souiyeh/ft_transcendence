@@ -61,7 +61,7 @@ function Network() {
         </div>
       </div>
 
-      <div className="overflow-hidden h-[93%]">
+      <div className="overflow-hidden bg-purple-sh-1 h-[93%]">
         <div className="overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-0 h-[100%]">
           {/* divs for tabs content*/}
           { tab === networkTabs.FRIENDS ? (friends.length ? friends.map((user)=> < Friends friend={user} unmount={handleUnmount} key={user.id}/>) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> Look at you Lonely lil sh*t :')</p> ) 
