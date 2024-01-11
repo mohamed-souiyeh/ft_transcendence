@@ -1,10 +1,12 @@
 
-import souiyeh from "../assets/souiyeh.jpeg";
-import mounir from "../assets/mounir.jpeg";
-import github from "../assets/github.png";
-import laila from "../assets/laila.png";
-import jawaher from "../assets/jawaher.png";
-import malika from "../assets/malika.png";
+import souiyeh from "../../assets/souiyeh.jpeg";
+import mounir from "../../assets/mounir.jpeg";
+import github from "../../assets/github.png";
+import laila from "../../assets/laila.png";
+import jawaher from "../../assets/jawaher.png";
+import malika from "../../assets/malika.png";
+
+
 
 const people = [
 

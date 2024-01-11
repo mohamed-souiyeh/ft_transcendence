@@ -1,5 +1,6 @@
 
-import pong from "../assets/pong.png";
+import pong from "../../assets/pong.png";
+
 
 function IconButtom({ val , url}: { val: string , url: string}) {
   return (

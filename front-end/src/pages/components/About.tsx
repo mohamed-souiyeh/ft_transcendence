@@ -1,4 +1,4 @@
-import Aboutimg from "../assets/Aboutimg.png";
+import Aboutimg from "../../assets/Aboutimg.png"
 import { IconButtom } from "./Hero";
 
 export default function About() {
