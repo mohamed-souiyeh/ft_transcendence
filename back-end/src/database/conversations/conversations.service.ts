@@ -6,7 +6,6 @@ import { createChanneldto } from './channel.dto/channel.dto';
 import { ChannelType, Role, UserState } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { createDMdto } from './dmDTO/createDM.dto';
-import { channel } from 'diagnostics_channel';
 @Injectable()
 export class ConversationsService {
   constructor(private readonly prismaService: PrismaService) { }
@@ -75,7 +74,7 @@ export class ConversationsService {
 
   async setChanneltype(channelId: number, type: ChannelType, password: string | null = null) {
 
-    console.log("type => ", type);
+    // console.log("type => ", type);
 
     if (type === ChannelType.protected && password) {
       return await this.setChanneltoProtected(channelId, password);
@@ -396,7 +395,7 @@ export class ConversationsService {
       throw new BadRequestException("channelPassword is required for protected channels");
     }
 
-    console.log("channel Data => ", channelData);
+    // console.log("channel Data => ", channelData);
     if (channelData.channelPassword) {
       const hash = await bcrypt.hash(channelData.channelPassword, 10);
       channelData.channelPassword = hash;

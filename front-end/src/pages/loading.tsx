@@ -16,14 +16,14 @@ function Loading() {
       setUser(prevUser => ({ ...prevUser, data: resp.data }))
       Cookies.set('user', JSON.stringify(resp.data) );
       if (!user.data.isProfileSetup){
-        console.log('hhhhhhh')
+        // console.log('hhhhhhh')
         navigate("/setup")
       }
       else
         navigate("/home")
     })
     .catch((err)=> {
-      console.log("My sad potato we have an error:", err)
+      // console.log("My sad potato we have an error:", err)
       navigate("/login")
     })
 

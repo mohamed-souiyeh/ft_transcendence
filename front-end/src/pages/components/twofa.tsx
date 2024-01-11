@@ -30,19 +30,19 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
           setStatus(true);
         }
       }).catch((err) => {
-        console.log("an error occured: ", err)
+        // console.log("an error occured: ", err)
       });
     // setStatus(true);
   }
 
   const handleDisable = () => {
-    console.log("send request here");
+    // console.log("send request here");
     axios.get("http://localhost:1337/2fa/deactivate", {
       withCredentials: true
     })
       .then((resp) => {
         if (resp.status == 200){
-          console.log("2fa is off")
+          // console.log("2fa is off")
 
           setSwitchValue(!switchValue);
           setPrompt(!prompt)
@@ -52,7 +52,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
         }
       })
     .catch( (err) => {
-        console.log("dang an error: ", err)
+        // console.log("dang an error: ", err)
       })
   }
 
@@ -74,27 +74,25 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
     })
       .then((res) => {
         if (res.status === 200) {
-          console.log('the code is correct')
+          // console.log('the code is correct')
           setEnable(true)
           user.data.TFAisEnabled = true;
-          console.log(user)
-          console.log(JSON.stringify(user.data))
+          // console.log(user)
+          // console.log(JSON.stringify(user.data))
 
           Cookies.remove('user')
           Cookies.set('user',JSON.stringify(user.data));
         }
         else {
-          console.log('code is rong', res.status)
+          // console.log('code is rong', res.status)
           setConfirmed(false)
         }
       })
       .catch((e) => {
-        console.log('an Error occured!!', e.response.data.message);
+        // console.log('an Error occured!!', e.response.data.message);
         // setConfirmed(false)
       })
-    console.log('Code inserted by user is:', Code);
-
-
+    // console.log('Code inserted by user is:', Code);
   }
 
   return (

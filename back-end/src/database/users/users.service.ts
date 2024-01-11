@@ -94,11 +94,28 @@ export class UsersService {
             username: true,
           }
         },
-        receivedNotifications: true,
+        receivedNotifications: {
+          include: {
+            sender: {
+              select: {
+                id: true,
+                username: true,
+              }
+            },
+            receiver: {
+              select: {
+                id: true,
+                username: true,
+              }
+            },
+          },
+        },
       }
     });
 
     if (user === null) null;
+
+    this.updatefriendRequests(userId, false);
 
     return {
       blockedUsers: user.blockedUsers,
@@ -106,6 +123,7 @@ export class UsersService {
       friendRequests: user.receivedNotifications,
     };
   }
+
 
   async getUserFriends(userId: number): Promise<any> {
     const friends = await this.prismaService.user.findUnique({
@@ -254,6 +272,54 @@ export class UsersService {
 
 
   //SECTION - UPDATE OPERATIONS
+
+
+  async updatefriendRequests(id: number, state: boolean): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        friendRequests: state,
+      }
+    });
+
+    return user;
+  }
+
+  async blockUser(userId: number, blockedUserId: number): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        blockedUsers: {
+          connect: {
+            id: blockedUserId,
+          }
+        }
+      }
+    });
+
+    return user;
+  }
+
+  async unblockUser(userId: number, blockedUserId: number): Promise<any> {
+    const user = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        blockedUsers: {
+          disconnect: {
+            id: blockedUserId,
+          }
+        }
+      }
+    });
+
+    return user;
+  }
 
 
   async setScore(id: number, score: number): Promise<any> {

@@ -47,8 +47,8 @@ function Setup()
 
   const changeBoth = () =>
 {
-    console.log("username is :", `|${userName}|`);
-    console.log("image is :", `|${srcImg}|`);
+    // console.log("username is :", `|${userName}|`);
+    // console.log("image is :", `|${srcImg}|`);
 
 
     if (userName.length)
@@ -65,8 +65,8 @@ function Setup()
           withCredentials: true
         })
       .then( (res)=> {
-        console.log("type of res :", typeof res );
-        console.log("response from the back-end after update in user setup :", res);
+        // console.log("type of res :", typeof res );
+        // console.log("response from the back-end after update in user setup :", res);
         setUsername("");
         if (res.status == 200) {
           // navigate("/home");

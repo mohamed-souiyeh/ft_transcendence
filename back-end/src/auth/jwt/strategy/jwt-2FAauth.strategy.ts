@@ -24,7 +24,7 @@ export class Jwt2FAStrategy extends PassportStrategy(Strategy, '2FAauth') {
     const extractJwtFromCookie = (req) => {
       let token = null;
 
-      console.log('jwt2FA strategy req.cookies =>', req.cookies);
+      // console.log('jwt2FA strategy req.cookies =>', req.cookies);
       if (req && req.cookies) {
         token = req.cookies[process.env.ACCESS_TOKEN_KEY];
       }

@@ -35,7 +35,7 @@ export class ChatService {
     const { jwt, refreshJwt } = await this.getTokensFromSocket(socket);
 
     if (jwt == null || refreshJwt == null) {
-      console.log('jwt or refreshJwt is null');
+      // console.log('jwt or refreshJwt is null');
       socket.emit('401', 'Unauthorized access');
       socket.disconnect();
       return null;
@@ -44,7 +44,7 @@ export class ChatService {
     
     const user = await this.authService.getUserFromAuthenticationToken(jwt, refreshJwt);
     if (user == null) {
-      console.log('user is null');
+      // console.log('user is null');
       socket.emit('401', 'Unauthorized access');
       socket.disconnect();
       // throw new WsException('Unauthorized access');
