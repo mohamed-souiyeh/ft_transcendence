@@ -13,7 +13,7 @@ function Icons() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      if (!menuRef?.current?.contains(event.target)) {
         setState(false);
       }
     };
