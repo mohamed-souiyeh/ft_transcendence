@@ -18,6 +18,7 @@ import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
 import { DmProvider } from "./contexts/chatContext";
 import { setupSocket } from "./pages/setupSocket";
+import { ChannelProvider } from "./contexts/channelContext";
 
 
 
@@ -149,6 +150,7 @@ function App() {
         <BrowserRouter>
           <KickTheBastard/>
           <DmProvider>
+            <ChannelProvider>
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<LandingPage/>} />
@@ -167,6 +169,7 @@ function App() {
                 {/* <Route path="/game" element={<Game/>} /> */}
               </Route>
             </Routes>
+            </ChannelProvider>
           </DmProvider>
         </BrowserRouter>
       </UserContext.Provider>
