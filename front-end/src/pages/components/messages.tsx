@@ -8,15 +8,15 @@ function Messages() {
 
   const {dm} = useDmContext()
   const [val, setVal] = useState('')
+  const maxLength = 20;
 
   useEffect(() => {
-    dm ? console.log("we hav smth") : console.log("we ain't got shit")
 
   }, [dm])
 
   const sendMsg = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-   console.log("send msg here") 
+   console.log("msg is: ", val) 
     setVal('')
   }
 
@@ -40,7 +40,7 @@ function Messages() {
       </div>
       <div className="fixed bottom-5 bg-purple-sh-0 w-[66%] h-12 m-2 rounded-lg px-2">
         <form onSubmit={sendMsg} className="flex items-center">
-          <input value={val} onChange={(e) => setVal(e.target.value)} type='text' placeholder="send a Messages" className='w-[98%] h-12 bg-transparent outline-none rounded-lg text-impure-white px-2 place-self-center' />
+          <input value={val} maxLength={maxLength} onChange={(e) => setVal(e.target.value)} type='text' placeholder="send a Messages" className='w-[98%] h-12 bg-transparent outline-none rounded-lg text-impure-white px-2 place-self-center' />
 
           <button type="submit" className="hover:border-none border-none focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" width="23" height="22" viewBox="0 0 23 22" fill="none">
