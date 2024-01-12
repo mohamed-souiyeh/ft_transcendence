@@ -7,13 +7,15 @@ function Icons() {
   const menuRef = useRef(null);
   const navigate = useNavigate()
 
+  //---------------------------------------------------
   //we need a REAL username to navigate to !!
   const username = 'username'
+  //---------------------------------------------------
 
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!menuRef?.current?.contains(event.target)) {
+    const handleClickOutside = (event: Event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
         setState(false);
       }
     };
@@ -21,7 +23,8 @@ function Icons() {
   }, [menuRef]);
 
 
-  const Unfriend = () => {
+  const unfriend = () => {
+    console.log('remove from friends')
 
   }
 
@@ -31,6 +34,7 @@ function Icons() {
   }
 
   const blocUser = () => {
+    console.log('blocki zmar')
 
   }
 
@@ -51,8 +55,8 @@ function Icons() {
           </defs>
         </svg>
         {state && (  
-          <div className="z-20 flex flex-col w-32 absolute bg-purple-sh-1 rounded-lg border border-purple-tone-1">
-            <div className="flex hover:bg-purple-sh-2 p-2 rounded-t-lg" onClick={() => {Unfriend()}}>
+          <div ref={menuRef} className="z-20 flex flex-col w-32 absolute bg-purple-sh-1 rounded-lg border border-purple-tone-1">
+            <div className="flex hover:bg-purple-sh-2 p-2 rounded-t-lg" onClick={() => {unfriend()}}>
               Unfriend
             </div>
             <div className="flex hover:bg-purple-sh-2 p-2" onClick={() => {visitProfile()}}>
