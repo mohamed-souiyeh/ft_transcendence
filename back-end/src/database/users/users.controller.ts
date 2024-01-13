@@ -101,6 +101,8 @@ export class UsersController {
   @HttpCode(200)
   @Post('block')
   async blockUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+    if (req.user.id === id)
+      throw new BadRequestException("what do you think you are doing?!");
     await this.userService.blockUser(req.user.id, id);
 
     return { message: 'user blocked successfully' };
@@ -111,9 +113,22 @@ export class UsersController {
   @HttpCode(200)
   @Post('unblock')
   async unblockUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+    if (req.user.id === id)
+      throw new BadRequestException("what do you think you are doing?!");
     await this.userService.unblockUser(req.user.id, id);
 
     return { message: 'user unblocked successfully' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('unfriend')
+  async unfriendUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+    if (req.user.id === id)
+      throw new BadRequestException("what do you think you are doing?!");
+    await this.userService.removeFriendship(req.user.id, id);
+
+    return { message: 'user unfriended successfully' };
   }
 
   @Get('search')
