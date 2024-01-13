@@ -4,6 +4,11 @@ import axios from "axios"
 import {useNavigate} from "react-router-dom"
 import Cookies from 'js-cookie';
 
+
+
+
+
+//TODO - if the user have some new notifications the side bar component should be updated with a red dot
 function Loading() {
 
   const {user, setUser}  = useContext(UserContext)

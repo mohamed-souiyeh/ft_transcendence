@@ -232,6 +232,34 @@ export class ConversationsService {
 
 
   //SECTION - READ operations
+
+  async getDMs(userId: number) {
+    const dms = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        dms: {
+          include: {
+            users: {
+              select: {
+                id: true,
+                username: true,
+              },
+            },
+
+          },
+        },
+      },
+    });
+
+    return {
+      id: dms.id,
+      username: dms.username,
+      dms: dms.dms,
+    };
+  }
+
   async getDmMessages(dmId: number) {
     const dm = await this.prismaService.dms.findUnique({
       where: {
