@@ -28,6 +28,9 @@ function Network() {
         setBlockedUsers(res.data.blockedUsers);
         setFriends(res.data.friends);
         setRefresh(false);
+          console.log("friend requests: ", friendRequests);
+          console.log("blocked users: ", blockedUsers);
+          console.log("friends: ", friends);
       }).catch((err) => {
         console.log("error in network tab: ", err);
       });
@@ -35,9 +38,6 @@ function Network() {
   }, [tab, refresh])
 
   // useEffect(() => {
-  //   console.log("friend requests: ", friendRequests);
-  //   console.log("blocked users: ", blockedUsers);
-  //   console.log("friends: ", friends);
   // }, [friendRequests, blockedUsers, friends]);
 
   const handleUnmount = () => {
