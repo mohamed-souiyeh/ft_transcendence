@@ -1,15 +1,24 @@
+import axios from "axios";
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
+import { networkTabs } from "../chat.enums";
 
-function Icons() {
+function Icons(props) {
 
   const [state, setState] = useState(false)
   const menuRef = useRef(null);
   const navigate = useNavigate()
 
+  let { friend, unmount } = props;
+
+  // console.log('friend: ', friend);
+
+  if (!friend) {
+    friend = {id: 0, username: 'username'};
+  }
   //---------------------------------------------------
   //we need a REAL username to navigate to !!
-  const username = 'username'
+  const username = friend.username;
   //---------------------------------------------------
 
 
@@ -24,17 +33,39 @@ function Icons() {
 
 
   const unfriend = () => {
-    console.log('remove from friends')
+    axios.post('http://localhost:1337/users/unfriend', {id: friend.id}, {
+      withCredentials: true
+    }).then((res) => {
+      if (unmount) {
+        unmount(networkTabs.FRIENDS);
+      }
+      console.log('remove from friends')
+    }).catch((err) => {
+      console.log('error in removing friend in Icons: ', err);
+    });
+    // console.log('remove from friends');
 
   }
 
   const visitProfile = () => {
     navigate('/'+ username)
     console.log("NOTE: please go to icons.tsx and add a valid username in order to navigate to it.")
+    console.log("DONE");
   }
 
   const blocUser = () => {
-    console.log('blocki zmar')
+    axios.post('http://localhost:1337/users/block', {id: friend.id}, {
+      withCredentials: true
+    }).then((res) => {
+      if (unmount) {
+        unmount(networkTabs.FRIENDS);
+      }
+      console.log('blocki zmar')
+    }).catch((err) => {
+      console.log('error in blocking user in Icons: ', err);
+    });
+    
+    // console.log('blocki zmar')
 
   }
 

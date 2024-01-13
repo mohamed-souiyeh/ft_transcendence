@@ -273,6 +273,42 @@ export class UsersService {
 
   //SECTION - UPDATE OPERATIONS
 
+  async removeFriendship(userId: number, friendId: number): Promise<any> {
+    const findUser = await this.findUserById(userId);
+    const findFriend = await this.findUserById(friendId);
+
+    if (findUser === null || findFriend === null)
+      throw new NotFoundException('User not found');
+
+    const user = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        friends: {
+          disconnect: {
+            id: friendId,
+          }
+        }
+      }
+    });
+
+    await this.prismaService.user.update({
+      where: {
+        id: friendId,
+      },
+      data: {
+        friends: {
+          disconnect: {
+            id: userId,
+          }
+        }
+      }
+    });
+
+    return user;
+  }
+
 
   async updatefriendRequests(id: number, state: boolean): Promise<any> {
     const user = await this.prismaService.user.update({
@@ -288,6 +324,13 @@ export class UsersService {
   }
 
   async blockUser(userId: number, blockedUserId: number): Promise<any> {
+    const findUser = await this.findUserById(userId);
+    const findBlockedUser = await this.findUserById(blockedUserId);
+
+    if (findUser === null || findBlockedUser === null)
+      throw new NotFoundException('User not found');
+
+    this.removeFriendship(userId, blockedUserId);
     const user = await this.prismaService.user.update({
       where: {
         id: userId,
@@ -305,6 +348,12 @@ export class UsersService {
   }
 
   async unblockUser(userId: number, blockedUserId: number): Promise<any> {
+    const findUser = await this.findUserById(userId);
+    const findBlockedUser = await this.findUserById(blockedUserId);
+
+    if (findUser === null || findBlockedUser === null)
+      throw new NotFoundException('User not found');
+
     const user = await this.prismaService.user.update({
       where: {
         id: userId,
