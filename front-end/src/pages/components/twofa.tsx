@@ -12,7 +12,8 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
   let formdata = new FormData();
 
 
-  if (!codeFetched) {
+  useEffect(() => {
+  // if (!codeFetched) {
     axios.get("http://localhost:1337/2fa/generate",
       {
         withCredentials: true,
@@ -33,7 +34,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
         // console.log("an error occured: ", err)
       });
     // setStatus(true);
-  }
+  }, []);
 
   const handleDisable = () => {
     // console.log("send request here");

@@ -3,22 +3,20 @@ import img from '../../assets/taha.jpg'
 import { networkTabs } from '../chat.enums';
 
 function Blocked(props) {
-
   const { blocked, unmount } = props;
 
-  console.log("blocked user: ", blocked);
+  console.log("blocked is: ", blocked);
 
-  const unblockUser = () => {
-    axios.post('http://localhost:1337/users/unblock', {id: blocked.id}, {
+  const UnblockUser = () => {
+    axios.post('http://localhost:1337/users/unblock', blocked, {
       withCredentials: true,
     }).then(() => {
       console.log("user unblocked");
       unmount(networkTabs.BLOCKED);
-    }).catch((err) => {
-      console.log("error in unblocking user => ", err)
+    }).catch(() => {
+      console.log("error in unblocking user")
     });
   };
-
 
   return (
     <div className='flex border border-transparent border-b-purple-sh-0 mx-14 py-3 '>
@@ -28,7 +26,7 @@ function Blocked(props) {
       </div>
       <div className='flex flex-row-reverse  place-items-center basis-1/2' >
          
-            <button className="rounded-lg bg-purple-sh-0 focus:outline-none border-none hover:bg-purple text-sm" onClick={unblockUser}>Unblock</button>
+            <button className="rounded-lg bg-purple-sh-0 focus:outline-none border-none hover:bg-purple text-sm" onClick={UnblockUser}>Unblock</button>
       </div>
     </div>
   )

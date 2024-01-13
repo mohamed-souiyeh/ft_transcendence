@@ -330,7 +330,7 @@ export class UsersService {
     if (findUser === null || findBlockedUser === null)
       throw new NotFoundException('User not found');
 
-    this.removeFriendship(userId, blockedUserId);
+    await this.removeFriendship(userId, blockedUserId);
     const user = await this.prismaService.user.update({
       where: {
         id: userId,

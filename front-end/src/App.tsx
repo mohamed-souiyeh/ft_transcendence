@@ -18,6 +18,8 @@ import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
 import { DmProvider } from "./contexts/chatContext";
 import { setupSocket } from "./pages/setupSocket";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import { ChannelProvider } from "./contexts/channelContext";
 
 
@@ -76,6 +78,14 @@ function SetupSockets() {
       // console.log(err); // Prints the error message
     });
 
+    chat_socket.on("notification", (msg) => {
+      console.log("notification msg is :", msg);
+      //TODO - here we need to create the logic to start the notification logic
+      //TODO - mark the network icon in the sidebar with a small red dot
+      //TODO - and send a toastify notification
+      toast(`${msg.from} sent u a friend request`);
+    });
+
     const ping_socket = setupSocket("http://localhost:1337");
 
     ping_socket.on("exception", (err) => {
@@ -105,6 +115,7 @@ function SetupSockets() {
     };
   }, []);
 
+  // toast('socket setup done');
   return null;
 }
 
