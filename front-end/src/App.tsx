@@ -15,7 +15,9 @@ import Loading from "./pages/loading";
 import Cookies from 'js-cookie';;
 import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
+import { DmProvider } from "./contexts/chatContext";
 import { setupSocket } from "./pages/setupSocket";
+import { ChannelProvider } from "./contexts/channelContext";
 import BotMode from "./pages/game/botmode";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
@@ -39,7 +41,7 @@ function KickTheBastard() {
 
     const kick = () => {
       if (typeof user.chat.disconnect === 'function')
-        user.chat.disconnect();
+      user.chat.disconnect();
 
       setUser({ data: {} });
       // console.log("the user context is after seting it :", user);
@@ -141,35 +143,31 @@ function App() {
   
   return (
     <>
-      <UserContext.Provider value={{ user, setUser }}>
+      <UserContext.Provider value={{user, setUser}}>
         <BrowserRouter>
-        <ToastContainer />
-          <KickTheBastard />
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<SignUp />} />
-            <Route path="/loading" element={<Loading />} />
-            <Route path="*" element={<NotFound />} />
+          <KickTheBastard/>
+          <DmProvider>
+            <ChannelProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<LandingPage/>} />
+              <Route path="/login" element={<SignUp/>} />
+              <Route path="/loading" element={<Loading/>} />
+              <Route path="*" element={<NotFound/>} />
 
-            <Route path="/2fa" element={<TwoFAConfirmation />} />
-            {/* Private Routes */}
-            <Route element={
-              <>
-                <RequireAuth />
-                <SetupSockets />
-              </>
-            }>
-
-              <Route path="/home" element={<Home />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/setup" element={<Setup />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/userprofile" element={<UserProfile />} />
-              <Route path="/game" element={<Game/>}/>
-              <Route path="/bot" element={<BotMode/>}/>
-            </Route>
-          </Routes>
+              <Route path="/2fa" element={<TwoFAConfirmation/>}/>
+              {/* Private Routes */}
+              <Route element={<RequireAuth/>}>
+                <Route path="/home" element={<Home/>}/>
+                <Route path="/chat" element={<Chat/>}/>
+                <Route path="/setup" element={<Setup/>}/>
+                <Route path="/profile" element={<Profile/>} />
+                <Route path="/userprofile" element={<UserProfile/>} />
+                {/* <Route path="/game" element={<Game/>} /> */}
+              </Route>
+            </Routes>
+            </ChannelProvider>
+          </DmProvider>
         </BrowserRouter>
       </UserContext.Provider>
     </>
