@@ -40,7 +40,7 @@ export class gameServer implements OnModuleInit {
 	}
 
 	async handleConnection(client: Socket) {
-		console.log("Client connected", client.id);
+		console.log("Client connected to gamegateway", client.id);
 		let user = await this.gameService.chatService.getUserFromSocket(client);
 		if (user == null)
 			return;
@@ -52,7 +52,6 @@ export class gameServer implements OnModuleInit {
 		let roomCheck = Array.from(this.roomsList.values())
 			.find(room => room.firstClient === client
 				|| room.secondClient === client);
-		
 		console.log("Leave room from disconnect");
 		if (roomCheck) {
 			let user1, user2;
@@ -142,6 +141,7 @@ export class gameServer implements OnModuleInit {
 	// The triggered event once the user accepts the invite
 	@SubscribeMessage('acceptPlayingInvite')
 	async acceptMatchInvite(client: Socket, roomID: number) {
+		console.log("Player accept invite");
 		// The invited user will join the room by it's id and a match will start
 		let roomCheck = Array.from(this.roomsList.values())
 			.find(room => room.id === roomID);

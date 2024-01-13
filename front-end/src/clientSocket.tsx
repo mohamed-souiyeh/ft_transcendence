@@ -5,7 +5,6 @@ import { eventBus } from './eventBus';
 import Cookies from 'js-cookie';
 
 export const SocketContext = createContext(null);
-// export const GameModeContext= createContext();
 
 export const useSocket = (namespace: string): Socket | null  => 
 {
@@ -30,15 +29,3 @@ export const useSocket = (namespace: string): Socket | null  =>
 
   return socket;
 };
-
-// export const GameModeProvider = ({ children }) => {
-//     const [mode, setMode] = useState('random');
-
-//     return (
-//         <GameModeContext.Provider value={{ mode, setMode }}>
-//             {children}
-//         </GameModeContext.Provider>
-//     );
-// };
-
-// export const useMode = () => useContext(GameModeContext);

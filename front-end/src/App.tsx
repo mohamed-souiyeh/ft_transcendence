@@ -17,12 +17,47 @@ import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
 import { DmProvider } from "./contexts/chatContext";
 import { setupSocket } from "./pages/setupSocket";
-import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
 import { ChannelProvider } from "./contexts/channelContext";
 import BotMode from "./pages/game/botmode";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
+import { SocketContext } from "./clientSocket";
+import { io } from 'socket.io-client';
+import 'react-toastify/dist/ReactToastify.css';
+import './Toasts.css';
+
+
+const game_socket = io("http://localhost:1337/game", 
+                { withCredentials: true });
+
+function GameInviteToast({msg, joinGame}:{msg:string, joinGame?:any})
+{
+  const navigate = useNavigate();
+
+  return (
+    <div>
+      <h3>{msg}</h3>
+      <button style={{
+                      backgroundColor:"purple", 
+                      marginRight: "10px",
+                      cursor:"pointer",
+                      pointerEvents:"auto"
+                      }}
+                      onClick={() =>
+                      {
+                        joinGame();
+                        navigate("/game");
+                    }}
+      >
+        Accept
+      </button>
+      <button style={{backgroundColor:"purple",
+                  cursor:"pointer",
+                  pointerEvents:"auto"}}>
+        Decline</button>
+    </div>
+  );
+}
 
 export const UserContext = createContext({
   user: {
@@ -77,13 +112,10 @@ function SetupSockets() {
       // console.log(err); // Prints the error message
     });
 
-    chat_socket.on("notification", (msg) => {
-      console.log("notification msg is :", msg);
-      //TODO - here we need to create the logic to start the notification logic
-      //TODO - mark the network icon in the sidebar with a small red dot
-      //TODO - and send a toastify notification
-      toast(`${msg.from} sent u a friend request`);
-    });
+    const handleJoinPrivate = () => {
+      game_socket.emit('acceptPlayingInvite', user.data.username);
+    }
+
 
     const ping_socket = setupSocket("http://localhost:1337");
 
@@ -101,12 +133,20 @@ function SetupSockets() {
     }, 3 * 60 * 1000);
 
 
+    ping_socket.on('private', (roomID:number,username:string) => {
+      console.log("waaaaa");
+      const message = username + " Invited you to a game";
+      toast(<GameInviteToast msg={message} joinGame={handleJoinPrivate}/>
+        );
+    });
+
     setUser(prevUser => ({
       ...prevUser,
       ping: ping_socket,
       chat: chat_socket,
     }));
 
+    console.log("the user context is in setup sockets :", user);
     return () => {
       ping_socket.disconnect();
       chat_socket.disconnect();
@@ -114,11 +154,8 @@ function SetupSockets() {
     };
   }, []);
 
-  // toast('socket setup done');
   return null;
 }
-
-
 
 function App() {
 
@@ -127,7 +164,6 @@ function App() {
   //   name: string;
   //   authed: boolean;
   // }
-
 
   const [user, setUser] = useState({
     data: {},
@@ -138,20 +174,20 @@ function App() {
 
   //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
 
+  eventBus.on('private', () => {
+    console.log("private event");
+  });
   // const navigate = useNavigate();
   useEffect(() => {
     const userData = Cookies.get('user');
 
-
     if (userData) {
       //prevUser => ({...prevUser, data: resp.data})
-      
+
       setUser(prevUser => ({ ...prevUser, data: JSON.parse(userData) }));
     }
-    
-    
   }, []);
-  
+
   return (
     <>
       <UserContext.Provider value={{ user, setUser }}>
@@ -159,29 +195,35 @@ function App() {
           <KickTheBastard />
           <DmProvider>
             <ChannelProvider>
+              <ToastContainer/>
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<SignUp />} />
                 <Route path="/loading" element={<Loading />} />
                 <Route path="*" element={<NotFound />} />
-
-                <Route path="/2fa" element={
-                  <TwoFAConfirmation />
-                } />
+                <Route path="/2fa" element={<TwoFAConfirmation />} />
                 {/* Private Routes */}
                 <Route element={
                   <>
-                    <SetupSockets />
-                    <RequireAuth />
+                    <RequireAuth/>
+                    <SetupSockets/>
                   </>
                 }>
-                  <Route path="/home" element={<Home />} />
+                  <Route path="/home" element={
+                   <SocketContext.Provider value={game_socket}>
+                    <Home />
+                   </SocketContext.Provider>} />
                   <Route path="/chat" element={<Chat />} />
                   <Route path="/setup" element={<Setup />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/userprofile" element={<UserProfile />} />
-                  {/* <Route path="/game" element={<Game/>} /> */}
+                  <Route path="/game" element={
+                    <SocketContext.Provider value={game_socket}>
+                      <Game />
+                    </SocketContext.Provider>
+                  } />
+                  <Route path="/bot" element={<BotMode />} />
                 </Route>
               </Routes>
             </ChannelProvider>

@@ -1,4 +1,4 @@
-import React , {useRef, useEffect, useState} from 'react';
+import React , {useRef, useEffect, useState, useContext} from 'react';
 import axios from 'axios';
 import Profile from "../components/userProfileIcone";
 import {Cube} from './cube';
@@ -7,6 +7,8 @@ import { useSocket } from '../../clientSocket';
 import pic from '../../assets/taha.jpg'
 import './spinner.css';
 import { useNavigate } from 'react-router-dom';
+import { SocketContext } from '../../clientSocket';
+import { UserContext } from '../../App';
 
 function rad2Degree(angle:number) : number
 {
@@ -31,7 +33,7 @@ function Game()
   let formdata = new FormData();
   console.log(gameState);
   
-  const socket = useSocket("game");
+  const socket = useContext(SocketContext);
 
   const leaveGame = () => {
     if (socket)
@@ -43,7 +45,7 @@ function Game()
     {
       if (socket)
       {
-        socket.emit("queuing");
+        // socket.emit("queuing");
         socket.on("winner", (v:boolean)=>{setWinState(v);});
         socket.on("leaveGame", ()=>{
           navigate("/home");
@@ -276,8 +278,11 @@ function Game()
 
     window.addEventListener("resize", handle);
     return () => {cancelAnimationFrame(frameRef.current);
+      socket.disconnect();
+      socket.connect();
     }
-  }, [socket]);
+  },
+  []);
 
   return (<>
           <div className="w-screen grid justify-center ">
