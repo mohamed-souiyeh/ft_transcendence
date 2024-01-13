@@ -135,12 +135,13 @@ export class gameServer implements OnModuleInit {
 		room_.id = this.roomsList.size;
 		room_.firstClient = client;
 		room_.roomState = "invite";
-		this.roomsList.set(room_.id, room_);
+		client.join(`${room_.id}`);
+		this.roomsList.set(room_.id, room_); 
 		eventBus.emit("privateGame", user.id, invitedUserID, room_.id);
 	}
 	// The triggered event once the user accepts the invite
 	@SubscribeMessage('acceptPlayingInvite')
-	async acceptMatchInvite(client: Socket, roomID: number) {
+	async acceptMatchInvite(client: Socket, roomID: number) { 
 		console.log("Player accept invite");
 		// The invited user will join the room by it's id and a match will start
 		let roomCheck = Array.from(this.roomsList.values())
@@ -148,6 +149,7 @@ export class gameServer implements OnModuleInit {
 		if (roomCheck) {
 			roomCheck.secondClient = client;
 			roomCheck.roomState = "ready";
+			this.server.to(`${roomCheck.id}`).emit("inviteAccepted");
 			client.join(`${roomCheck.id}`);
 			this.server.to(`${roomCheck.id}`).emit("matchFound", true);
 			roomCheck.secondName = await this.gameService.chatService.getUserFromSocket(client).then((user) => {
