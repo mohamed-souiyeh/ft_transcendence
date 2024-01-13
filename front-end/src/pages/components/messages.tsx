@@ -8,6 +8,7 @@ function Messages() {
 
   const {dm} = useDmContext()
   const [val, setVal] = useState('')
+  const [status, setStatus] = useState(false)
   const maxLength = 20;
 
   useEffect(() => {
@@ -29,7 +30,7 @@ function Messages() {
         <div className="basis-11/12 flex">
           <img src={img} className="h-14 w-14 rounded-full" />
           <div className="grid px-3 ">
-            <p className="text-xl font-semibold text-purple-tone-2"> {dm.name} </p>
+            <p className="text-xl font-semibold text-purple-tone-2"> {dm.username} </p>
             <p className="text-impure-white/40  truncate"> status </p>
           </div>
         </div>
@@ -39,7 +40,7 @@ function Messages() {
       </div>
 
       <div className="h-[87%] overflow-scroll scrollbar-thin scrollbar-thumb-purple-sh-0 ">
-        <Bubble left={true} username={dm.name} message={"This is a message"}/>
+        <Bubble left={true} username={dm.username} message={"This is a message"}/>
       </div>
       <div className="fixed bottom-5 bg-purple-sh-0 w-[66%] h-12 m-2 rounded-lg px-2">
         <form onSubmit={sendMsg} className="flex items-center">
