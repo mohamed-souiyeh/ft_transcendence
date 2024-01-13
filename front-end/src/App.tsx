@@ -17,7 +17,9 @@ import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
 import { setupSocket } from "./pages/setupSocket";
 import BotMode from "./pages/game/botmode";
-import BotMode from "./pages/game/botmode";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+
 export const UserContext = createContext({
   user: {
     data: {},
@@ -130,19 +132,18 @@ function App() {
 
     if (userData) {
       //prevUser => ({...prevUser, data: resp.data})
-
+      
       setUser(prevUser => ({ ...prevUser, data: JSON.parse(userData) }));
     }
-
-
+    
+    
   }, []);
-
-
-
+  
   return (
     <>
       <UserContext.Provider value={{ user, setUser }}>
         <BrowserRouter>
+        <ToastContainer />
           <KickTheBastard />
           <Routes>
             {/* Public Routes */}
@@ -159,12 +160,14 @@ function App() {
                 <SetupSockets />
               </>
             }>
+
               <Route path="/home" element={<Home />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/setup" element={<Setup />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/userprofile" element={<UserProfile />} />
-              {/* <Route path="/game" element={<Game/>} /> */}
+              <Route path="/game" element={<Game/>}/>
+              <Route path="/bot" element={<BotMode/>}/>
             </Route>
           </Routes>
         </BrowserRouter>

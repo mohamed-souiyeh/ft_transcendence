@@ -44,6 +44,7 @@ export class gameServer implements OnModuleInit {
 		let user = await this.gameService.chatService.getUserFromSocket(client);
 		if (user == null)
 			return;
+		client.join(`${user.id}`);
 	}
 
 	async handleDisconnect(client: Socket) {
@@ -51,7 +52,8 @@ export class gameServer implements OnModuleInit {
 		let roomCheck = Array.from(this.roomsList.values())
 			.find(room => room.firstClient === client
 				|| room.secondClient === client);
-		console.log("Leave room");
+		
+		console.log("Leave room from disconnect");
 		if (roomCheck) {
 			let user1, user2;
 			if (roomCheck.firstClient)
@@ -124,17 +126,18 @@ export class gameServer implements OnModuleInit {
 	async invitePlayer(client: Socket, invitedUserID: number) {
 
 		let user = await this.gameService.chatService.getUserFromSocket(client);
+		console.log("Invite player");
 		if (!user)
-			return;
+		return;
 		if (await this.userService.getStatus(invitedUserID) == "busy") {
 			return;
 		}
-		eventBus.emit("privateGame", user.id, invitedUserID);
 		let room_ = new room();
 		room_.id = this.roomsList.size;
 		room_.firstClient = client;
 		room_.roomState = "invite";
 		this.roomsList.set(room_.id, room_);
+		eventBus.emit("privateGame", user.id, invitedUserID, room_.id);
 	}
 	// The triggered event once the user accepts the invite
 	@SubscribeMessage('acceptPlayingInvite')
@@ -226,6 +229,11 @@ export class gameServer implements OnModuleInit {
 		if (roomCheck && roomCheck.roomState != "gameOver") {
 			console.log("Game over");
 			if (roomCheck.gameMode != "robot") {
+				let user1, user2;
+				if (roomCheck.firstClient)
+					user1 = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient);
+				if (roomCheck.secondClient)
+					user2 = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
 				if (roomCheck.score1 > roomCheck.score2) {
 					console.log("Right");
 					match.winnerId = roomCheck.user1ID;
@@ -269,6 +277,10 @@ export class gameServer implements OnModuleInit {
 				}
 				if (this.roomsList.has(roomCheck.id))
 					this.roomsList.get(roomCheck.id).roomState = "gameOver";
+				if (user1)
+					this.userService.setOnlineStatus(user1.id);
+				if (user2)
+					this.userService.setOnlineStatus(user2.id);
 				this.gameService.matchesService.create(match);
 			}
 			this.roomsList.delete(roomCheck.id);
