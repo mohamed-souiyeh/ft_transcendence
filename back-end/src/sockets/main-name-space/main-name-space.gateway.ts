@@ -37,7 +37,7 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
 
     eventBus.on('newNotification', sendNotification);
 
-    eventBus.on('privateGame', async (senderID: number, guestID: number, roomID: number) => 
+    eventBus.on('privateGame', async (senderID: number, guestID: number, roomID: number) =>
     {
       const user = await this.usersService.findUserById(senderID);
       console.log("user in private game => ", user);

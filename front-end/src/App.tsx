@@ -112,8 +112,8 @@ function SetupSockets() {
       // console.log(err); // Prints the error message
     });
 
-    const handleJoinPrivate = () => {
-      game_socket.emit('acceptPlayingInvite', user.data.username);
+    const handleJoinPrivate = (roomID) => {
+      game_socket.emit('acceptPlayingInvite', roomID);
     }
 
 
@@ -135,8 +135,8 @@ function SetupSockets() {
 
     ping_socket.on('private', (roomID:number,username:string) => {
       console.log("waaaaa");
-      const message = username + " Invited you to a game";
-      toast(<GameInviteToast msg={message} joinGame={handleJoinPrivate}/>
+      const message = username + " Invited you to a game in room " + roomID + " !";
+      toast(<GameInviteToast msg={message} joinGame={handleJoinPrivate(roomID)}/>
         );
     });
 
@@ -180,6 +180,7 @@ function App() {
   // const navigate = useNavigate();
   useEffect(() => {
     const userData = Cookies.get('user');
+
 
     if (userData) {
       //prevUser => ({...prevUser, data: resp.data})

@@ -16,6 +16,12 @@ function Home() {
   const { user, setUser } = useContext(UserContext);
   const game_socket = useContext(SocketContext);
   
+  useEffect(() => {
+    game_socket.on("inviteAccepted", ()=>{
+      navigate("/game");
+    })  
+  })
+
   return (
     <>
       <div className="grid justify-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
