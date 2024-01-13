@@ -21,8 +21,8 @@ function Chat() {
   const friends = [
     { name : 'lennie', id : 1 , message: 'ata7adaak fi lo3batti lpingpong', },
     { name : 'kennie', id : 2 , message: 'Hellooooooo!', },
-    { name : 'bennie', id : 3 , message: 'all of my demons are my friends are my frieeeends yeaaaa ya, thats a song btw', },
-    { name : 'dennie', id : 4 , message: 'brb', },
+    { name : 'bennie', id : 3 , message: 'aall of my demons are my friends are my frieeeends yeaaaa all of my demons are my friends are my frieeeends yeaaaa all of my demons are my friends are my frieeeends yeaaaa all of my demons are my friends are my frieeeends yeaaaa ll of my demons are my friends are my frieeeends yeaaaa ya, thats a song btw', },
+    { name : 'dennie', id : 4 , message: 'b', },
     { name : 'jennie', id : 5 , message: 'darling you re my best friend', },
   ]
 
