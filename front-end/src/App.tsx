@@ -12,7 +12,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { createContext } from "react";
 import TwoFAConfirmation from "./pages/twofaconfirm";
 import Loading from "./pages/loading";
-import Cookies from 'js-cookie';;
+import Cookies from 'js-cookie';
 import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
 import { DmProvider } from "./contexts/chatContext";
@@ -45,8 +45,10 @@ function GameInviteToast({msg, joinGame}:{msg:string, joinGame?:any})
                       }}
                       onClick={() =>
                       {
-                        joinGame();
-                        navigate("/game");
+                        if (joinGame)
+                        {
+                          joinGame();
+                        }
                     }}
       >
         Accept
@@ -99,6 +101,11 @@ function KickTheBastard() {
 
 function SetupSockets() {
   const { user, setUser } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  game_socket.on("inviteAccepted", ()=>{
+    navigate("/game");
+  })
 
   useEffect(() => {
 
@@ -117,6 +124,7 @@ function SetupSockets() {
     }
 
 
+
     const ping_socket = setupSocket("http://localhost:1337");
 
     ping_socket.on("exception", (err) => {
@@ -128,16 +136,16 @@ function SetupSockets() {
       // console.log(err); // Prints the error message
     });
 
-    const setIntervalId = setInterval(() => {
+    const setIntervalId = setInterval(() =>
+    {
       ping_socket.emit('ping');
     }, 3 * 60 * 1000);
 
-
-    ping_socket.on('private', (roomID:number,username:string) => {
-      console.log("waaaaa");
+    ping_socket.on('private', (roomID:number,username:string) => 
+    {
       const message = username + " Invited you to a game in room " + roomID + " !";
-      toast(<GameInviteToast msg={message} joinGame={handleJoinPrivate(roomID)}/>
-        );
+        toast(<GameInviteToast msg={message} joinGame={()=>handleJoinPrivate(roomID)}/>
+      );
     });
 
     setUser(prevUser => ({
@@ -174,9 +182,6 @@ function App() {
 
   //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
 
-  eventBus.on('private', () => {
-    console.log("private event");
-  });
   // const navigate = useNavigate();
   useEffect(() => {
     const userData = Cookies.get('user');
@@ -215,7 +220,9 @@ function App() {
                    <SocketContext.Provider value={game_socket}>
                     <Home />
                    </SocketContext.Provider>} />
-                  <Route path="/chat" element={<Chat />} />
+                  <Route path="/chat" element={<SocketContext.Provider value={game_socket}>
+                                                <Chat />
+                                              </SocketContext.Provider>} />
                   <Route path="/setup" element={<Setup />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/userprofile" element={<UserProfile />} />

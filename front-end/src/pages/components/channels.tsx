@@ -1,7 +1,7 @@
 import Icons from "./icons"
 import img from "../../assets/taha.jpg"
 import { useChannelContext } from "../../contexts/channelContext"
-
+import { SocketContext } from "../../clientSocket"
 
 // function Channels() {
 //   return (

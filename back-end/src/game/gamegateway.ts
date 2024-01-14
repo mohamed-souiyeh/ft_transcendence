@@ -120,14 +120,13 @@ export class gameServer implements OnModuleInit {
 		this.server.to(`${room_.id}`).emit("botGame");
 	}
 
-
 	@SubscribeMessage('invite')
-	async invitePlayer(client: Socket, invitedUserID: number) {
-
-		let user = await this.gameService.chatService.getUserFromSocket(client);
+	async invitePlayer(client: Socket, invitedUserID: number) 
+	{
+		let user = await this.gameService.chatService.getUserFromSocket(client); 
 		console.log("Invite player");
 		if (!user)
-		return;
+		return; 
 		if (await this.userService.getStatus(invitedUserID) == "busy") {
 			return;
 		}
@@ -135,22 +134,23 @@ export class gameServer implements OnModuleInit {
 		room_.id = this.roomsList.size;
 		room_.firstClient = client;
 		room_.roomState = "invite";
+		console.log("Invite player to room ", room_.id);
 		client.join(`${room_.id}`);
 		this.roomsList.set(room_.id, room_); 
 		eventBus.emit("privateGame", user.id, invitedUserID, room_.id);
 	}
 	// The triggered event once the user accepts the invite
 	@SubscribeMessage('acceptPlayingInvite')
-	async acceptMatchInvite(client: Socket, roomID: number) { 
-		console.log("Player accept invite");
+	async acceptMatchInvite(client: Socket, roomID: number) {
+		console.log("Player accept invite ", roomID);
 		// The invited user will join the room by it's id and a match will start
 		let roomCheck = Array.from(this.roomsList.values())
 			.find(room => room.id === roomID);
 		if (roomCheck) {
+			client.join(`${roomCheck.id}`);
 			roomCheck.secondClient = client;
 			roomCheck.roomState = "ready";
 			this.server.to(`${roomCheck.id}`).emit("inviteAccepted");
-			client.join(`${roomCheck.id}`);
 			this.server.to(`${roomCheck.id}`).emit("matchFound", true);
 			roomCheck.secondName = await this.gameService.chatService.getUserFromSocket(client).then((user) => {
 				return user.username;

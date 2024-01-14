@@ -15,12 +15,6 @@ function Home() {
   
   const { user, setUser } = useContext(UserContext);
   const game_socket = useContext(SocketContext);
-  
-  useEffect(() => {
-    game_socket.on("inviteAccepted", ()=>{
-      navigate("/game");
-    })  
-  })
 
   return (
     <>
