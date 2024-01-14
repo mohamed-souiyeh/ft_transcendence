@@ -587,5 +587,22 @@ export class UsersService {
     return users.map(user => new UserDto(user));
   }
 
+
+  async getUserAvatar(userId: number): Promise<string> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: { 
+        avatar: true
+      },
+    });
+
+    if (!user) {
+      throw new Error('User introuvable');
+    }
+
+    return user.avatar;
+  }
+
+  //fetch user avatar
   // !
 }

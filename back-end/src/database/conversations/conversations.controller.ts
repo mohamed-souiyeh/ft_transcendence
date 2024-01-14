@@ -40,4 +40,3 @@ export class ConversationsController {
     return channels;
   }
 }
-}

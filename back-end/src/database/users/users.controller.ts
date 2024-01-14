@@ -10,7 +10,10 @@ import {
   Req,
   UseGuards,
   UseInterceptors,
-  Query
+  Query,
+  Param, 
+  NotFoundException, 
+  ParseIntPipe
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
@@ -131,6 +134,7 @@ export class UsersController {
     return { message: 'user unfriended successfully' };
   }
 
+//! jojo's part
   @Get('search')
   async searchUsersByUsernamePrefix(@Query('prefix') prefix: string): Promise<any> {
     const users = await this.userService.searchUsersByUsernamePrefix(prefix);
@@ -149,5 +153,17 @@ export class UsersController {
     return finalUsers;
   }
 
+  @Get(':userId/avatar')
+  async getUserAvatar(@Param('userId', ParseIntPipe) userId: number): Promise<{ avatarUrl: string }> {
+    try {
+      const avatarUrl = await this.userService.getUserAvatar(userId);
+      return { avatarUrl };
+    } catch (error) 
+    {
+      throw new NotFoundException('User introuvable');
+    }
+  }
+
+  //!
 
 }
