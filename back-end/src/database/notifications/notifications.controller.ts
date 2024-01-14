@@ -10,8 +10,12 @@ export class NotificationsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('friend-request')
-  async createNotification(@Body() notificationDto: NotificationDto) {
-    return await this.notificationService.createNotification(notificationDto);
+  async createNotification(@Req() req: IRequestWithUser, @Body() notificationDto: NotificationDto) {
+    if (notificationDto.senderId !== req.user.id)
+      throw new BadRequestException("what do u think u are doing?");
+    if (notificationDto.receiverId === notificationDto.senderId)
+      throw new BadRequestException("You can't send a friend request to yourself");
+    return await this.notificationService.createNotification(notificationDto, req.user);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -19,7 +23,7 @@ export class NotificationsController {
   @Post('friend-request/accept')
   async acceptFriendRequest(@Req() req: IRequestWithUser, @Body() notificationDto: NotificationDto) {
     if (notificationDto.receiverId !== req.user.id)
-      throw new BadRequestException("You can't accept a friend request that is not yours");
+      throw new BadRequestException("opertion not permited, friend request is not yours");
     await this.notificationService.acceptFriendRequest(notificationDto);
     return { message: "Friend request accepted" };
   }
@@ -29,8 +33,18 @@ export class NotificationsController {
   @Post('friend-request/refuse')
   async refuseFriendRequest(@Req() req: IRequestWithUser, @Body() notificationDto: NotificationDto) {
     if (notificationDto.receiverId !== req.user.id)
-      throw new BadRequestException("You can't refuse a friend request that is not yours");
+      throw new BadRequestException("opertion not permited, friend request is not yours");
     await this.notificationService.refuseFriendRequest(notificationDto);
     return { message: "Friend request refused" };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('friend-request/block')
+  async blockAndDeleteFriendRequest(@Req() req: IRequestWithUser, @Body() notificationDto: NotificationDto) {
+    if (notificationDto.receiverId !== req.user.id)
+      throw new BadRequestException("opertion not permited, friend request is not yours");
+    await this.notificationService.blockAndDeleteFriendRequest(notificationDto);
+    return { message: "Friend request blocked and deleted" };
   }
 }

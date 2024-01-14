@@ -23,8 +23,6 @@ import {
 } from './FormDataInterceptorConfig/UploadConfig';
 import { UpdateUsernameDTO, UploadDTO } from './uploadDTO/uploadDTO';
 
-import { UserDto } from './User_DTO/User.dto';
-
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
@@ -88,36 +86,67 @@ export class UsersController {
     if (data.username !== undefined)
       await this.userService.updateUserUsername(req.user.id, data.username);
     if (data.avatar !== undefined){
-      console.log("data.avatar => ", data.avatar);
+      // console.log("data.avatar => ", data.avatar);
       await this.userService.updateAvatar(req.user.id, data.avatar as any);
     }
     await this.userService.setProfileSetup(req.user.id, true);
 
-    console.log("updatd successfully");
+    // console.log("updatd successfully");
     return true;
   }
 
 
-  // @Get('test')
-  // async test() {
-  //   return this.userService.setScore(1, 1000);
-  // }
 
-  @UseGuards()
-  @Get('avatar')
-  async getAvatar() {
-    //REVIEW - under construction
-    return {message: "under construction"};
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('block')
+  async blockUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+    if (req.user.id === id)
+      throw new BadRequestException("what do you think you are doing?!");
+    await this.userService.blockUser(req.user.id, id);
+
+    return { message: 'user blocked successfully' };
   }
 
 
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('unblock')
+  async unblockUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+    if (req.user.id === id)
+      throw new BadRequestException("what do you think you are doing?!");
+    await this.userService.unblockUser(req.user.id, id);
 
+    return { message: 'user unblocked successfully' };
+  }
 
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('unfriend')
+  async unfriendUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+    if (req.user.id === id)
+      throw new BadRequestException("what do you think you are doing?!");
+    await this.userService.removeFriendship(req.user.id, id);
 
+    return { message: 'user unfriended successfully' };
+  }
 
   @Get('search')
-  async searchUsersByUsernamePrefix(@Query('prefix') prefix: string): Promise<UserDto[]> {
-    return this.userService.searchUsersByUsernamePrefix(prefix);
+  async searchUsersByUsernamePrefix(@Query('prefix') prefix: string): Promise<any> {
+    const users = await this.userService.searchUsersByUsernamePrefix(prefix);
+
+    const finalUsers = users.map((user) => {
+      return {
+        id: user.id,
+        username: user.username,
+        score: user.score,
+        machesPlayed: user.machesPlayed,
+        status: user.status,
+        //TODO add avatar;
+      };
+    });
+
+    return finalUsers;
   }
 
 

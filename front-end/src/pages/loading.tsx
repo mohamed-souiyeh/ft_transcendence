@@ -4,6 +4,11 @@ import axios from "axios"
 import {useNavigate} from "react-router-dom"
 import Cookies from 'js-cookie';
 
+
+
+
+
+//TODO - if the user have some new notifications the side bar component should be updated with a red dot
 function Loading() {
 
   const {user, setUser}  = useContext(UserContext)
@@ -16,14 +21,14 @@ function Loading() {
       setUser(prevUser => ({ ...prevUser, data: resp.data }))
       Cookies.set('user', JSON.stringify(resp.data) );
       if (!user.data.isProfileSetup){
-        console.log('hhhhhhh')
+        // console.log('hhhhhhh')
         navigate("/setup")
       }
       else
         navigate("/home")
     })
     .catch((err)=> {
-      console.log("My sad potato we have an error:", err)
+      // console.log("My sad potato we have an error:", err)
       navigate("/login")
     })
 

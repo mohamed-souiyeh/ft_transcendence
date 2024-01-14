@@ -1,11 +1,16 @@
-import SideBar from "./components/sidebar"
+import SideBar from "./components/sidebar";
+import NavBar from "./components/navbar";
 
-function UserProfile () {
-  return(
-  <>
-      {<SideBar/>}
-      <h1 className="pr-10"> let's pretend it's someone's ptofile page! </h1>
-  </>
-  )
+function UserProfile() {
+  return (
+    <div className="w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
+      {<SideBar />}
+      {
+        <NavBar
+        // name={user.profilePicture}
+        />
+      }
+    </div>
+  );
 }
-export default UserProfile
+export default UserProfile;

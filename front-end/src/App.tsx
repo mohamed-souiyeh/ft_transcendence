@@ -16,7 +16,11 @@ import Loading from "./pages/loading";
 import Cookies from 'js-cookie'
 import Chat from "./pages/chat";
 import { eventBus } from "./eventBus";
+import { DmProvider } from "./contexts/chatContext";
 import { setupSocket } from "./pages/setupSocket";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { ChannelProvider } from "./contexts/channelContext";
 
 
 
@@ -34,7 +38,7 @@ export const UserContext = createContext({
 function KickTheBastard() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
-  console.log("the user context is in kick the bastard :", user);
+  // console.log("the user context is in kick the bastard :", user);
 
   useEffect(() => {
 
@@ -43,9 +47,9 @@ function KickTheBastard() {
         user.chat.disconnect();
 
       setUser({ data: {} });
-      console.log("the user context is after seting it :", user);
+      // console.log("the user context is after seting it :", user);
       Cookies.remove('user');
-      console.log("kicking the bastard")
+      // console.log("kicking the bastard")
       navigate('/login');
     };
 
@@ -71,7 +75,15 @@ function SetupSockets() {
         ...prevUser,
         chatException: err,
       }));
-      console.log(err); // Prints the error message
+      // console.log(err); // Prints the error message
+    });
+
+    chat_socket.on("notification", (msg) => {
+      console.log("notification msg is :", msg);
+      //TODO - here we need to create the logic to start the notification logic
+      //TODO - mark the network icon in the sidebar with a small red dot
+      //TODO - and send a toastify notification
+      toast(`${msg.from} sent u a friend request`);
     });
 
     const ping_socket = setupSocket("http://localhost:1337");
@@ -82,7 +94,7 @@ function SetupSockets() {
         ...prevUser,
         chatException: err,
       }));
-      console.log(err); // Prints the error message
+      // console.log(err); // Prints the error message
     });
 
     const setIntervalId = setInterval(() => {
@@ -103,6 +115,7 @@ function SetupSockets() {
     };
   }, []);
 
+  // toast('socket setup done');
   return null;
 }
 
@@ -147,29 +160,35 @@ function App() {
       <UserContext.Provider value={{ user, setUser }}>
         <BrowserRouter>
           <KickTheBastard />
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<SignUp />} />
-            <Route path="/loading" element={<Loading />} />
-            <Route path="*" element={<NotFound />} />
+          <DmProvider>
+            <ChannelProvider>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<SignUp />} />
+                <Route path="/loading" element={<Loading />} />
+                <Route path="*" element={<NotFound />} />
 
-            <Route path="/2fa" element={<TwoFAConfirmation />} />
-            {/* Private Routes */}
-            <Route element={
-              <>
-                <RequireAuth />
-                <SetupSockets />
-              </>
-            }>
-              <Route path="/home" element={<Home />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/setup" element={<Setup />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/userprofile" element={<UserProfile />} />
-              {/* <Route path="/game" element={<Game/>} /> */}
-            </Route>
-          </Routes>
+                <Route path="/2fa" element={
+                  <TwoFAConfirmation />
+                } />
+                {/* Private Routes */}
+                <Route element={
+                  <>
+                    <SetupSockets />
+                    <RequireAuth />
+                  </>
+                }>
+                  <Route path="/home" element={<Home />} />
+                  <Route path="/chat" element={<Chat />} />
+                  <Route path="/setup" element={<Setup />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/userprofile" element={<UserProfile />} />
+                  {/* <Route path="/game" element={<Game/>} /> */}
+                </Route>
+              </Routes>
+            </ChannelProvider>
+          </DmProvider>
         </BrowserRouter>
       </UserContext.Provider>
     </>

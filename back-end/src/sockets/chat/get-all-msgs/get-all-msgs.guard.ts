@@ -26,7 +26,7 @@ export class GetAllMsgsGuard implements CanActivate {
     const { error } = schema.validate(msg);
 
     if (error) {
-      console.log("error => ", error);
+      // console.log("error => ", error);
       throw new WsException(error.message);
     }
 
