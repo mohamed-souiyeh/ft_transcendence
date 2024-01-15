@@ -37,34 +37,31 @@ function Game()
 
   const leaveGame = () => {
     if (socket)
-    socket.emit("leaveRoom")
+      socket.emit("leaveRoom")
+    navigate("/home");
   }
 
   useEffect(() => 
   {
-    {
-      if (socket)
-      {
-        // socket.emit("queuing");
-        socket.on("winner", (v:boolean)=>{setWinState(v);});
-        socket.on("leaveGame", ()=>{
-          navigate("/home");
-        })
-        socket.on("alreadyPlaying", ()=>{
-          navigate("/home");
-        });
-        socket.on("alreadyQueuing", ()=>{
-          navigate("/home");
-        });
-        socket.on("gameover", ()=>{
-            if (!gameState)
-            {
-              socket.emit("gameOver");
-              setState(true);
-            }
-          });
-        }
+    const handleWinner = (v: boolean) => { setWinState(v); };
+    const handleLeaveGame = () => { navigate("/home"); };
+    const handleAlreadyPlaying = () => { navigate("/home"); };
+    const handleAlreadyQueuing = () => { navigate("/home"); };
+    const handleGameOver = () => {
+      if (!gameState) {
+        socket.emit("gameOver");
+        setState(true);
       }
+    };
+    if (socket)
+    {
+      // socket.emit("queuing");
+      socket.on("winner", handleWinner);
+      socket.on("leaveGame", handleLeaveGame);
+      socket.on("alreadyPlaying", handleAlreadyPlaying);
+      socket.on("alreadyQueuing", handleAlreadyQueuing);
+      socket.on("gameover", handleGameOver);
+    }
     if (canvasRef.current) 
     {
       gl = canvasRef.current.getContext("webgl");
@@ -278,11 +275,16 @@ function Game()
 
     window.addEventListener("resize", handle);
     return () => {cancelAnimationFrame(frameRef.current);
+      socket.off("winner", handleWinner);
+      socket.off("leaveGame", handleLeaveGame);
+      socket.off("alreadyPlaying", handleAlreadyPlaying);
+      socket.off("alreadyQueuing", handleAlreadyQueuing);
+      socket.off("gameover", handleGameOver);
       socket.disconnect();
       socket.connect();
     }
   },
-  []);
+  [socket]);
 
   return (<>
           <div className="w-screen grid justify-center ">

@@ -30,7 +30,7 @@ import './Toasts.css';
 const game_socket = io("http://localhost:1337/game", 
                 { withCredentials: true });
 
-function GameInviteToast({msg, joinGame}:{msg:string, joinGame?:any})
+function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any, declineGame?:any})
 {
   const navigate = useNavigate();
 
@@ -55,7 +55,15 @@ function GameInviteToast({msg, joinGame}:{msg:string, joinGame?:any})
       </button>
       <button style={{backgroundColor:"purple",
                   cursor:"pointer",
-                  pointerEvents:"auto"}}>
+                  pointerEvents:"auto"}}
+                onClick={() =>
+                  {
+                    if (declineGame)
+                    {
+                      declineGame();
+                    }
+                }}
+              >
         Decline</button>
     </div>
   );
@@ -123,6 +131,10 @@ function SetupSockets() {
       game_socket.emit('acceptPlayingInvite', roomID);
     }
 
+    const handleDeclinePrivate = (roomID) => {
+      game_socket.emit('declinePlayingInvite', roomID);
+    }
+
 
 
     const ping_socket = setupSocket("http://localhost:1337");
@@ -144,7 +156,8 @@ function SetupSockets() {
     ping_socket.on('private', (roomID:number,username:string) => 
     {
       const message = username + " Invited you to a game in room " + roomID + " !";
-        toast(<GameInviteToast msg={message} joinGame={()=>handleJoinPrivate(roomID)}/>
+        toast(<GameInviteToast msg={message}  joinGame={()=>handleJoinPrivate(roomID)} 
+                                              declineGame={()=>handleDeclinePrivate(roomID)}/>
       );
     });
 

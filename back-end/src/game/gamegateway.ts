@@ -133,6 +133,7 @@ export class gameServer implements OnModuleInit {
 		let room_ = new room();
 		room_.id = this.roomsList.size;
 		room_.firstClient = client;
+		room_.gameMode = "private";
 		room_.roomState = "invite";
 		console.log("Invite player to room ", room_.id);
 		client.join(`${room_.id}`);
@@ -143,7 +144,6 @@ export class gameServer implements OnModuleInit {
 	@SubscribeMessage('acceptPlayingInvite')
 	async acceptMatchInvite(client: Socket, roomID: number) {
 		console.log("Player accept invite ", roomID);
-		// The invited user will join the room by it's id and a match will start
 		let roomCheck = Array.from(this.roomsList.values())
 			.find(room => room.id === roomID);
 		if (roomCheck) {
@@ -155,10 +155,12 @@ export class gameServer implements OnModuleInit {
 			roomCheck.secondName = await this.gameService.chatService.getUserFromSocket(client).then((user) => {
 				return user.username;
 			});
-			roomCheck.user2ID = await this.gameService.chatService.getUserFromSocket(client).then((user) => {
+			roomCheck.user2ID = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient).then((user) => {
 				return user.id;
 			});
-			console.log("player " + roomCheck.user2ID + "here");
+			roomCheck.user1ID = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient).then((user) => {
+				return user.id;
+			});
 		}
 	}
 	@SubscribeMessage('declinePlayingInvite')
@@ -226,11 +228,17 @@ export class gameServer implements OnModuleInit {
 	@SubscribeMessage('gameOver')
 	async gameOver(client: Socket) {
 		let match = new MatchDto();
+		console.log("Game over");
 		let roomCheck = Array.from(this.roomsList.values()).find(room => room.secondClient === client ||
 			room.firstClient === client);
 		if (roomCheck && roomCheck.roomState != "gameOver") {
-			console.log("Game over");
-			if (roomCheck.gameMode != "robot") {
+			if (this.roomsList.has(roomCheck.id))
+			{
+				this.roomsList.get(roomCheck.id).roomState = "gameOver";
+				console.log("Set game over now !!");
+			}
+			if (roomCheck.gameMode != "robot")
+			{
 				let user1, user2;
 				if (roomCheck.firstClient)
 					user1 = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient);
@@ -238,7 +246,7 @@ export class gameServer implements OnModuleInit {
 					user2 = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
 				if (roomCheck.score1 > roomCheck.score2) {
 					console.log("Right");
-					match.winnerId = roomCheck.user1ID;
+					match.winnerId = roomCheck.user1ID; 
 					match.loserId = roomCheck.user2ID;
 					match.endedAt = roomCheck.endTime;
 					match.mode = roomCheck.gameMode;
@@ -267,7 +275,7 @@ export class gameServer implements OnModuleInit {
 					match.endedAt = roomCheck.endTime;
 					match.winnerStats = { score: roomCheck.score2, name: roomCheck.firstName };
 					match.loserStats = { score: roomCheck.score1, name: roomCheck.secondName };
-					this.userService.findUserById(roomCheck.user1ID).then(async (user) => {
+					this.userService.findUserById(roomCheck.user1ID).then(async (user) => { 
 						await this.userService.setScore(user.id, user.score + (roomCheck.score2 - roomCheck.score1));
 						console.log("Score ", (roomCheck.score2 - roomCheck.score1));
 					});
@@ -277,8 +285,6 @@ export class gameServer implements OnModuleInit {
 						return;
 					this.userService.setOnlineStatus(user.id);
 				}
-				if (this.roomsList.has(roomCheck.id))
-					this.roomsList.get(roomCheck.id).roomState = "gameOver";
 				if (user1)
 					this.userService.setOnlineStatus(user1.id);
 				if (user2)
