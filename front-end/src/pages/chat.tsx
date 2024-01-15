@@ -12,6 +12,11 @@ import { subpages } from './chat.enums'
 import axios from 'axios'
 import { UserContext } from '../App'
 
+const mokDm = { id: 0, users: [{ id: 0, username: "test" }] };
+
+type dmType = typeof mokDm;
+
+
 function Chat() {
   const [selected, setSelected] = useState(subpages.NETWORK)
   const {dm, setDm} = useDmContext()
@@ -20,19 +25,20 @@ function Chat() {
 
 
   const setSelectedState = (id: number) => {
-    setSelected(id)
+    setSelected(id);
   }
 
-  const [dms, setDms] = useState([{id: 0, users:[{id: 0, username: "test"}]},]);
+  const [dms, setDms] = useState<dmType[]>([]);
   const [refreshDms, setRefreshDms] = useState(false);
 
   useEffect(() => {
-    console.log("chat page mounted");
+    console.log("user: ", user);
+    console.log("dms refreshed");
     axios.get('http://localhost:1337/conv/dms',
       {
         withCredentials: true,
       }).then((res) => {
-        console.log("this is the chat page response :", res);
+        // console.log("this is the chat page response :", res);
         setDms(res.data.dms);
         setRefreshDms(false);
       }).catch((err) => {
@@ -56,6 +62,7 @@ function Chat() {
         setChannel({})
       }
       setSelected(subpages.CHAT);
+      console.log("dm is: ", dm);
     }
   }, [dm])
 
@@ -68,6 +75,7 @@ function Chat() {
     }
   }, [channel])
 
+
   return (
     <>
       <SideBar/>
@@ -78,11 +86,12 @@ function Chat() {
             <p className='text-4xl' >Network </p>
           </div>
 
-          <div className={`bg-purple-sh-1 my-5 rounded-lg h-[500px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} >
-            <div className="sticky top-0 bg-opacity-70 backdrop-blur-sm px-4 py-2" onClick={() => {setSelectedState(subpages.CHAT)}}>
+          <div className={`bg-purple-sh-1 my-5 rounded-lg h-[500px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} onClick={() => {
+            setRefreshDms(true)}}>
+            <div className="sticky top-0 bg-opacity-70 backdrop-blur-sm px-4 py-2" >
               <p className="text-4xl ">Messages</p>
             </div>
-           { (dms.length ? dms.map((dm)=> <Contacts id={dm.id} user={dm.users.find((User) => User.username !== user.data.username)} key={dm.id}/>) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p> ) }
+           { (dms.length ? dms.map((dm)=> <Contacts id={dm.id} user={dm.users.find((User) => User.username !== user.data.username)} key={dm.id} dmInfo={dm}/>) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p> ) }
           </div>
 
           <div className='bg-purple-sh-1 my-5 rounded-lg h-[325px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]'>
@@ -105,7 +114,7 @@ function Chat() {
           </div>
         </div>
         <div className='relative basis-2/3 m-5 '>
-          {selected === subpages.NETWORK ? <Network/> : (selected === subpages.CHAT ? <Messages/> : <Rooms/>)}
+          {selected === subpages.NETWORK ? <Network refreshDms={setRefreshDms} /> : (selected === subpages.CHAT ? <Messages/> : <Rooms/>)}
         </div>
 
       </div>

@@ -9,16 +9,16 @@ function Icons(props) {
   const menuRef = useRef(null);
   const navigate = useNavigate()
 
-  let { friend, unmount } = props;
+  let { user, unmount } = props;
 
   // console.log('friend: ', friend);
 
-  if (!friend) {
-    friend = {id: 0, username: 'username'};
+  if (!user) {
+    user = {id: 0, username: 'username'};
   }
   //---------------------------------------------------
   //we need a REAL username to navigate to !!
-  const username = friend.username;
+  const username = user.username;
   //---------------------------------------------------
 
 
@@ -33,7 +33,7 @@ function Icons(props) {
 
 
   const unfriend = () => {
-    axios.post('http://localhost:1337/users/unfriend', {id: friend.id}, {
+    axios.post('http://localhost:1337/users/unfriend', {id: user.id}, {
       withCredentials: true
     }).then((res) => {
       if (unmount) {
@@ -54,7 +54,7 @@ function Icons(props) {
   }
 
   const blocUser = () => {
-    axios.post('http://localhost:1337/users/block', {id: friend.id}, {
+    axios.post('http://localhost:1337/users/block', {id: user.id}, {
       withCredentials: true
     }).then((res) => {
       if (unmount) {
