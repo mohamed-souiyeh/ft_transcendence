@@ -10,6 +10,12 @@ export class ConversationsController {
 
   constructor(private conversationService: ConversationsService) { }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('dms')
+  async getDMs(@Req() req: IRequestWithUser) {
+    return this.conversationService.getDMs(req.user.id);
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Post('createDM')

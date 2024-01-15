@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import SideBar from './components/sidebar'
 import Messages from './components/messages'
 import Rooms from './components/rooms'
@@ -8,15 +8,45 @@ import { useDmContext } from '../contexts/chatContext'
 import Channels from './components/channels'
 import { useChannelContext } from '../contexts/channelContext'
 import Icons from './components/icons'
+import { subpages } from './chat.enums'
+import axios from 'axios'
+import { UserContext } from '../App'
+
+const mokDm = { id: 0, users: [{ id: 0, username: "test" }] };
+
+type dmType = typeof mokDm;
+
 
 function Chat() {
-  const [selected, setSelected] = useState(1)
+  const [selected, setSelected] = useState(subpages.NETWORK)
   const {dm, setDm} = useDmContext()
   const {channel, setChannel} = useChannelContext()
+  const {user} = useContext(UserContext);
+
 
   const setSelectedState = (id: number) => {
-    setSelected(id)
+    setSelected(id);
   }
+
+  const [dms, setDms] = useState<dmType[]>([]);
+  const [refreshDms, setRefreshDms] = useState(false);
+
+  useEffect(() => {
+    console.log("user: ", user);
+    console.log("dms refreshed");
+    axios.get('http://localhost:1337/conv/dms',
+      {
+        withCredentials: true,
+      }).then((res) => {
+        // console.log("this is the chat page response :", res);
+        setDms(res.data.dms);
+        setRefreshDms(false);
+      }).catch((err) => {
+        console.log("error in chat page: ", err);
+      });
+
+  }, [refreshDms])
+
 
   const friends = [
     { name : 'lennie', id : 1 , message: 'ata7adaak fi lo3batti lpingpong', },
@@ -31,7 +61,8 @@ function Chat() {
       if(Object.keys(channel).length) {
         setChannel({})
       }
-      setSelected(2)
+      setSelected(subpages.CHAT);
+      console.log("dm is: ", dm);
     }
   }, [dm])
 
@@ -40,9 +71,10 @@ function Chat() {
       if(Object.keys(dm).length){
         setDm({})
       }
-      setSelected(3)
+      setSelected(subpages.CHANNELS);
     }
   }, [channel])
+
 
   return (
     <>
@@ -50,15 +82,16 @@ function Chat() {
       <div className='w-screen h-screen bg-purple-sh-2 flex flex-row'>
         <div className='basis-1/4 pl-20'>
 
-          <div className={`${selected === 1 ? 'bg-[#48435E]' :'bg-purple-sh-1'} p-4 my-5 rounded-lg hover:cursor-pointer focus:bg-purple`} onClick={() => setSelectedState(1)}>
+          <div className={`${selected === subpages.NETWORK ? 'bg-[#48435E]' :'bg-purple-sh-1'} p-4 my-5 rounded-lg hover:cursor-pointer focus:bg-purple`} onClick={() => setSelectedState(subpages.NETWORK)}>
             <p className='text-4xl' >Network </p>
           </div>
 
-          <div className={`bg-purple-sh-1 my-5 rounded-lg h-[500px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} >
+          <div className={`bg-purple-sh-1 my-5 rounded-lg h-[500px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]`} onClick={() => {
+            setRefreshDms(true)}}>
             <div className="sticky top-0 bg-opacity-70 backdrop-blur-sm px-4 py-2" >
               <p className="text-4xl ">Messages</p>
             </div>
-           { (friends.length ? friends.map((user)=> <Contacts id={user.id} message={user.message} name={user.name} key={user.id}/>) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p> ) }
+           { (dms.length ? dms.map((dm)=> <Contacts id={dm.id} user={dm.users.find((User) => User.username !== user.data.username)} key={dm.id} dmInfo={dm}/>) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p> ) }
           </div>
 
           <div className='bg-purple-sh-1 my-5 rounded-lg h-[325px] overflow-auto scrollbar-thin scrollbar-thumb-[#48435E]'>
@@ -81,7 +114,7 @@ function Chat() {
           </div>
         </div>
         <div className='relative basis-2/3 m-5 '>
-          {selected === 1 ? <Network/> : (selected === 2 ? <Messages/> : <Rooms/>)}
+          {selected === subpages.NETWORK ? <Network refreshDms={setRefreshDms} /> : (selected === subpages.CHAT ? <Messages/> : <Rooms/>)}
         </div>
 
       </div>

@@ -1,26 +1,41 @@
 import Icons from "./icons"
 import img from "../../assets/taha.jpg"
 import {useDmContext} from "../../contexts/chatContext.tsx"
+import { useState } from "react";
 
-function Contacts(contact:object) {
+function Contacts(props) {
 
-  const {dm, setDm} = useDmContext()
+  const {dm, setDm} = useDmContext();
+  const [status, setStatus] = useState("online");
+
+  const { user, dmInfo } = props;
+
+  // console.log("this is the user in contacts :", user);
 
   const clicked = () => {
-    setDm(contact)
+    // if (dm.id === dmInfo.id) return;
+    setDm({
+      ...dmInfo,
+      username: user.username,
+      userId: user.id,
+    })
+    // console.log("user => ", user);
+    // console.log("clicked on the contact");
+    // console.log("the user is: ", user);
+    // console.log("the dm is: ", dm);
   }
 
   return (
-    <div className={` ${dm.name === contact.name ? 'bg-purple-sh-0' : 'bg-transparent'} flex border border-transparent border-b-purple-sh-0 p-4`}>
-      <div className='flex basis-11/12 hover:cursor-pointer' onClick={() => clicked()}>
+    <div className={` ${dm.id === dmInfo.id ? 'bg-purple-sh-0' : 'bg-transparent'} flex border border-transparent border-b-purple-sh-0 p-4`} onClick={() => clicked()}>
+      <div className='flex basis-11/12 hover:cursor-pointer' >
         <img src={img} className="rounded-full h-12 w-12" />
         <div className="grid px-2">
-          <p className="text-xl font-bold text-purple-tone-2"> {contact.name} </p>
-          <p className="text-sm text-impure-white/40  truncate"> {contact.message} </p>
+          <p className="text-xl font-bold text-purple-tone-2"> {user.username} </p>
+          <p className="text-sm text-impure-white/40  truncate"> {status} </p>
         </div>
       </div>
       <div className='flex flex-row-reverse basis-1/12 self-center'>
-        <Icons/>
+        <Icons user={user}/>
       </div>
     </div>
   )

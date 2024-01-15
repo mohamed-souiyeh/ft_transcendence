@@ -232,6 +232,34 @@ export class ConversationsService {
 
 
   //SECTION - READ operations
+
+  async getDMs(userId: number) {
+    const dms = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        dms: {
+          include: {
+            users: {
+              select: {
+                id: true,
+                username: true,
+              },
+            },
+
+          },
+        },
+      },
+    });
+
+    return {
+      id: dms.id,
+      username: dms.username,
+      dms: dms.dms,
+    };
+  }
+
   async getDmMessages(dmId: number) {
     const dm = await this.prismaService.dms.findUnique({
       where: {
@@ -371,7 +399,15 @@ export class ConversationsService {
         AND: [
           { users: { some: { username: req.user.username } } },
           { users: { some: { username: dmData.username } } },
-        ],
+        ]
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
       },
     });
 
@@ -383,7 +419,15 @@ export class ConversationsService {
         users: {
           connect: [{ username: dmData.username }, { username: req.user.username }],
         },
-      }
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
     });
   }
 
@@ -435,15 +479,15 @@ export class ConversationsService {
   async searchChannels(prefix: string): Promise<createChanneldto[]> {
     const channels = await this.prismaService.channel.findMany({
       where: {
-        channelName : {
+        channelName: {
           startsWith: prefix,
         },
         OR: [
           {
-            type : 'public' ,
+            type: 'public',
           },
           {
-            type : 'protected' ,
+            type: 'protected',
           },
         ],
       },

@@ -422,31 +422,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
     const user = dm.users.find(user => user.id === payload.id);
 
+    const user2 = dm.users.find(user => user.id !== payload.id);
 
-    this.server.to(`${msg.convType}.${msg.convId}`).emit('broadcast', {
-      authorInfo: {
-        authorUsername: user.username,
-        authorId: user.id
-      },
-      message: msg.message,
-      convType: msg.convType,
-      convId: msg.convId,
-    });
+    const isBlocked = (user.blockedUsers.find(user => user.id === user2.id) || user2.blockedUsers.find(user => user.id === user.id)) === undefined ? false : true;
+
+    if (isBlocked)
+      return { message: 'you are blocked by the other user in this conversation' };
+
     // console.log("adapter keys => ", Object.keys(this.server.adapter));
     // console.log("adapter values => ", Object.values(this.server.adapter));
     // return ;
-
+    
     const adapter = this.server.adapter as any;
     const room = adapter.rooms.get(`${msg.convType}.${msg.convId}`);
-
+    
     if (room && room.size > 0) {
       const db_msg = {
         text: msg.message,
         senderId: user.id,
         dmId: msg.convId,
       }
-      await this.convService.createMessage(db_msg);
+      const toSend = await this.convService.createMessage(db_msg);
+      this.server.to(`${msg.convType}.${msg.convId}`).emit('broadcast', {
+        id: toSend.id,
+        authorInfo: {
+          username: user.username,
+          authorId: user.id
+        },
+        message: msg.message,
+        convType: msg.convType,
+        convId: msg.convId,
+      });
     }
+    return { message: 'message sent' };
   }
   //!SECTION - DMs
 
@@ -466,8 +474,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
         // eslint-disable-next-line prefer-const
         let toAdd: dmBroadcastedMsg = new dmBroadcastedMsg();
 
-        toAdd.userInfo.autorId = msg.sender.id;
-        toAdd.userInfo.username = msg.sender.username;
+        toAdd.id = msg.id;
+        toAdd.authorInfo.autorId = msg.sender.id;
+        toAdd.authorInfo.username = msg.sender.username;
 
         toAdd.message = msg.text;
         toAdd.convType = conv.type;
@@ -501,7 +510,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       }
       return messages;
     } else {
-      throw new WsException({ error: 'Unauthorized operation', message: 'channel doenst exist' });
+      throw new WsException({ error: 'Unauthorized operation', message: 'channel type doenst exist' });
     }
   }
 

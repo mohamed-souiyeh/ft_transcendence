@@ -59,12 +59,12 @@ export class GetAllMsgsGuard implements CanActivate {
       if (user === undefined)
         throw new WsException({ error: 'Unauthorized operation', message: 'you are not in this dm' });
 
-      const user2 = conv.users.find(user => user.id !== payload.id);
+      // const user2 = conv.users.find(user => user.id !== payload.id);
 
-      const isBlocked = (user.blockedUsers.find(user => user.id === user2.id) || user2.blockedUsers.find(user => user.id === user.id)) === undefined ? false : true;
+      // const isBlocked = (user.blockedUsers.find(user => user.id === user2.id) || user2.blockedUsers.find(user => user.id === user.id)) === undefined ? false : true;
 
-      if (isBlocked)
-        throw new WsException({ error: 'Unauthorized operation', message: 'you are blocked by the other user in this conversation' });
+      // if (isBlocked)
+      //   throw new WsException({ error: 'Unauthorized operation', message: 'you are blocked by the other user in this conversation' });
 
     } else if (data.convType in ChannelType) {
       const conv = await this.convService.getChannel(data.convId, payload.id);
