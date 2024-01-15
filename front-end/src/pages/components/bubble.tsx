@@ -7,6 +7,7 @@ function Bubble(props : object) {
       <div className="flex ">
         <div className="grid max-w-[70%]">
           <div className="flex p-3 pb-0" >
+              {/* make username clickable */}
             <p className="text-purple-tone-2 font-bold"> {props.username} </p>
           </div>
           <div className='flex bg-purple rounded-b-xl rounded-tr-xl p-2 m-3 mt-0 break-words shadow-xl'>

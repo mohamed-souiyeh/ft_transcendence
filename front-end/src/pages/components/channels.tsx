@@ -1,7 +1,5 @@
 import { useChannelContext } from "../../contexts/channelContext"
-import { MenuDefault } from "./menuDefault"
-
-
+import GroupsIcons from "./groupsIcons"
 
 
 function Channels (contact:object) {
@@ -22,7 +20,7 @@ function Channels (contact:object) {
         </div>
       </div>
       <div className='flex flex-row-reverse basis-1/3 self-center'>
-        <MenuDefault/>
+        <GroupsIcons/>
       </div>
     </div>
   )

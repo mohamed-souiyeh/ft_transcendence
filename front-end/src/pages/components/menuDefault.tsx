@@ -1,5 +1,3 @@
-import type { MenuProps } from "@material-tailwind/react";
-
 import { Menu, MenuHandler, MenuList, MenuItem} from "@material-tailwind/react";
 
 export function MenuDefault() {
@@ -18,9 +16,9 @@ export function MenuDefault() {
         </button>
       </MenuHandler>
       <MenuList className="bg-purple-sh-2 border border-purple">
-        <MenuItem onClick={() => {console.log('hi')}} placeholder={"a"} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Unfriend</MenuItem>
-        <MenuItem className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Visit profile</MenuItem>
-        <MenuItem className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Bloc user</MenuItem>
+        <MenuItem onClick={() => {console.log('hi')}} placeholder={"a"} className="text-purple-tone-0 hover:bg-purple-sh-0 hover:text-purple-tone-2">Unfriend</MenuItem>
+        <MenuItem className="text-purple-tone-0 hover:bg-purple-sh-0 hover:text-purple-tone-2">Visit profile</MenuItem>
+        <MenuItem className="text-purple-tone-0 hover:bg-purple-sh-0 hover:text-purple-tone-2">Bloc user</MenuItem>
       </MenuList>
     </Menu>
   );
