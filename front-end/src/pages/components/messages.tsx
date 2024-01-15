@@ -24,27 +24,44 @@ function Messages() {
   const [status, setStatus] = useState("online");
   const [msgs, setMsgs] = useState<msgType[]>([]);
   const [isBlocked, setIsBlocked] = useState(false);
+  const isBlockedRef = useRef(isBlocked);
+
+  useEffect(() => {
+    isBlockedRef.current = isBlocked;
+  }, [isBlocked]);
+
   const maxLength = 42;
-
+  
   const { user } = useContext(UserContext);
-
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-
+  
+  
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
     }
   }, [msgs]);
   useEffect(() => {
-    user.chat.timeout(5000).emit('checkDmpls', {
-      convId: dm.id,
-      convType: dm.type,
-    }, (err, res) => {
-      if (err) return console.log("error in checking if the user is blocked: ", err);
-      console.log("isBlocked is: ", res);
-      setIsBlocked(res.isBlocked);
-    })
+    const setIntervalId: NodeJS.Timeout = setInterval(() => {
+      user.chat.timeout(1000).emit('checkDmpls', {
+        convId: dm.id,
+        convType: dm.type,
+      }, (err, res) => {
+        if (err) {
+          console.log("error in checking if the user is blocked: ", err)
+          // console.log("the res is: ", res);
+          return;
+        }
+        // console.log("isBlocked is: ", res);
+        if (res.isBlocked !== isBlockedRef.current)
+          setIsBlocked(res.isBlocked);
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(setIntervalId);
+    }
   }, []);
 
 
