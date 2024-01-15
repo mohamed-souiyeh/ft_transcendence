@@ -2,6 +2,7 @@ import { useChannelContext } from "../../contexts/channelContext"
 import { useEffect, useState } from "react"
 import Icons from "./icons"
 import Bubble from "./bubble"
+import GroupsIcons from "./groupsIcons"
 
 function Rooms() {
 
@@ -32,7 +33,7 @@ function Rooms() {
           </div>
         </div>
         <div className="flex flex-row-reverse self-center basis-1/12" >
-          <Icons/>
+          <GroupsIcons/>
         </div>
       </div>
 
