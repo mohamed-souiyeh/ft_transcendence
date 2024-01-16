@@ -1,7 +1,16 @@
 import { transform } from 'typescript';
+const withMT = require("@material-tailwind/react/utils/withMT");
+ 
+  // content: [],
+  // theme: {
+  //   extend: {},
+  // },
+  // plugins: [],
+// });
 
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = withMT({
+// export default {
   content: [
     "./index.html",
     "./src/*.{js,ts,jsx,tsx}",
@@ -43,4 +52,5 @@ export default {
     },
   },
   plugins: [ require('tailwind-scrollbar'),],
-}
+// }
+});
