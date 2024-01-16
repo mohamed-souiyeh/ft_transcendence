@@ -21,6 +21,7 @@ import { setupSocket } from "./pages/setupSocket";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ChannelProvider } from "./contexts/channelContext";
+import ManageGoups from "./pages/manageGoups";
 
 
 
@@ -184,6 +185,7 @@ function App() {
                   <Route path="/setup" element={<Setup />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/userprofile" element={<UserProfile />} />
+                  <Route path="/groups" element={<ManageGoups/>} />
                   {/* <Route path="/game" element={<Game/>} /> */}
                 </Route>
               </Routes>

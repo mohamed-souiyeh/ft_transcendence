@@ -12,6 +12,7 @@ import { subpages } from './chat.enums'
 import axios from 'axios'
 import { UserContext } from '../App'
 import { Menu, MenuHandler, MenuList, MenuItem} from "@material-tailwind/react";
+import { useNavigate } from 'react-router-dom'
 
 const mokDm = { id: 0, users: [{ id: 0, username: "test" }] };
 
@@ -76,6 +77,7 @@ function Chat() {
     }
   }, [channel])
 
+  const navigate = useNavigate()
 
   return (
     <>
@@ -115,7 +117,7 @@ function Chat() {
                   </button>
                 </MenuHandler>
                 <MenuList className="bg-purple-sh-2 border border-purple">
-                  <MenuItem onClick={() => {console.log('a')}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Find/Create Group</MenuItem>
+                  <MenuItem onClick={() => {navigate('/groups')}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Find/Create Group</MenuItem>
                 </MenuList>
               </Menu>
             </div>
