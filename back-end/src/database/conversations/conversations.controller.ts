@@ -16,6 +16,11 @@ export class ConversationsController {
     return this.conversationService.getDMs(req.user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('channels')
+  async getChannels(@Req() req: IRequestWithUser) {
+    return this.conversationService.getChannels(req.user.id);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('createDM')

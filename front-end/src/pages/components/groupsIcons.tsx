@@ -1,12 +1,28 @@
 import { Menu, MenuHandler, MenuList, MenuItem} from "@material-tailwind/react";
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
+import { UserContext } from "../../App";
 
-function GroupsIcons() {
-  const isAdmin = !false;
+function GroupsIcons(props: object) {
+  
+  const { channel } = props;
+  const { user } = useContext(UserContext);
+
+  const isOwner = channel.usersState.find((userState: any) => userState.userId === user.data.id)?.role === 'owner'; 
+  const isAdmin = channel.usersState.find((userState: any) => userState.userId === user.data.id)?.role === 'modirator';
+
+  // console.log("isOwner: ", isOwner);
+  // console.log("isAdmin: ", isAdmin);
+  // console.log("user: ", user);
+  // console.log("channel: ", channel);
 
   const leaveGroup = () => {
-    console.log("I'm outta here")
-
+    if (user.chat) {
+      user.chat.emit('leaveChannel', {
+        convId: channel.id,
+        convType: channel.type,
+      });
+      console.log("I'm outta here")
+    }
   }
 
   const addMembers = () => {
@@ -34,8 +50,8 @@ function GroupsIcons() {
       </MenuHandler>
       <MenuList className="bg-purple-sh-2 border border-purple">
         <MenuItem onClick={() => {leaveGroup()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Leave Group</MenuItem>
-        { isAdmin &&  <MenuItem onClick={() => {addMembers()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Add Members</MenuItem> }
-        { isAdmin && <MenuItem onClick={() => {passwordSettings()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Password Settings</MenuItem> }
+        { (isAdmin || isOwner) &&  <MenuItem onClick={() => {addMembers()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Add Members</MenuItem> }
+        { isOwner && <MenuItem onClick={() => {passwordSettings()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Password Settings</MenuItem> }
       </MenuList>
     </Menu>
   )

@@ -11,6 +11,7 @@ function Bubble(props) {
   const visitProfile = () => {
     navigate('/'+ props.username)
   }
+  
   const setAsAdmin = () => {
     console.log("oh you got promoted, now back to work promoted slave")
   }
