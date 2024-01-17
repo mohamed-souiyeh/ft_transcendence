@@ -1,12 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { useChannelContext } from "../../contexts/channelContext"
 import { Menu, MenuHandler, MenuList, MenuItem} from "@material-tailwind/react";
+import { UserContext } from "../../App";
+import { useContext } from "react";
 
 function Bubble(props) {
 
   const {channel} = useChannelContext()
   const navigate = useNavigate()
-  const isAdmin = true
+  const { user } = useContext(UserContext);
+  const { isBanned } = props;
+  let isAdmin = false;
+
+  if (Object.keys(channel).length)  {
+    isAdmin = (channel.usersState.find(fuser => fuser.id === user.data.id).role === "modirator" || channel.usersState.find(fuser => fuser.id === user.data.id).role === "owner") && !isBanned;
+  }
 
   const visitProfile = () => {
     navigate('/'+ props.username)

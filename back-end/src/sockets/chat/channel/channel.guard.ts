@@ -56,8 +56,6 @@ export class ChannelGuard implements CanActivate {
 
     if (userState === undefined)
       throw new WsException({ error: 'Unauthorized operation', message: 'you are not in this channel' });
-    if (userState.state !== 'active')
-      throw new WsException({ error: 'Unauthorized operation', message: 'your state is not active' });
 
     return true;
   }

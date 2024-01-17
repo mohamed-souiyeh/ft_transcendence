@@ -25,29 +25,13 @@ const mokChannel = {
   "channelImage": "",
   "channelDescription": "an epic place to be in",
   "channelPassword": null,
-  "ownerId": 0,
+  "ownerId": 1,
   "createdAt": "2024-01-16T13:55:37.481Z",
   "users": [
     {
-      "id": 5,
-      "username": "slave 3"
-    },
-    {
-      "id": 4,
-      "username": "slave 2"
-    },
-    {
-      "id": 3,
-      "username": "slave 1"
-    },
-    {
-      "id": 2,
-      "username": "msouiyeh"
-    },
-    {
       "id": 1,
       "username": "mohamed"
-    }
+    },
   ],
   "usersState": [
     {
@@ -56,22 +40,6 @@ const mokChannel = {
       "role": "owner",
       "untile": null,
       "userId": 1,
-      "channelId": 1
-    },
-    {
-      "id": 2,
-      "state": "active",
-      "role": "modirator",
-      "untile": null,
-      "userId": 2,
-      "channelId": 1
-    },
-    {
-      "id": 3,
-      "state": "active",
-      "role": "user",
-      "untile": null,
-      "userId": 3,
       "channelId": 1
     }
   ]
@@ -136,6 +104,9 @@ function Chat() {
         // console.log("channels: ", JSON.stringify(res.data.channels, null, 2));
         setChannels(res.data.channels);
         setRefreshChannels(false);
+        if (Object.keys(channel).length) {
+          setChannel(res.data.channels.find((refreshedChannel) => refreshedChannel.id === channel.id));
+        }
       }).catch((err) => {
         console.log("error in chat page: ", err);
       });
@@ -204,7 +175,7 @@ function Chat() {
           </div>
         </div>
         <div className='relative basis-2/3 m-5 '>
-          {selected === subpages.NETWORK ? <Network refreshDms={setRefreshDms} /> : (selected === subpages.CHAT ? <Messages /> : <Rooms />)}
+          {selected === subpages.NETWORK ? <Network refreshDms={setRefreshDms} /> : (selected === subpages.CHAT ? <Messages /> : <Rooms setRefreshChannels={setRefreshChannels}/>)}
         </div>
 
       </div>

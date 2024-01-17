@@ -35,13 +35,18 @@ const dummymsg = {
 
 type msgType = typeof dummymsg;
 
-function Rooms() {
+function Rooms(props: object) {
 
   const [val, setVal] = useState('')
   const maxLength = 20;
   const { channel } = useChannelContext()
   const [msgs, setMsgs] = useState<msgType[]>([])
   const { user } = useContext(UserContext);
+
+  const [isBaned, setIsBaned] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
+  const { setRefreshChannels } = props;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -59,20 +64,35 @@ function Rooms() {
       convType: channel.type,
     }, (err, msgs) => {
       if (err) {
-        console.log("error in getting messages: ", err)
+        console.log("error in getting messages: ", err);
+        console.log("exeption: ", user.chatException);
         return;
       }
       // console.log("the res is: ", JSON.stringify(msgs, null, 2));
       setMsgs(msgs);
     });
 
+    // console.log("channel is: ", channel);
+    // console.log("user is: ", user);
+    // console.log("is banned :", channel.usersState.find((userState) => userState.userId === user.data.id).state);
+
+    const state = channel.usersState.find((userState) => userState.userId === user.data.id)?.state;
+
+    setIsBaned(state === 'banned');
+    setIsMuted(state === 'muted');
+
     user.chat.on('broadcast', (msg) => {
-      console.log("the msg is: ", msg);
+      // console.log("the msg is: ", msg);
       setMsgs(prevMsgs => [...prevMsgs, msg]);
+    });
+
+    user.chat.on('update', () => {
+      setRefreshChannels(true);
     });
 
     return () => {
       user.chat.off('broadcast');
+      user.chat.off('update');
     }
   }, [channel])
 
@@ -114,15 +134,15 @@ function Rooms() {
 
                 if (msg.authorInfo.usersAuthorBlockedBy.find((blockedUser) => blockedUser.id === user.data.id))
                   message = "you are blocked by this user";
-                if (msg.bannedUsers.find((bannedUser) => bannedUser.id === user.data.id))
+                if (isBaned)
                   message = "you are banned from this channel";
 
-                return <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={message} key={msg.id} />
+                return <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={message} key={msg.id} isBanned={isBaned}/>
               }) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p>)
           }
         </div>
         <div className="fixed bottom-5 bg-purple-sh-0 w-[66%] h-12 m-2 rounded-lg px-2">
-          <form onSubmit={sendMsg} className="flex items-center">
+          {(!isBaned && !isMuted )? <form onSubmit={sendMsg} className="flex items-center">
             <input value={val} maxLength={maxLength} onChange={(e) => setVal(e.target.value)} type='text' placeholder="send a Messages" className='w-[98%] h-12 bg-transparent outline-none rounded-lg text-impure-white px-2 place-self-center' />
             <button type="submit" className="hover:border-none border-none focus:outline-none">
               <svg xmlns="http://www.w3.org/2000/svg" width="23" height="22" viewBox="0 0 23 22" fill="none">
@@ -134,7 +154,11 @@ function Rooms() {
                 </defs>
               </svg>
             </button>
-          </form >
+          </form > : 
+            <p className="text-2xl p-1 text-purple-tone-2 text-opacity-60">{
+              isBaned ? "you are banned from this channel" : "you are muted from this channel"
+            }</p>
+}
         </div>
       </div>
     )
