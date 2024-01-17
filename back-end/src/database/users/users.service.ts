@@ -603,6 +603,70 @@ export class UsersService {
     return user.avatar;
   }
 
-  //fetch user avatar
+
+
+  async getUserData(username: string): Promise<any> {
+    const user = await this.prismaService.user.findUnique({
+      where: { username },
+      select: {
+        id: true,
+        username: true,
+        score: true,
+        wins: true,
+        loses: true,
+        matchesPlayed: true,
+        status: true,
+        achievements: true,
+        wonMatches: true ,
+        lostMatches: true
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    //const allMatches = [...user.wonMatches, ...user.lostMatches].sort((a, b) => a.id - b.id);
+
+    const allMatches = [...user.wonMatches, ...user.lostMatches].sort((a, b) => {
+      return new Date(b.endedAt).getTime() - new Date(a.endedAt).getTime();
+    });
+    
+
+    return {
+      id: user.id,
+      username: user.username,
+      score: user.score,
+      wins: user.wins,
+      loses: user.loses,
+      matchesPlayed: user.matchesPlayed,
+      status: user.status,
+      achievements: user.achievements,
+      allMatches,
+    };
+  }
+
+
+
+  async getLeaderboard(): Promise<any> {
+    const leaderboard = await this.prismaService.user.findMany({
+      take: 10, 
+      orderBy: {
+        score: 'desc', 
+      },
+      select: {
+        id: true,
+        username: true,
+        score: true,
+        matchesPlayed: true,
+        wins: true,
+        loses: true,
+      },
+    });
+
+    return leaderboard;
+  }
+
+
   // !
 }

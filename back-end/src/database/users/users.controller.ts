@@ -13,7 +13,8 @@ import {
   Query,
   Param, 
   NotFoundException, 
-  ParseIntPipe
+  ParseIntPipe,
+  Res
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
@@ -25,6 +26,7 @@ import {
   usernameUpdateConfig,
 } from './FormDataInterceptorConfig/UploadConfig';
 import { UpdateUsernameDTO, UploadDTO } from './uploadDTO/uploadDTO';
+import { Response } from 'express';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -154,16 +156,36 @@ export class UsersController {
   }
 
   @Get(':userId/avatar')
-  async getUserAvatar(@Param('userId', ParseIntPipe) userId: number): Promise<{ avatarUrl: string }> {
+  async getUserAvatar(@Param('userId', ParseIntPipe) userId: number, @Res() res: Response): Promise<void> {
     try {
-      const avatarUrl = await this.userService.getUserAvatar(userId);
-      return { avatarUrl };
-    } catch (error) 
-    {
-      throw new NotFoundException('User introuvable');
+      const avatarPath = await this.userService.getUserAvatar(userId);
+      res.sendFile(avatarPath);
+    } catch (error) {
+      throw new NotFoundException('Utilisateur ou Avatar non trouvé');
     }
   }
 
+
+
+  @Get('Public_data/:username')
+  async getUserByUsername(@Param('username') username: string): Promise<any> {
+    try {
+      const userData = await this.userService.getUserData(username);
+      return userData;
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  @Get('leaderboard')
+  async getLeaderboard(): Promise<any> {
+    try {
+      const leaderboard = await this.userService.getLeaderboard();
+      return leaderboard;
+    } catch (error) {
+      throw new NotFoundException('Leaderboard not found');
+    }
+  }
   //!
 
 }
