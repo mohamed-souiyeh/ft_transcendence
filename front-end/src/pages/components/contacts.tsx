@@ -12,6 +12,8 @@ function Contacts(props) {
 
   // console.log("this is the user in contacts :", user);
 
+  //NOTE - we need to add the status of the user from the back-end
+
   const clicked = () => {
     // if (dm.id === dmInfo.id) return;
     setDm({
