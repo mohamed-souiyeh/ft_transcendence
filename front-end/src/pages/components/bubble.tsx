@@ -13,7 +13,7 @@ function Bubble(props) {
   let isAdmin = false;
 
   if (Object.keys(channel).length)  {
-    isAdmin = (channel.usersState.find(fuser => fuser.id === user.data.id).role === "modirator" || channel.usersState.find(fuser => fuser.id === user.data.id).role === "owner") && !isBanned;
+    isAdmin = (channel.usersState.find(fuser => fuser.id === user.data.id)?.role === "modirator" || channel.usersState.find(fuser => fuser.id === user.data.id)?.role === "owner") && !isBanned;
   }
 
   const visitProfile = () => {
