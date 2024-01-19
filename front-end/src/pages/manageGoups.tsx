@@ -75,9 +75,12 @@ function ManageGoups() {
       setBadInput({...badInput, badName: true})
     }
   }
-  const FakeData = [
-    {groupName: "One", privacy: "Protected", joined: true, id: 0},
+
+  var FakeData = [
+    {groupName: "One", privacy: "Protected", joined: false, id: 0},
     {groupName: "Two", privacy: "Public", joined: false, id: 1},
+    {groupName: "Three", privacy: "Public", joined: false, id: 2},
+    {groupName: "Four", privacy: "Public", joined: false, id: 3},
   ]
 
   return (
@@ -147,7 +150,6 @@ function ManageGoups() {
                 { createdGroup.privacy === "Protected" &&                 
                   <div >
                     <p className="text-2xl pt-3" > Password: </p>
-                    {/* JUST conf psswd first, once confirmed then directly set it in obj from confirmation func */}
                     <input type="password" name="password" placeholder="enter password" onChange={handleInputChange} className="bg-purple-sh-0 rounded-lg w-72 h-12 focus:outline-none p-2 placeholder:text-impure-white/30 " />
                     <p className="text-2xl pt-3" > confirm Password: </p>
                     <input type="password" name="confirmedPassword" placeholder="re-enter password" onChange={(e) => {setConfirmationPwd(e.target.value)}} className="bg-purple-sh-0 rounded-lg w-72 h-12 focus:outline-none p-2 placeholder:text-impure-white/30 " />
@@ -164,9 +166,10 @@ function ManageGoups() {
               <div className="flex-col h-full p-4 basis-1/2 " >
                 <p className="text-2xl" > Add Members: </p>
                 <div className="border-4 rounded-lg border-purple-sh-1 h-[80%] overflow-y-scroll scrollbar-thin scrollbar-thumb-purple-sh-0 p-4">
-                  <div className={`grid w-[100%] ${ !FakeData.length && 'place-content-center'}  `}>
-                    {FakeData.length ? FakeData.map((grp) => <GroupMembers userName={grp.groupName} added={grp.joined} key={grp.id}/>) : <p className="text-xl text-purple/50 p-5"> You have no friends </p>}
-                  </div>
+                  {/* <div className={`grid w-[100%] ${ !FakeData.length && 'place-content-center'}  `}> */}
+                    {/* {FakeData.length ? FakeData.map((grp) => <GroupMembers userName={grp.groupName} added={grp.joined} key={grp.id}/>) : <p className="text-xl text-purple/50 p-5"> You have no friends </p>} */}
+                  <GroupMembers createdGroup={createdGroup} setCreatedGroup={setCreatedGroup}/>
+                  {/* </div> */}
                 </div>
                     {badInput.badMembers && <p className="text-[#D9534F] pl-1 font-bold text-sm" > Please add some members </p> }
               </div>
