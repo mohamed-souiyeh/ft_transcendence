@@ -83,38 +83,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   //SECTION - Channels
 
-  async validateCheckChannelMsg(msg: any) {
-    const schema = Joi.object({
-      convType: Joi.string().required().valid(ChannelType.public, ChannelType.protected, ChannelType.private),
-      convId: Joi.number().required(),
-    });
+  // async validateCheckChannelMsg(msg: any) {
+  //   const schema = Joi.object({
+  //     convType: Joi.string().required().valid(ChannelType.public, ChannelType.protected, ChannelType.private),
+  //     convId: Joi.number().required(),
+  //   });
 
-    const { error } = schema.validate(msg);
+  //   const { error } = schema.validate(msg);
 
-    if (error) {
-      // console.log("error => ", error);
-      throw new WsException(error.message);
-    }
+  //   if (error) {
+  //     // console.log("error => ", error);
+  //     throw new WsException(error.message);
+  //   }
 
-    msg.convId = Number(msg.convId);
-  }
+  //   msg.convId = Number(msg.convId);
+  // }
 
-  @UseGuards(ChannelGuard)
-  @SubscribeMessage('checkChannelpls')
-  async checkChannelpls(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
+  // @UseGuards(ChannelGuard)
+  // @SubscribeMessage('checkChannelpls')
+  // async checkChannelpls(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
 
-    await this.validateCheckChannelMsg(msg);
+  //   await this.validateCheckChannelMsg(msg);
 
-    const { jwt } = await this.chatService.getTokensFromSocket(client);
+  //   const { jwt } = await this.chatService.getTokensFromSocket(client);
 
-    const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
+  //   const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
 
-    const conv = await this.convService.getChannel(msg.convId, payload.id);
+  //   const conv = await this.convService.getChannel(msg.convId, payload.id);
 
-    const userState = conv.usersState.find(userState => userState.userId === payload.id);
+  //   const userState = conv.usersState.find(userState => userState.userId === payload.id);
 
-    return userState;
-  }
+  //   return userState;
+  // }
 
 
   async validateChannelMsg(msg: any) {
@@ -140,7 +140,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('channelmsg')
   async handleMessage(@MessageBody() msg, @ConnectedSocket() client: Socket) {
 
-    await this.validateChannelMsg(msg);
+    // await this.validateChannelMsg(msg);
 
     const { jwt } = await this.chatService.getTokensFromSocket(client);
 

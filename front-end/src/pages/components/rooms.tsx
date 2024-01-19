@@ -59,7 +59,7 @@ function Rooms(props: object) {
 
 
   useEffect(() => {
-    user.chat.timeout(5000).emit('getAllMessages', {
+    user.chat.timeout(60000).emit('getAllMessages', {
       convId: channel.id,
       convType: channel.type,
     }, (err, msgs) => {
@@ -112,6 +112,12 @@ function Rooms(props: object) {
     }
   }
 
+  const now: Date = new Date();
+
+  console.log("date: ", now);
+  now.setFullYear(now.getFullYear() + 1);
+  console.log("date: ", now);
+  console.log("date as a string: ", now.toISOString());
     return (
       <div className="bg-purple-sh-1 h-[100%] pb-10 ">
         <div className="flex sticky bg-purple-s-0 w-[100%] border border-transparent border-b-purple-sh-2 p-5 ">
@@ -137,7 +143,7 @@ function Rooms(props: object) {
                 if (isBaned)
                   message = "you are banned from this channel";
 
-                return <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={message} key={msg.id} isBanned={isBaned}/>
+                return <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={message} key={msg.id} isBanned={(isBaned || isMuted)}/>
               }) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p>)
           }
         </div>
