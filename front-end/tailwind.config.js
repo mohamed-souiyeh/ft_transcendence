@@ -20,6 +20,7 @@ module.exports = withMT({
     extend: {
       colors: {
         'green': '#00FF00',
+        'gray':'#B4B4B3',
         'purple-sh-2': '#201E2D',
         'purple-sh-1': '#302C42',
         'purple-sh-0': '#48435E',
@@ -29,7 +30,12 @@ module.exports = withMT({
         'purple-tone-2': '#DFDAF6' ,
         'impure-white': '#EDE9FB' ,
         'rose':'#f0abfc',
-        'yellow':'#16a34a',
+        'yellow':'#F8E559',
+        'yellow2':'#F6D776',
+        'sky':'#31bacd',
+        'violet':'#800080',
+        'purple-start': '#9c27b0',
+        'purple-end': '#7b1fa2',
         'team':'8785A2'
       },
       height: {
