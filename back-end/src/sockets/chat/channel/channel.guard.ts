@@ -5,7 +5,7 @@ import { JwtAuthService } from 'src/auth/jwt/jwt.service';
 import { ConversationsService } from 'src/database/conversations/conversations.service';
 import Joi from 'joi';
 import { WsException } from '@nestjs/websockets';
-import { ChannelType } from '@prisma/client';
+import { ChannelType, UserState } from '@prisma/client';
 
 
 @Injectable()
@@ -56,8 +56,12 @@ export class ChannelGuard implements CanActivate {
 
     if (userState === undefined)
       throw new WsException({ error: 'Unauthorized operation', message: 'you are not in this channel' });
-    if (userState.state !== 'active')
-      throw new WsException({ error: 'Unauthorized operation', message: 'your state is not active' });
+
+    const isBanned = userState.state === UserState.banned;
+    const isMuted = userState.state === UserState.muted;
+
+    if (isBanned || isMuted)
+      throw new WsException({ error: 'Unauthorized operation', message: 'you are banned from this channel' });
 
     return true;
   }

@@ -260,6 +260,34 @@ export class ConversationsService {
     };
   }
 
+
+  async getChannels(userId: number) {
+    const channels = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        channels: {
+          include: {
+            users: {
+              select: {
+                id: true,
+                username: true,
+              },
+            },
+            usersState: true,
+          },
+        },
+      },
+    });
+
+    return {
+      id: channels.id,
+      username: channels.username,
+      channels: channels.channels,
+    };
+  }
+
   async getDmMessages(dmId: number) {
     const dm = await this.prismaService.dms.findUnique({
       where: {

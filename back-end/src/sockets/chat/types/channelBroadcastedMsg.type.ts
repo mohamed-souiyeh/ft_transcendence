@@ -2,13 +2,14 @@
 import { ChannelType, Role } from "@prisma/client";
 
 class authorInfo  {
-  authorUsername: string
-  authorid: number
-  authorRole: Role
+  username: string
+  id: number
+  role: Role
   usersAuthorBlockedBy: any
 }
 
 export class ChannelBroadcastedMsg  {
+  id: number
   authorInfo: authorInfo = new authorInfo()
   message: string
   convType: ChannelType

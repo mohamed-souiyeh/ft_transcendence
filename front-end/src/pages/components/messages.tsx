@@ -42,6 +42,7 @@ function Messages() {
       messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
     }
   }, [msgs]);
+  
   useEffect(() => {
     const setIntervalId: NodeJS.Timeout = setInterval(() => {
       user.chat.timeout(1000).emit('checkDmpls', {
@@ -68,7 +69,7 @@ function Messages() {
   useEffect(() => {
     //NOTE - here we need to fetch the public data of the user and set the status from it
 
-    user.chat.timeout(5000).emit('checkDmpls', {
+    user.chat.timeout(1000).emit('checkDmpls', {
       convId: dm.id,
       convType: dm.type,
     }, (err, res) => {
