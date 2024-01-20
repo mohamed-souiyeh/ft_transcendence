@@ -22,8 +22,8 @@ import { ChangeChannelTypeGuard } from './change-channel-type/change-channel-typ
 import { ChangeChannelPasswordGuard } from './change-channel-password/change-channel-password.guard';
 import { JoinChannelGuard } from './join-channel/join-channel.guard';
 import { RemoveChannelGuard } from './remove-channel/remove-channel.guard';
-import { eventBus } from 'src/eventBus';
-import { UserDto } from 'src/database/users/User_DTO/User.dto';
+// import { eventBus } from 'src/eventBus';
+// import { UserDto } from 'src/database/users/User_DTO/User.dto';
 
 const chatGatewayConfig = {
   ...baseGateWayConfig,
@@ -79,48 +79,42 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     // console.log('client disconnected from chat');
   }
 
-  //SECTION - game invites
-
-  @UseGuards()
-
-
-  //!SECTION - game invites
 
 
   //SECTION - Channels
 
-  async validateCheckChannelMsg(msg: any) {
-    const schema = Joi.object({
-      convType: Joi.string().required().valid(ChannelType.public, ChannelType.protected, ChannelType.private),
-      convId: Joi.number().required(),
-    });
+  // async validateCheckChannelMsg(msg: any) {
+  //   const schema = Joi.object({
+  //     convType: Joi.string().required().valid(ChannelType.public, ChannelType.protected, ChannelType.private),
+  //     convId: Joi.number().required(),
+  //   });
 
-    const { error } = schema.validate(msg);
+  //   const { error } = schema.validate(msg);
 
-    if (error) {
-      // console.log("error => ", error);
-      throw new WsException(error.message);
-    }
+  //   if (error) {
+  //     // console.log("error => ", error);
+  //     throw new WsException(error.message);
+  //   }
 
-    msg.convId = Number(msg.convId);
-  }
+  //   msg.convId = Number(msg.convId);
+  // }
 
-  @UseGuards(ChannelGuard)
-  @SubscribeMessage('checkChannelpls')
-  async checkChannelpls(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
+  // @UseGuards(ChannelGuard)
+  // @SubscribeMessage('checkChannelpls')
+  // async checkChannelpls(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
 
-    await this.validateCheckChannelMsg(msg);
+  //   await this.validateCheckChannelMsg(msg);
 
-    const { jwt } = await this.chatService.getTokensFromSocket(client);
+  //   const { jwt } = await this.chatService.getTokensFromSocket(client);
 
-    const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
+  //   const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
 
-    const conv = await this.convService.getChannel(msg.convId, payload.id);
+  //   const conv = await this.convService.getChannel(msg.convId, payload.id);
 
-    const userState = conv.usersState.find(userState => userState.userId === payload.id);
+  //   const userState = conv.usersState.find(userState => userState.userId === payload.id);
 
-    return userState;
-  }
+  //   return userState;
+  // }
 
 
   async validateChannelMsg(msg: any) {
@@ -146,7 +140,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('channelmsg')
   async handleMessage(@MessageBody() msg, @ConnectedSocket() client: Socket) {
 
-    await this.validateChannelMsg(msg);
+    // await this.validateChannelMsg(msg);
 
     const { jwt } = await this.chatService.getTokensFromSocket(client);
 
@@ -162,29 +156,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
     const bannedUsers = conv.usersState.filter(userState => userState.state === UserState.banned);
 
-    this.server.to(`${msg.convType}.${msg.convId}`).emit('broadcast', {
-      authorInfo: {
-        authorUsername: user.username,
-        authorid: user.id,
-        authorRole: userState.role,
-        usersAuthorBlockedBy: user.blockedBy,
-      },
-      message: msg.message,
-      convType: msg.convType,
-      convId: msg.convId,
-      bannedUsers: bannedUsers,
-    });
-
+    
     const adapter = this.server.adapter as any;
     const room = adapter.rooms.get(`${msg.convType}.${msg.convId}`);
-
+    
     if (room && room.size > 0) {
       const db_msg = {
         text: msg.message,
         senderId: user.id,
         channelId: msg.convId,
       }
-      await this.convService.createMessage(db_msg);
+      const toSend = await this.convService.createMessage(db_msg);
+
+      this.server.to(`${msg.convType}.${msg.convId}`).emit('broadcast', {
+        id: toSend.id,
+        authorInfo: {
+          username: user.username,
+          id: user.id,
+          role: userState.role,
+          usersAuthorBlockedBy: user.blockedBy,
+        },
+        message: msg.message,
+        convType: msg.convType,
+        convId: msg.convId,
+        bannedUsers: bannedUsers,
+      });
     }
   }
 
@@ -493,9 +489,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
         // eslint-disable-next-line prefer-const
         let toAdd: ChannelBroadcastedMsg = new ChannelBroadcastedMsg();
 
-        toAdd.authorInfo.authorUsername = msg.sender.username;
-        toAdd.authorInfo.authorid = msg.sender.id;
-        toAdd.authorInfo.authorRole = conv.usersState.find(userState => userState.userId === msg.sender.id).role;
+        toAdd.id = msg.id;
+        toAdd.authorInfo.username = msg.sender.username;
+        toAdd.authorInfo.id = msg.sender.id;
+        toAdd.authorInfo.role = conv.usersState.find(userState => userState.userId === msg.sender.id).role;
         toAdd.authorInfo.usersAuthorBlockedBy = msg.sender.blockedBy.map(user => ({
           id: user.id,
           username: user.username,
