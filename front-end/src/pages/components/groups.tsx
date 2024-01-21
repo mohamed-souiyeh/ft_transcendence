@@ -1,7 +1,13 @@
+import { useProtectedRoomContext } from "../../contexts/ProtectedRoomContext"
 
 function Groups(props) {
+ 
+  const {setProtectedRoom } = useProtectedRoomContext()
+
 
   const joinGroup = () => {
+    if (props.privacy === "Protected")
+      setProtectedRoom(true)
     console.log("joiiiin")
   }
 

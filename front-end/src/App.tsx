@@ -24,6 +24,7 @@ import { ChannelProvider } from "./contexts/channelContext";
 import ManageGoups from "./pages/manageGoups";
 import { PwdPopupProvider } from "./contexts/pwdPopupContext";
 import { AddFriendsPopupProvider } from "./contexts/addFriendsPopupContext";
+import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
 
 
 
@@ -167,32 +168,34 @@ function App() {
             <ChannelProvider>
               <PwdPopupProvider >
                 <AddFriendsPopupProvider>
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/login" element={<SignUp />} />
-                  <Route path="/loading" element={<Loading />} />
-                  <Route path="*" element={<NotFound />} />
+                  <ProtectedRoomProvider >
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route path="/" element={<LandingPage />} />
+                      <Route path="/login" element={<SignUp />} />
+                      <Route path="/loading" element={<Loading />} />
+                      <Route path="*" element={<NotFound />} />
 
-                  <Route path="/2fa" element={
-                    <TwoFAConfirmation />
-                  } />
-                  {/* Private Routes */}
-                  <Route element={
-                    <>
-                      <SetupSockets />
-                      <RequireAuth />
-                    </>
-                  }>
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/chat" element={<Chat />} />
-                    <Route path="/setup" element={<Setup />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/userprofile" element={<UserProfile />} />
-                    <Route path="/groups" element={<ManageGoups/>} />
-                    {/* <Route path="/game" element={<Game/>} /> */}
-                  </Route>
-                </Routes>
+                      <Route path="/2fa" element={
+                        <TwoFAConfirmation />
+                      } />
+                      {/* Private Routes */}
+                      <Route element={
+                        <>
+                          <SetupSockets />
+                          <RequireAuth />
+                        </>
+                      }>
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/chat" element={<Chat />} />
+                        <Route path="/setup" element={<Setup />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/userprofile" element={<UserProfile />} />
+                        <Route path="/groups" element={<ManageGoups/>} />
+                        {/* <Route path="/game" element={<Game/>} /> */}
+                      </Route>
+                    </Routes>
+                  </ProtectedRoomProvider>
                 </AddFriendsPopupProvider>
               </PwdPopupProvider >
             </ChannelProvider>
