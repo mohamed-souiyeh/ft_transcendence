@@ -7,7 +7,8 @@ class userInfo {
 }
 
 export class dmBroadcastedMsg {
-  userInfo: userInfo = new userInfo()
+  id: number
+  authorInfo: userInfo = new userInfo()
   message: string
   convType: ChannelType
   convId: number

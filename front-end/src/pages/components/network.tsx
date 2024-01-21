@@ -6,7 +6,7 @@ import Blocked from "./blocked"
 import axios from "axios"
 import { networkTabs } from "../chat.enums"
 
-function Network() {
+function Network(props) {
   const [tab, setTab] = useState(networkTabs.FRIENDS)
   const [refresh, setRefresh] = useState(false)
 
@@ -28,9 +28,9 @@ function Network() {
         setBlockedUsers(res.data.blockedUsers);
         setFriends(res.data.friends);
         setRefresh(false);
-          console.log("friend requests: ", friendRequests);
-          console.log("blocked users: ", blockedUsers);
-          console.log("friends: ", friends);
+          // console.log("friend requests: ", friendRequests);
+          // console.log("blocked users: ", blockedUsers);
+          // console.log("friends: ", friends);
       }).catch((err) => {
         console.log("error in network tab: ", err);
       });
@@ -45,6 +45,8 @@ function Network() {
     setRefresh(!refresh);
   };
 
+
+  const { refreshDms } = props;
 
   return (
     <>
@@ -69,7 +71,7 @@ function Network() {
       <div className="overflow-hidden bg-purple-sh-1 h-[93%]">
         <div className="overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-0 h-[100%]">
           {/* divs for tabs content*/}
-          {tab === networkTabs.FRIENDS ? (friends.length ? friends.map((user) => < Friends friend={user} unmount={handleUnmount} key={user.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> Look at you Lonely lil sh*t :')</p>)
+          {tab === networkTabs.FRIENDS ? (friends.length ? friends.map((user) => < Friends refreshDms={refreshDms} friend={user} unmount={handleUnmount} key={user.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> Look at you Lonely lil sh*t :')</p>)
             : (tab === networkTabs.REQUESTS ? (friendRequests.length ? friendRequests.map((user) => < Requests request={user} unmount={handleUnmount} key={user.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60">hmm seems like u have no friends requests, maybe nobody wants u</p>)
               : (blockedUsers.length ? blockedUsers.map((user) => < Blocked blocked={user} unmount={handleUnmount} key={user.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60">your list of blocked users is empty, but we're pretty sure your name is in so many lists</p>))}
         </div>

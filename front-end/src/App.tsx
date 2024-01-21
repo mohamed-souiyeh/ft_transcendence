@@ -18,6 +18,7 @@ import { eventBus } from "./eventBus";
 import { DmProvider } from "./contexts/chatContext";
 import { setupSocket } from "./pages/setupSocket";
 import { ChannelProvider } from "./contexts/channelContext";
+import ManageGoups from "./pages/manageGoups";
 import BotMode from "./pages/game/botmode";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
@@ -239,6 +240,7 @@ function App() {
                   <Route path="/setup" element={<Setup />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/userprofile" element={<UserProfile />} />
+                  <Route path="/groups" element={<ManageGoups/>} />
                   <Route path="/game" element={
                     <SocketContext.Provider value={game_socket}>
                       <Game />

@@ -14,23 +14,23 @@ export class DmGuard implements CanActivate {
     private readonly jwtAuthService: JwtAuthService,
     private readonly convService: ConversationsService) { }
 
-  async validateDmMsg(msg: any) {
-    const schema = Joi.object({
-      authorUsername: Joi.string().required(),
-      message: Joi.string().required().min(1).max(250),
-      convType: Joi.string().required().valid(ChannelType.dm),
-      convId: Joi.number().required(),
-    });
+  // async validateDmMsg(msg: any) {
+  //   const schema = Joi.object({
+  //     authorUsername: Joi.string().required(),
+  //     message: Joi.string().required().min(1).max(250),
+  //     convType: Joi.string().required().valid(ChannelType.dm),
+  //     convId: Joi.number().required(),
+  //   });
 
-    const { error } = schema.validate(msg);
+  //   const { error } = schema.validate(msg);
 
-    if (error) {
-      // console.log("error => ", error);
-      throw new WsException(error.message);
-    }
+  //   if (error) {
+  //     // console.log("error => ", error);
+  //     throw new WsException(error.message);
+  //   }
 
-    msg.convId = Number(msg.convId);
-  }
+  //   msg.convId = Number(msg.convId);
+  // }
 
   async canActivate(
     context: ExecutionContext,
@@ -40,12 +40,11 @@ export class DmGuard implements CanActivate {
 
     const data = await context.switchToWs().getData();
 
-    await this.validateDmMsg(data);
-
     const { jwt } = await this.chatService.getTokensFromSocket(client);
 
     const payload = await this.jwtAuthService.decodetoken(jwt);
 
+    
     const conv = await this.convService.getDm(data.convId);
 
     if (conv === null)
@@ -53,15 +52,14 @@ export class DmGuard implements CanActivate {
 
     const user1 = conv.users.find(user => user.id === payload.id);
 
-    const user2 = conv.users.find(user => user.id !== payload.id);
 
     if (user1 === undefined)
       throw new WsException({ error: 'Unauthorized operation', message: 'you are not in this dm' });
     
-    const isBlocked = (user1.blockedUsers.find(user => user.id === user2.id) || user2.blockedUsers.find(user => user.id === user1.id)) === undefined ? false : true;
+    // const isBlocked = (user1.blockedUsers.find(user => user.id === user2.id) || user2.blockedUsers.find(user => user.id === user1.id)) === undefined ? false : true;
 
-    if (isBlocked)
-      throw new WsException({ error: 'Unauthorized operation', message: 'you are blocked by the other user in this conversation' });
+    // if (isBlocked)
+    //   throw new WsException({ error: 'Unauthorized operation', message: 'you are blocked by the other user in this conversation' });
 
     return true;
   }
