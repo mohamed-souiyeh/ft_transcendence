@@ -59,9 +59,9 @@ function ManageGoups() {
 
   const handleSubmit = (e : React.FormEvent) => {
     e.preventDefault()
-    // console.log("submitting some data..")
-    // console.log("_name:",createdGroup.name,'privacy:', createdGroup.privacy,'desc:', createdGroup.description)
-    // console.log("pwd:",createdGroup.password, 'conf pwd:', confirmationPwd, 'members:', createdGroup.members)
+    console.log("submitting some data..")
+    console.log("_name:",createdGroup.name,'privacy:', createdGroup.privacy,'desc:', createdGroup.description)
+    console.log("pwd:",createdGroup.password, 'conf pwd:', confirmationPwd, 'members:', createdGroup.members)
     if(!Object.keys(createdGroup.members).length){
       setBadInput({...badInput, badMembers: true})
     }
@@ -92,7 +92,6 @@ function ManageGoups() {
           <p className="text-impure-white text-5xl pb-3"> Join a Group </p>
           <div className="bg-purple-sh-2 rounded-lg h-[90%] w-full overflow-y-scroll scrollbar-thin scrollbar-thumb-purple-sh-1 p-4">
 
-            {!FakeData.length && 
               <div className="flex flex-row-reverse py-2" >
                 <form onSubmit={getGroups} className="flex bg-purple-sh-0 rounded-lg items-center m-3">
                   <svg className="w-10 h-10 stroke-purple stroke-2 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -101,7 +100,6 @@ function ManageGoups() {
                   <input onChange={(e) => setVal(e.target.value)} type='text' placeholder="search for a group" className='h-12 p-3 bg-transparent cursor-text border-transparent outline-none placeholder:italic placeholder:text-purple/60'/>
                 </form>
               </div>
-            }
             <div className={`grid w-[100%] ${ !FakeData.length && 'place-content-center'}`}>
               {FakeData.length ? FakeData.map((grp) => <Groups groupName={grp.groupName} privacy={grp.privacy} joined={grp.joined} key={grp.id}/>) : <p className="text-xl text-purple/50 p-5"> search for a group </p>}
             </div>

@@ -1,11 +1,13 @@
 import { Menu, MenuHandler, MenuList, MenuItem} from "@material-tailwind/react";
 import { useContext, useEffect, useRef, useState } from "react"
 import { UserContext } from "../../App";
+import { usePwdPopupContext } from "../../contexts/pwdPopupContext";
 
 function GroupsIcons(props: object) {
   
   const { channel } = props;
   const { user } = useContext(UserContext);
+  const { setPwdPopup} = usePwdPopupContext()
 
   const isOwner = channel.usersState.find((userState: any) => userState.userId === user.data.id)?.role === 'owner'; 
   const isAdmin = channel.usersState.find((userState: any) => userState.userId === user.data.id)?.role === 'modirator';
@@ -22,6 +24,7 @@ function GroupsIcons(props: object) {
         convType: channel.type,
       });
       console.log("I'm outta here")
+    setPwdPopup(true)
     }
   }
 
@@ -30,6 +33,7 @@ function GroupsIcons(props: object) {
   }
 
   const passwordSettings = () => {
+    setPwdPopup(true)
     console.log('add, remove or edit Password')
 
   }
