@@ -1,11 +1,13 @@
 import logo from "../../assets/Logo.svg"
 import { useEffect, useRef, useState } from "react"
+import { usePwdPopupContext } from "../../contexts/pwdPopupContext"
 
 function PwdPopup() {
 
   const [state, setState] = useState(false)
   const [badPwd, setBadPwd] = useState(false)
   const [confirmationPwd, setConfirmationPwd] = useState("")
+  const {setPwdPopup} = usePwdPopupContext()
 
   //we're using this to temporary store the privacy and pwds. should be replaced ------------
   const [temporaryObj, setTemporaryObj] = useState({
@@ -45,12 +47,13 @@ function PwdPopup() {
     }
     else {
       console.log("we good to go!")
+      setPwdPopup(true)
     }
   }
 
   return (
-    <div className="h-screen w-screen bg-purple-sh-1 bg-opacity-30 backdrop-blur-sm absolute z-40 grid place-content-center" > 
-      <div className="h-[28rem] w-l-card-w bg-purple bg-opacity-20 p-4 rounded-xl grid place-content-center">
+    <div className="h-screen w-screen bg-purple-sh-1 bg-opacity-30 backdrop-blur-sm absolute z-40 grid place-content-center" onClick={() => {setPwdPopup(false)}}> 
+      <div className="h-[28rem] w-l-card-w bg-purple bg-opacity-20 p-4 rounded-xl grid place-content-center" onClick={ (e) => {e.stopPropagation()}}>
         <form onSubmit={handleSubmit} >
           <div className="grid place-content-center">
             <img src={logo} className="h-11 w-11" />
