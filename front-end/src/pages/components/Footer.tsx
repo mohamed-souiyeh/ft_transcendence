@@ -10,7 +10,7 @@ import { IconContext } from "react-icons";
 
 export default function Footer() {
   return (
-    <div className="bg-purple-sh-1 w-screen  ml-5w-screen text-center space-y-3 pb-20 ">
+    <div className="bg-purple-sh-1  ml-5 text-center space-y-3 pb-20 ">
       <h2 className="text-white text-2xl" style={{ letterSpacing: '0.2rem' }}>TECHNOLOGIES & SOFTWARES</h2>
       <p className="text-white text-xl">Used in the project</p>
       <div className="flex justify-center space-x-9">
