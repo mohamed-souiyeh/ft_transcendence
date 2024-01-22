@@ -8,7 +8,7 @@ function Blocked(props) {
   console.log("blocked is: ", blocked);
 
   const UnblockUser = () => {
-    axios.post('http://localhost:1337/users/unblock', blocked, {
+    axios.post('${process.env.REACT_URL}:1337/users/unblock', blocked, {
       withCredentials: true,
     }).then(() => {
       console.log("user unblocked");

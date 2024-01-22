@@ -8,11 +8,11 @@ import { Navigate, useLocation } from 'react-router-dom';
 
 function googleSignUp()
 {
-  window.location.href = 'http://localhost:1337/auth/google';
+  window.location.href = '${process.env.REACT_URL}:1337/auth/google';
 }
 
 function ftSignUp() {
-  window.location.href = 'http://localhost:1337/auth/42';
+  window.location.href = '${process.env.REACT_URL}:1337/auth/42';
 }
 
 

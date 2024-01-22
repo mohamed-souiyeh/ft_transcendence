@@ -12,7 +12,7 @@ export const useSocket = (namespace: string): Socket | null  =>
   const navigate = useNavigate();
 
   useEffect(() => {
-    const socketIo = io(`http://localhost:1337/${namespace}`, {withCredentials: true});
+    const socketIo = io(`${process.env.REACT_URL}:1337/${namespace}`, {withCredentials: true});
     setSocket(socketIo);
 
     const kick = () => {

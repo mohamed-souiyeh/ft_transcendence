@@ -16,7 +16,7 @@ function TwoFactorAuthCode () {
       formdata.set("code", code);
       console.log(code);
       axios.
-        post("http://localhost:1337/2fa/verify", formdata,
+        post(`${process.env.REACT_URL}:1337/2fa/verify`, formdata,
         {
           withCredentials: true
         }).

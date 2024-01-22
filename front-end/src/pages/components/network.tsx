@@ -19,7 +19,7 @@ function Network(props) {
 
   useEffect(() => {
     console.log("network tab mounted");
-    axios.get('http://localhost:1337/users/network',
+    axios.get('${process.env.REACT_URL}:1337/users/network',
       {
         withCredentials: true,
       }).then((res) => {

@@ -28,7 +28,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './Toasts.css';
 
 
-const game_socket = io("http://localhost:1337/game", 
+const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
                 { withCredentials: true });
 
 function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any, declineGame?:any})
@@ -118,7 +118,7 @@ function SetupSockets() {
 
   useEffect(() => {
 
-    const chat_socket = setupSocket("http://localhost:1337/chat");
+    const chat_socket = setupSocket(`${process.env.REACT_URL}:1337/chat`);
     chat_socket.on("exception", (err) => {
       // Handle the error here
       setUser(prevUser => ({
@@ -138,7 +138,7 @@ function SetupSockets() {
 
 
 
-    const ping_socket = setupSocket("http://localhost:1337");
+    const ping_socket = setupSocket(`${process.env.REACT_URL}:1337`);
 
     ping_socket.on("exception", (err) => {
       // Handle the error here
