@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, PropsWithChildren  } from 'react';
 
-export const PwdPopupContext = createContext({
-  pwdPopup: false,
+  interface MyContextType {
+  pwdPopup: boolean,
   setPwdPopup: React.Dispatch<React.SetStateAction<boolean>>
-});
+};
+
+export const PwdPopupContext  = createContext<MyContextType | undefined>(undefined);
 
 
 export const PwdPopupProvider = ({ children }: PropsWithChildren<{}>) => {

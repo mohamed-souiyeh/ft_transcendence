@@ -1,20 +1,25 @@
 import logo from "../../assets/Logo.svg"
 import { useState } from "react"
 import GroupMembers from "./groupMembers"
+import { useAddFriendsPopupContext } from "../../contexts/addFriendsPopupContext"
 
 function AddFriendsPopup() {
+  const {setAddFriendsPopup} = useAddFriendsPopupContext()
   const [createdGroup, setCreatedGroup] = useState({
     members: [],
   })
 
   const handleSubmit = (e : React.FormEvent) => {
     e.preventDefault()
-    console.log("salina")
+    console.log("Functionality isn't added yet !! i am just closing the popup as if we implemented submition action..")
+    //-------------Functionality needed here ...
+    //------------------------------------------
+    setAddFriendsPopup(false)
   }
 
   return (
-    <div className="h-screen w-screen bg-purple-sh-1 bg-opacity-30 backdrop-blur-sm absolute z-40 grid place-content-center" > 
-      <div className="h-[35rem] w-l-card-w bg-purple bg-opacity-20 p-4 rounded-xl ">
+    <div className="h-screen w-screen bg-purple-sh-1 bg-opacity-30 backdrop-blur-sm absolute z-40 grid place-content-center" onClick={() => {setAddFriendsPopup(false)}} > 
+      <div className="h-[35rem] w-l-card-w bg-purple bg-opacity-20 p-4 rounded-xl " onClick={(e) => {e.stopPropagation()}}>
         <div className="grid place-content-center h-11 py-2">
           <img src={logo} className="h-11 w-11" />
         </div>

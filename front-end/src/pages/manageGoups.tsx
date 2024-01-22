@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import Groups from "./components/groups";
 import SideBar from "./components/sidebar";
 import GroupMembers from "./components/groupMembers";
+import ProtectedRoomPopup from "./components/protectedRoomPopup";
+import { useProtectedRoomContext } from "../contexts/ProtectedRoomContext";
 
 function ManageGoups() {
   const [badInput, setBadInput] = useState({
@@ -10,6 +12,7 @@ function ManageGoups() {
     badPrv:false,
     badMembers:false,
   })
+  const {protectedRoom } = useProtectedRoomContext()
   const [val, setVal] = useState("")
   const [state, setState] = useState(false)
   const menuRef = useRef(null);
@@ -59,9 +62,9 @@ function ManageGoups() {
 
   const handleSubmit = (e : React.FormEvent) => {
     e.preventDefault()
-    console.log("submitting some data..")
-    console.log("_name:",createdGroup.name,'privacy:', createdGroup.privacy,'desc:', createdGroup.description)
-    console.log("pwd:",createdGroup.password, 'conf pwd:', confirmationPwd, 'members:', createdGroup.members)
+    // console.log("submitting some data..")
+    // console.log("_name:",createdGroup.name,'privacy:', createdGroup.privacy,'desc:', createdGroup.description)
+    // console.log("pwd:",createdGroup.password, 'conf pwd:', confirmationPwd, 'members:', createdGroup.members)
     if(!Object.keys(createdGroup.members).length){
       setBadInput({...badInput, badMembers: true})
     }
@@ -86,6 +89,7 @@ function ManageGoups() {
   return (
     <>
       <SideBar/>
+      { protectedRoom  && <ProtectedRoomPopup />}
       {/* --------------------------------{ JOIN  a Group }----------------------------------- */}
       <div className="h-screen w-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple flex gap-10 justify-center items-center">
         <div className="basis-1/4 h-[80%] ">

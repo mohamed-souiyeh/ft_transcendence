@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import AddFriendsPopup from './components/addFriendsPopup'
 import PwdPopup from './components/pwdPopup'
 import { PwdPopupProvider, usePwdPopupContext } from '../contexts/pwdPopupContext'
+import { useAddFriendsPopupContext } from '../contexts/addFriendsPopupContext'
 
 const mokDm = { id: 0, users: [{ id: 0, username: "test" }] };
 
@@ -55,7 +56,8 @@ function Chat() {
   const { dm, setDm } = useDmContext()
   const { channel, setChannel } = useChannelContext()
   const { user } = useContext(UserContext);
-  const { pwdPopup, setPwdPopup} = usePwdPopupContext()
+  const { pwdPopup} = usePwdPopupContext()
+  const {addFriendsPopup, setAddFriendsPopup} = useAddFriendsPopupContext()
 
 
   const setSelectedState = (id: number) => {
@@ -132,13 +134,13 @@ function Chat() {
 
   const navigate = useNavigate()
 
+
   return (
     <>
-      <PwdPopupProvider >
-        <SideBar />
-        { pwdPopup &&  <PwdPopup/> }
-        {/* <AddFriendsPopup /> */}
-        <div className='w-screen h-screen bg-purple-sh-2 flex flex-row'>
+      <SideBar />
+      { pwdPopup &&  <PwdPopup/> }
+      { addFriendsPopup && <AddFriendsPopup />}
+        <div className='w-screen h-screen bg-purple-sh-2 flex flex-row ' >
           <div className='basis-1/4 pl-20'>
 
             <div className={`${selected === subpages.NETWORK ? 'bg-[#48435E]' : 'bg-purple-sh-1'} p-4 my-5 rounded-lg hover:cursor-pointer focus:bg-purple`} onClick={() => setSelectedState(subpages.NETWORK)}>
@@ -186,7 +188,6 @@ function Chat() {
           </div>
 
         </div>
-      </PwdPopupProvider >
     </>
   )
 }
