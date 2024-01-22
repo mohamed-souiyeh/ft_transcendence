@@ -15,6 +15,8 @@ export const useSocket = (namespace: string): Socket | null  =>
     const socketIo = io(`${process.env.REACT_URL}:1337/${namespace}`, {withCredentials: true});
     setSocket(socketIo);
 
+    console.log(`Variablle value : ${process.env.REACT_URL}`);
+
     const kick = () => {
       Cookies.remove('user');
       console.log("kicking the bastard")

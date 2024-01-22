@@ -8,7 +8,7 @@ function Friends(props) {
   const {dm, setDm } = useDmContext();
 
   const handleChat = () => {
-    axios.post('${process.env.REACT_URL}:1337/conv/createDM', friend, {
+    axios.post(`${process.env.REACT_URL}:1337/conv/createDM`, friend, {
       withCredentials: true,
       }).then((res) => {
         refreshDms(true);

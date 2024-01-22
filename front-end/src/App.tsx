@@ -31,8 +31,12 @@ import './Toasts.css';
 const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
                 { withCredentials: true });
 
+
+                console.log(`Variablle value : ${process.env.REACT_URL}`);
+
 function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any, declineGame?:any})
 {
+
   const navigate = useNavigate();
 
   return (

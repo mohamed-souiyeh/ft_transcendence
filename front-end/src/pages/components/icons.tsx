@@ -41,7 +41,7 @@ function Icons(props) {
 
 
   const unfriend = () => {
-    axios.post('${process.env.REACT_URL}:1337/users/unfriend', {id: user.id}, {
+    axios.post(`${process.env.REACT_URL}:1337/users/unfriend`, {id: user.id}, {
       withCredentials: true
     }).then((res) => {
       if (unmount) {
@@ -62,7 +62,7 @@ function Icons(props) {
   }
 
   const blocUser = () => {
-    axios.post('${process.env.REACT_URL}:1337/users/block', {id: user.id}, {
+    axios.post(`${process.env.REACT_URL}:1337/users/block`, {id: user.id}, {
       withCredentials: true
     }).then((res) => {
       if (unmount) {
