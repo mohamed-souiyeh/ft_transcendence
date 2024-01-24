@@ -25,6 +25,7 @@ import ManageGoups from "./pages/manageGoups";
 import { PwdPopupProvider } from "./contexts/pwdPopupContext";
 import { AddFriendsPopupProvider } from "./contexts/addFriendsPopupContext";
 import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
+import Search from "./pages/search";
 
 
 
@@ -192,6 +193,7 @@ function App() {
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/userprofile" element={<UserProfile />} />
                         <Route path="/groups" element={<ManageGoups/>} />
+                        <Route path="/search" element={<Search/>} />
                         {/* <Route path="/game" element={<Game/>} /> */}
                       </Route>
                     </Routes>
