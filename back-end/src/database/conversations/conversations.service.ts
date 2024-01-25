@@ -523,4 +523,32 @@ export class ConversationsService {
 
     return channels.map(channel => new createChanneldto(channel));
   }
+
+
+
+  async joinChannel(channelId: number, userId: number): Promise<void> {
+    // Check if the channel and user exist
+    const channel = await this.prismaService.channel.findUnique({
+      where: { id: channelId },
+    });
+
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+
+  
+    await this.prismaService.channel.update({
+      where: { id: channelId },
+      data: {
+        users: {
+          connect: { id: userId },
+        },
+      },
+    });
+
+    // i need to think about user state :D here 
+
+  }
+
+
 }

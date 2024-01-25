@@ -26,6 +26,10 @@ import { SocketContext } from "./clientSocket";
 import { io } from 'socket.io-client';
 import 'react-toastify/dist/ReactToastify.css';
 import './Toasts.css';
+import { PwdPopupProvider } from "./contexts/pwdPopupContext";
+import { AddFriendsPopupProvider } from "./contexts/addFriendsPopupContext";
+import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
+import Search from "./pages/search";
 
 
 const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
@@ -74,6 +78,8 @@ function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any
   );
 }
 
+
+
 export const UserContext = createContext({
   user: {
     data: {},
@@ -93,7 +99,7 @@ function KickTheBastard() {
 
     const kick = () => {
       if (typeof user.chat.disconnect === 'function')
-        user.chat.disconnect();
+      user.chat.disconnect();
 
       setUser({ data: {} });
       // console.log("the user context is after seting it :", user);
@@ -219,40 +225,45 @@ function App() {
           <KickTheBastard />
           <DmProvider>
             <ChannelProvider>
-              <ToastContainer/>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<SignUp />} />
-                <Route path="/loading" element={<Loading />} />
-                <Route path="*" element={<NotFound />} />
-                <Route path="/2fa" element={<TwoFAConfirmation />} />
-                {/* Private Routes */}
-                <Route element={
-                  <>
-                    <RequireAuth/>
-                    <SetupSockets/>
-                  </>
-                }>
-                  <Route path="/home" element={
-                   <SocketContext.Provider value={game_socket}>
-                    <Home />
-                   </SocketContext.Provider>} />
-                  <Route path="/chat" element={<SocketContext.Provider value={game_socket}>
-                                                <Chat />
-                                              </SocketContext.Provider>} />
-                  <Route path="/setup" element={<Setup />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/userprofile" element={<UserProfile />} />
-                  <Route path="/groups" element={<ManageGoups/>} />
-                  <Route path="/game" element={
-                    <SocketContext.Provider value={game_socket}>
-                      <Game />
-                    </SocketContext.Provider>
-                  } />
-                  <Route path="/bot" element={<BotMode />} />
-                </Route>
-              </Routes>
+              <PwdPopupProvider >
+                <AddFriendsPopupProvider>
+                  <ProtectedRoomProvider >
+                  <ToastContainer/>
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route path="/" element={<LandingPage />} />
+                      <Route path="/login" element={<SignUp />} />
+                      <Route path="/loading" element={<Loading />} />
+                      <Route path="*" element={<NotFound />} />
+
+                      <Route path="/2fa" element={
+                        <TwoFAConfirmation />
+                      } />
+                      {/* Private Routes */}
+                      <Route element={
+                        <>
+                          <SetupSockets />
+                          <RequireAuth />
+                        </>
+                      }>
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/chat" element={<Chat />} />
+                        <Route path="/setup" element={<Setup />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/userprofile" element={<UserProfile />} />
+                        <Route path="/groups" element={<ManageGoups/>} />
+                        <Route path="/search" element={<Search/>} />
+                        <Route path="/game" element={
+                          <SocketContext.Provider value={game_socket}>
+                            <Game />
+                          </SocketContext.Provider>
+                        } />
+                        <Route path="/bot" element={<BotMode />} />
+                      </Route>
+                    </Routes>
+                  </ProtectedRoomProvider>
+                </AddFriendsPopupProvider>
+              </PwdPopupProvider >
             </ChannelProvider>
           </DmProvider>
         </BrowserRouter>

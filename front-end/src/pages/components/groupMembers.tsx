@@ -34,8 +34,8 @@ function GroupMembers({createdGroup, setCreatedGroup} : {createdGroup: { name: "
           </div>
           <div className='flex flex-row-reverse m-3 basis-1/3 items-center'>
             {friend.added ? 
-              <button onClick={() => removeMember(friend)} className="rounded-lg bg-purple-sh-2 h-10 w-28"> added </button> : 
-              <button onClick={() => addMember(friend)} className="rounded-lg bg-purple h-10 w-28"> add </button>
+              <button type="button" onClick={() => removeMember(friend)} className="rounded-lg bg-purple-sh-2 h-10 w-28"> added </button> : 
+              <button type="button" onClick={() => addMember(friend)} className="rounded-lg bg-purple h-10 w-28"> add </button>
             }
           </div>
         </div>
