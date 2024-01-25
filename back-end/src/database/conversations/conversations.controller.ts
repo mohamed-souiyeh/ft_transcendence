@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards, Query, Get } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards, Query, Get , ParseIntPipe, Delete} from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
 import { IRequestWithUser } from 'src/auth/Interfaces/IRequestWithUser';
@@ -47,4 +47,24 @@ export class ConversationsController {
 
 
   
+ 
+
+  @Post('/join')
+  async joinChannel(
+    @Body('channelId', ParseIntPipe) channelId: number,
+    @Body('userId', ParseIntPipe) userId: number,
+  ): Promise<void> {
+    await this.conversationService.addUserToChannel(channelId, userId);
+  }
+
+  @Delete('/leave')
+  async leaveChannel(
+    @Body('channelId', ParseIntPipe) channelId: number,
+    @Body('userId', ParseIntPipe) userId: number,
+  ): Promise<void> {
+    console.log("Je suis ici");
+    await this.conversationService.removeUserFromChannel(channelId, userId);
+  }
+
 }
+

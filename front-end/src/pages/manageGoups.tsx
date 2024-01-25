@@ -94,6 +94,7 @@ function ManageGoups() {
     {groupName: "Four", privacy: "Public", joined: false, id: 3},
   ]
 
+
   return (
     <>
       <SideBar/>
@@ -112,8 +113,10 @@ function ManageGoups() {
                   <input onChange={(e) => setVal(e.target.value)} type='text' placeholder="search for a group" className='h-12 p-3 bg-transparent cursor-text border-transparent outline-none placeholder:italic placeholder:text-purple/60'/>
                 </form>
               </div>
+
             <div className={`grid w-[100%] ${ !groupData.length && 'place-content-center'}`}>
-              {groupData.length ? groupData.map((grp) => <Groups groupName={grp.channelName} privacy={grp.type} joined={grp.users} key={grp.id}/>) : <p className="text-xl text-purple/50 p-5"> search for a group </p>}
+              
+              {groupData.length ? groupData.map((grp) => <Groups group={grp} key={grp.id} />) : <p className="text-xl text-purple/50 p-5"> search for a group </p>}
             </div>
 
           </div>
