@@ -20,7 +20,7 @@ export const useDmContext = () => {
   const context = useContext(DmContext);
 
   if (!context) {
-    throw new Error('useThemeContext must be used inside the ThemeProvider');
+    throw new Error('ThemeContext must be used inside the Provider');
   }
 
   return context;

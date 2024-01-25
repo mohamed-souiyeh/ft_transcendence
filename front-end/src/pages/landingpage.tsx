@@ -6,7 +6,7 @@ import About from "./components/About.tsx";
 
 function LandingPage() {
   return (
-    <div className="bg-purple-sh-1 w-screen  ml-5w-screen h-screen  ">
+    <div className="bg-purple-sh-1 ">
       <Hero />
       <About />
       <Team />
