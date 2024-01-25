@@ -3,9 +3,9 @@ import { useState } from "react"
 import { ProtectedRoomContext, useProtectedRoomContext } from "../../contexts/ProtectedRoomContext"
 
 function ProtectedRoomPopup() {
+  
   const [val, setVal] = useState("")
   const {setProtectedRoom} = useProtectedRoomContext()
-
 
 
   const handleSubmit = (e : React.FormEvent) => {
@@ -13,11 +13,11 @@ function ProtectedRoomPopup() {
     console.log("Functionality isn't added yet !! i am just closing the popup as if we implemented submition action..")
     //-------------Functionality needed here ...
     //------------------------------------------
+    
     setProtectedRoom(false)
-    console.log(val)
   }
 
-
+  
 
   return (
     <div className="h-screen w-screen bg-purple-sh-1 bg-opacity-40 backdrop-blur-sm absolute z-40 grid place-content-center" onClick={() => {setProtectedRoom(false)}} > 

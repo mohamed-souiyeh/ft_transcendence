@@ -4,6 +4,7 @@ import SideBar from "./components/sidebar";
 import GroupMembers from "./components/groupMembers";
 import ProtectedRoomPopup from "./components/protectedRoomPopup";
 import { useProtectedRoomContext } from "../contexts/ProtectedRoomContext";
+import axios from "axios";
 
 function ManageGoups() {
   const [badInput, setBadInput] = useState({
@@ -48,11 +49,18 @@ function ManageGoups() {
 
   }
 
+  const [groupData, setGroupData] = useState([]);
+
   const getGroups = (e : React.FormEvent) => {
     e.preventDefault()
-    console.log("list em", val)
-    if(!val)
-    console.log("no Value provided")
+    
+    axios.get(`http://localhost:1337/conv/search?prefix=${val}`)
+    .then(response => {
+      setGroupData(response.data);
+  console.log("response from channel is here :D" , response.data)    })
+    .catch(error => {
+      console.error('There was an error!', error);
+    });
   }
 
 
@@ -86,6 +94,7 @@ function ManageGoups() {
     {groupName: "Four", privacy: "Public", joined: false, id: 3},
   ]
 
+
   return (
     <>
       <SideBar/>
@@ -104,8 +113,10 @@ function ManageGoups() {
                   <input onChange={(e) => setVal(e.target.value)} type='text' placeholder="search for a group" className='h-12 p-3 bg-transparent cursor-text border-transparent outline-none placeholder:italic placeholder:text-purple/60'/>
                 </form>
               </div>
-            <div className={`grid w-[100%] ${ !FakeData.length && 'place-content-center'}`}>
-              {FakeData.length ? FakeData.map((grp) => <Groups groupName={grp.groupName} privacy={grp.privacy} joined={grp.joined} key={grp.id}/>) : <p className="text-xl text-purple/50 p-5"> search for a group </p>}
+
+            <div className={`grid w-[100%] ${ !groupData.length && 'place-content-center'}`}>
+              
+              {groupData.length ? groupData.map((grp) => <Groups group={grp} key={grp.id} />) : <p className="text-xl text-purple/50 p-5"> search for a group </p>}
             </div>
 
           </div>

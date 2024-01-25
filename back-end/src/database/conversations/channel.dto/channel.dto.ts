@@ -13,7 +13,10 @@ export class createChanneldto {
   
 
   channelDescription: string;
-  
+
+  @IsNotEmpty()
+  id : Number;
+
   @Exclude()
   channelPassword: string | null;
 

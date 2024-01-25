@@ -91,7 +91,7 @@ model channel {
   type ChannelType // type of channel
 
   channelName        String // name of the channel
-  channelImage       String // image of the channel
+  channelImage       String // image of the channel 
   channelDescription String // description of the channel
 
   channelPassword String? //NOTE - password of the channel need to be hashed
