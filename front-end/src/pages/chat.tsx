@@ -17,8 +17,11 @@ import AddFriendsPopup from './components/addFriendsPopup'
 import PwdPopup from './components/pwdPopup'
 import { PwdPopupProvider, usePwdPopupContext } from '../contexts/pwdPopupContext'
 import { useAddFriendsPopupContext } from '../contexts/addFriendsPopupContext'
+import Cookies from 'js-cookie';
 
-const mokDm = { id: 0, users: [{ id: 0, username: "test" }] };
+
+
+const mokDm = { id: 0, type: "dm", users: [{ id: 0, username: "test" }] };
 
 type dmType = typeof mokDm;
 
@@ -55,9 +58,9 @@ function Chat() {
   const [selected, setSelected] = useState(subpages.NETWORK)
   const { dm, setDm } = useDmContext()
   const { channel, setChannel } = useChannelContext()
-  const { user } = useContext(UserContext);
-  const { pwdPopup} = usePwdPopupContext()
-  const {addFriendsPopup, setAddFriendsPopup} = useAddFriendsPopupContext()
+  const { user, setUser } = useContext(UserContext);
+  const { pwdPopup } = usePwdPopupContext()
+  const { addFriendsPopup } = useAddFriendsPopupContext()
 
 
   const setSelectedState = (id: number) => {
@@ -80,6 +83,17 @@ function Chat() {
       }).catch((err) => {
         console.log("error in chat page: ", err);
       });
+
+    axios.get("http://localhost:1337/users/allforhome", {
+      withCredentials: true
+    })
+      .then((resp) => {
+        setUser(prevUser => ({ ...prevUser, data: resp.data }))
+        Cookies.set('user', JSON.stringify(resp.data));
+      })
+      .catch((err) => {
+        console.log("error while getting user data in chat refresh dms", err);
+      })
 
   }, [refreshDms])
 
@@ -111,11 +125,28 @@ function Chat() {
         setChannels(res.data.channels);
         setRefreshChannels(false);
         if (Object.keys(channel).length) {
-          setChannel(res.data.channels.find((refreshedChannel) => refreshedChannel.id === channel.id));
+          const current = res.data.channels.find((refreshedChannel) => refreshedChannel.id === channel.id);
+
+          console.log('current channel is: ', current);
+          if (current)
+            setChannel(current);
+          else
+            setChannel({});
         }
       }).catch((err) => {
         console.log("error in chat page: ", err);
       });
+
+    axios.get("http://localhost:1337/users/allforhome", {
+      withCredentials: true
+    })
+      .then((resp) => {
+        setUser(prevUser => ({ ...prevUser, data: resp.data }))
+        Cookies.set('user', JSON.stringify(resp.data));
+      })
+      .catch((err) => {
+        console.log("error while getting user data in chat refresh channels", err);
+      })
   }, [refreshChannels]);
 
 
@@ -180,7 +211,7 @@ function Chat() {
                   </MenuList>
                 </Menu>
               </div>
-              {(channels.length ? channels.map((channel) => <Channels currentChannel={channel} key={channel.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p>)}
+            {(channels.length ? channels.map((channel) => <Channels currentChannel={channel} key={channel.id} setRefreshChannels={setRefreshChannels }/>) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p>)}
             </div>
           </div>
           <div className='relative basis-2/3 m-5 '>

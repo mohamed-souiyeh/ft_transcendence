@@ -1,6 +1,6 @@
 import logo from "../../assets/Logo.svg"
 import { useState } from "react"
-import { ProtectedRoomContext, useProtectedRoomContext } from "../../contexts/ProtectedRoomContext"
+import { useProtectedRoomContext } from "../../contexts/ProtectedRoomContext"
 
 function ProtectedRoomPopup() {
   
@@ -13,14 +13,25 @@ function ProtectedRoomPopup() {
     console.log("Functionality isn't added yet !! i am just closing the popup as if we implemented submition action..")
     //-------------Functionality needed here ...
     //------------------------------------------
-    
-    setProtectedRoom(false)
+    if (!val)
+      return setProtectedRoom({
+        state: false,
+        password: undefined
+      })
+
+    setProtectedRoom({
+      state: false,
+      password: val
+    })
   }
 
   
 
   return (
-    <div className="h-screen w-screen bg-purple-sh-1 bg-opacity-40 backdrop-blur-sm absolute z-40 grid place-content-center" onClick={() => {setProtectedRoom(false)}} > 
+    <div className="h-screen w-screen bg-purple-sh-1 bg-opacity-40 backdrop-blur-sm absolute z-40 grid place-content-center" onClick={() => {setProtectedRoom({
+      state: false,
+      password: undefined
+    })}} > 
       <div className="h-l-card-h w-l-card-w bg-purple bg-opacity-20 p-4 rounded-xl grid place-content-center shadow-xl shadow-black/30" onClick={(e) => {e.stopPropagation()}}>
         <div className="grid place-content-center h-11 py-2">
           <img src={logo} className="h-16 w-16" />

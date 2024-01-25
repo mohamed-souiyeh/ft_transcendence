@@ -136,7 +136,18 @@ export class UsersController {
     return { message: 'user unfriended successfully' };
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('friends')
+  async getUserFriends(@Req() req: IRequestWithUser) {
+    const user = await this.userService.getUserFriends(req.user.id);
+
+    return user.friends;
+  }
+
+
 //! jojo's part
+
+  @UseGuards(JwtAuthGuard)
   @Get('search')
   async searchUsersByUsernamePrefix(@Query('prefix') prefix: string): Promise<any> {
     const users = await this.userService.searchUsersByUsernamePrefix(prefix);
@@ -155,6 +166,7 @@ export class UsersController {
     return finalUsers;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':userId/avatar')
   async getUserAvatar(@Param('userId', ParseIntPipe) userId: number, @Res() res: Response): Promise<void> {
     try {
@@ -167,6 +179,7 @@ export class UsersController {
 
 
 
+  @UseGuards(JwtAuthGuard)
   @Get('Public_data/:username')
   async getUserByUsername(@Param('username') username: string): Promise<any> {
     try {
@@ -177,6 +190,7 @@ export class UsersController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('leaderboard')
   async getLeaderboard(): Promise<any> {
     try {

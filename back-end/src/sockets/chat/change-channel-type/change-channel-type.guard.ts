@@ -64,12 +64,6 @@ export class ChangeChannelTypeGuard implements CanActivate {
         error: 'Unauthorized operation'
         , message: 'you are not the owner of the channel'
       });
-
-    if (conv.type === data.newType)
-      throw new WsException({
-        error: 'Unauthorized operation'
-        , message: 'the channel is already of this type'
-      });
     
     if (data.newType === ChannelType.protected && data.password === undefined)
       throw new WsException({

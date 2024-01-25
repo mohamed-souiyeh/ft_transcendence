@@ -21,10 +21,15 @@ function ManageGoups() {
   const [createdGroup, setCreatedGroup] = useState({
     name: "",
     privacy:"",
-    password:"",
+    password: undefined,
     description: "",
     members: [],
   })
+
+
+  useEffect(() => {
+    console.log("manage groups page is mounted");
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -50,11 +55,35 @@ function ManageGoups() {
   }
 
   const [groupData, setGroupData] = useState([]);
+  const [refreshGroups, setRefreshGroups] = useState(false);
+
+  useEffect(() => {
+    if (!val) return setGroupData([]);
+
+
+    axios.get(`http://localhost:1337/conv/search?prefix=${val}`, {
+      withCredentials: true,
+    })
+      .then(response => {
+        setGroupData(response.data);
+        console.log("response from channel is here :D", response.data)
+      })
+      .catch(error => {
+        console.error('There was an error!', error);
+      });
+      setRefreshGroups(false);
+
+  }, [refreshGroups])
 
   const getGroups = (e : React.FormEvent) => {
     e.preventDefault()
     
-    axios.get(`http://localhost:1337/conv/search?prefix=${val}`)
+    if (!val) return setGroupData([]);
+
+
+    axios.get(`http://localhost:1337/conv/search?prefix=${val}`, {
+      withCredentials: true,
+    })
     .then(response => {
       setGroupData(response.data);
   console.log("response from channel is here :D" , response.data)    })
@@ -76,7 +105,7 @@ function ManageGoups() {
     if(!Object.keys(createdGroup.members).length){
       setBadInput({...badInput, badMembers: true})
     }
-    if(createdGroup.privacy === "Protected" && (createdGroup.password != confirmationPwd || !createdGroup.password)) {
+    if(createdGroup.privacy === "protected" && (createdGroup.password != confirmationPwd || !createdGroup.password)) {
       setBadInput({...badInput, badPwd: true})
     }
     if(!createdGroup.privacy) {
@@ -98,7 +127,7 @@ function ManageGoups() {
   return (
     <>
       <SideBar/>
-      { protectedRoom  && <ProtectedRoomPopup />}
+      { protectedRoom.state  && <ProtectedRoomPopup />}
       {/* --------------------------------{ JOIN  a Group }----------------------------------- */}
       <div className="h-screen w-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple flex gap-10 justify-center items-center">
         <div className="basis-1/4 h-[80%] ">
@@ -116,7 +145,7 @@ function ManageGoups() {
 
             <div className={`grid w-[100%] ${ !groupData.length && 'place-content-center'}`}>
               
-              {groupData.length ? groupData.map((grp) => <Groups group={grp} key={grp.id} />) : <p className="text-xl text-purple/50 p-5"> search for a group </p>}
+              {groupData.length ? groupData.map((grp) => <Groups group={grp} refreshGroups={setRefreshGroups} key={grp.id} />) : <p className="text-xl text-purple/50 p-5"> search for a group </p>}
             </div>
 
           </div>
@@ -148,19 +177,19 @@ function ManageGoups() {
                 { badInput.badPrv && <p className="text-[#D9534F] font-bold text-sm" > Please choose privacy </p> }
                 { state && 
                   <div ref={menuRef} className="border border-purple  shadow-xl shadow-purple-sh-2 bg-purple-sh-0 rounded-lg mt-1 absolute w-72">
-                    <div onClick={() => {setPrivacy("Public")}} className="hover:bg-purple-sh-1 hover:cursor-pointer rounded-lg p-2">
+                    <div onClick={() => {setPrivacy("public")}} className="hover:bg-purple-sh-1 hover:cursor-pointer rounded-lg p-2">
                       Public
                     </div>
-                    <div onClick={() => {setPrivacy("Protected")}} className="hover:bg-purple-sh-1  hover:cursor-pointer rounded-lg p-2">
+                    <div onClick={() => {setPrivacy("protected")}} className="hover:bg-purple-sh-1  hover:cursor-pointer rounded-lg p-2">
                       Protected
                     </div>
-                    <div onClick={() => {setPrivacy("Private")}} className="hover:bg-purple-sh-1 rounded-lg p-2 hover:cursor-pointer ">
+                    <div onClick={() => {setPrivacy("private")}} className="hover:bg-purple-sh-1 rounded-lg p-2 hover:cursor-pointer ">
                       Private
                     </div>
                   </div>
                 }
 
-                { createdGroup.privacy === "Protected" &&                 
+                { createdGroup.privacy === "protected" &&                 
                   <div >
                     <p className="text-2xl pt-3" > Password: </p>
                     <input type="password" name="password" placeholder="enter password" onChange={handleInputChange} className="bg-purple-sh-0 rounded-lg w-72 h-12 focus:outline-none p-2 placeholder:text-impure-white/30 " />

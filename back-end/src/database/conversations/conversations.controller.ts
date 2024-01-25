@@ -37,7 +37,7 @@ export class ConversationsController {
   }
 
 
-
+  @UseGuards(JwtAuthGuard)
   @Get('search')
   async searchChannels(@Query('prefix') prefix: string): Promise<createChanneldto[]> {
     const channels = await this.conversationService.searchChannels(prefix);
@@ -48,16 +48,26 @@ export class ConversationsController {
 
   
  
-
+  @UseGuards(JwtAuthGuard)
   @Post('/join')
   async joinChannel(
     @Body('channelId', ParseIntPipe) channelId: number,
     @Body('userId', ParseIntPipe) userId: number,
+    @Body('password') password: string,
   ): Promise<void> {
-    await this.conversationService.addUserToChannel(channelId, userId);
+    
+    console.log("---------------------");
+    console.log(channelId);
+    console.log(userId);
+    console.log(password);
+    console.log("Je suis ici");
+
+
+    await this.conversationService.joinChannel(channelId, userId, password);
   }
 
-  @Delete('/leave')
+  @UseGuards(JwtAuthGuard)
+  @Post('/leave')
   async leaveChannel(
     @Body('channelId', ParseIntPipe) channelId: number,
     @Body('userId', ParseIntPipe) userId: number,

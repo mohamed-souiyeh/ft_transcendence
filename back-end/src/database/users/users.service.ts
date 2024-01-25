@@ -131,7 +131,12 @@ export class UsersService {
         id: userId,
       },
       select: {
-        friends: true,
+        friends: {
+          select: {
+            id: true,
+            username: true,
+          }
+        },
       }
     });
 
