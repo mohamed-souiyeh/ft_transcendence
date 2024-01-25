@@ -40,10 +40,18 @@ export class gameServer implements OnModuleInit {
 	}
 
 	async handleConnection(client: Socket) {
+		 
 		console.log("Client connected to gamegateway", client.id);
 		let user = await this.gameService.chatService.getUserFromSocket(client);
 		if (user == null)
 			return;
+		let userStatus: string = await this.userService.getStatus(user.id);
+		console.log("Status ", userStatus);
+		if (userStatus == "busy") {
+			console.log("Already queuing");
+			this.server.to(`${client.id}`).emit("alreadyQueuing");
+			return;
+		}
 		client.join(`${user.id}`);
 	}
 

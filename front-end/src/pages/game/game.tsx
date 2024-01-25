@@ -43,6 +43,7 @@ function Game()
 
   useEffect(() => 
   {
+    socket.emit("queuing");
     const handleWinner = (v: boolean) => { setWinState(v); };
     const handleLeaveGame = () => { navigate("/home"); };
     const handleAlreadyPlaying = () => { navigate("/home"); };

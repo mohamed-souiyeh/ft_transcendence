@@ -45,7 +45,7 @@ function Home() {
             <div 
               onClick={
                 () => {
-                  game_socket.emit("queuing");
+                  // game_socket.emit("queuing");
                   navigate("/game");
                 }
               } 
