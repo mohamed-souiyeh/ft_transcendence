@@ -30,17 +30,14 @@ import { PwdPopupProvider } from "./contexts/pwdPopupContext";
 import { AddFriendsPopupProvider } from "./contexts/addFriendsPopupContext";
 import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
 import Search from "./pages/search";
+import axios from "axios";
 
 
 const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
                 { withCredentials: true });
-
-
-                console.log(`Variablle value : ${process.env.REACT_URL}`);
-
+             
 function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any, declineGame?:any})
 {
-
   const navigate = useNavigate();
 
   return (
@@ -78,8 +75,6 @@ function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any
   );
 }
 
-
-
 export const UserContext = createContext({
   user: {
     data: {},
@@ -87,13 +82,13 @@ export const UserContext = createContext({
     chatException: {},
     requests: {},
     ping: {},
+    avatar: {},
   }, setUser: React.Dispatch<React.SetStateAction<boolean>>
 });
 
 function KickTheBastard() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
-  // console.log("the user context is in kick the bastard :", user);
 
   useEffect(() => {
 
@@ -122,6 +117,19 @@ function SetupSockets() {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
 
+
+  axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
+  { responseType: 'arraybuffer' })
+  .then((res) =>
+  {
+    const blob = new Blob([res.data], {type: 'image/jpeg'});
+    const url = URL.createObjectURL(blob);
+    setUser(prevUser => ({...prevUser, avatar: url}));
+  }).catch((err) => {
+    console.log("Ooooooopsiii ", err.message);
+  });
+
+
   game_socket.on("inviteAccepted", ()=>{
     navigate("/game");
   })
@@ -146,11 +154,10 @@ function SetupSockets() {
       game_socket.emit('declinePlayingInvite', roomID);
     }
 
-
-
     const ping_socket = setupSocket(`${process.env.REACT_URL}:1337`);
 
-    ping_socket.on("exception", (err) => {
+    ping_socket.on("exception", (err) =>
+    {
       // Handle the error here
       setUser(prevUser => ({
         ...prevUser,
@@ -206,14 +213,17 @@ function App() {
 
   //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
 
+
+
+  
   // const navigate = useNavigate();
   useEffect(() => {
     const userData = Cookies.get('user');
 
-
+    
     if (userData) {
       //prevUser => ({...prevUser, data: resp.data})
-
+      
       setUser(prevUser => ({ ...prevUser, data: JSON.parse(userData) }));
     }
   }, []);

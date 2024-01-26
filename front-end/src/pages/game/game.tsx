@@ -21,18 +21,15 @@ function Game()
 {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reff = useRef<Cube | null>(null);
+  let user = useContext(UserContext);
   let [score1, setScore1] = useState(0);
   let [score2, setScore2] = useState(0);
-  let [leftPic, setLeftPic] = useState(pic);
   let [gameState, setState] = useState(false);
   let [win, setWinState] = useState(true);
-  let [profileImage, setImage] = useState('');
   let [foundMatch, setMatchState] = useState(false);
   let navigate = useNavigate();
   const frameRef = useRef<number>(0);
-  let formdata = new FormData();
-  console.log(gameState);
-  
+
   const socket = useContext(SocketContext);
 
   const leaveGame = () => {
@@ -56,7 +53,6 @@ function Game()
     };
     if (socket)
     {
-      // socket.emit("queuing");
       socket.on("winner", handleWinner);
       socket.on("leaveGame", handleLeaveGame);
       socket.on("alreadyPlaying", handleAlreadyPlaying);
@@ -111,7 +107,8 @@ function Game()
     ball.prevPositions.y = first.vector3D.y + 0.5;
     ball.prevPositions.z = -0.01;
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', (e) => 
+    {
       if (e.code == 'Space')
       {
         if (!ballLaunched)
@@ -293,11 +290,10 @@ function Game()
           <div style={{textAlign:"center",
                       font:"status-bar",
                       height: "100%"}}>
-          {/* <h1>{gameState}</h1>s */}
           {<Profile score = {score1}
                     score2= {score2}
-                    pic1={leftPic}
-                    pic2={leftPic}/>}
+                    pic1={user.user.avatar}
+                    pic2={user.user.avatar}/>}
           <canvas style={{right:"300px",
                           width: "100%",
                           height: "100%"}} 
