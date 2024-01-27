@@ -36,43 +36,37 @@ export default function Hero() {
   return (
 
     <div className="flex m-10">
+
       <div className="flex basis-1/2">
         <div className="grid"> 
-
-          <div className="flex h-10 pl-5"> 
-            <p className="text-purple text-7xl font-extrabold p-0 mb-0 mr-3"> Dive </p>
-            <p className="text-7xl font-extrabold">  Into The Most </p>
+          <div className="flex-col pl-5"> 
+            <p className="text-purple text-6xl font-extrabold p-0 m-0 leading-none"> Dive Into The Most </p>
+            <p className="text-6xl  font-extrabold">  Exciting Pong Game.</p>
           </div>
-          <div className="flex pl-5"> 
-            <p className="text-7xl font-extrabold">  Exciting </p>
-            <p className="text-purple text-7xl font-extrabold ml-3">  Pong Game. </p>
-          </div>
-
-          <p className="text-justify text-lg pl-5 h-20"> 
+          <p className="text-justify mr-0 m-5 text-lg "> 
             Ready to serve up an epic win? <br /> 
             Dive into our new web game - a ping pong crafted by 
             passionate players just like you. <br /> 
             Experience the thrill of the rally, perfected through teamwork and 
             dedication.
           </p>
-
-          <div className="flex h-10"> 
+          <div className="flex "> 
             <button className="mr-5" onClick={() => {navigate("/home")}}> 
               <IconButtom val="Play Now" /> 
             </button>
           </div>
         </div>
       </div>
+
       <div className="flex flex-row-reverse basis-1/2 mr-10">
         <img 
           src={pong} 
-          className="h-auto ms-auto -mt-10 animate-trans-right" 
+          className="animate-trans-right" 
           alt="Pong Game Image" 
         /> 
       </div>
 
     </div>
-
   );
 }
 
