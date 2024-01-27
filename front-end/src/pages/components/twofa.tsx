@@ -91,7 +91,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
       })
       .catch((e) => {
         // console.log('an Error occured!!', e.response.data.message);
-        // setConfirmed(false)
+        setConfirmed(false)
       })
     // console.log('Code inserted by user is:', Code);
   }
@@ -124,7 +124,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
               <form onSubmit={verifyCode} action='' className=" grid place-self-center ">
                 <input type='text' name="verfCode" placeholder="Enter verification code" className='w-48 h-12 bg-purple-sh-2 outline-none rounded-lg text-impure-white px-2 place-self-center' />
                 <div className="grid h-7">
-                  { !confirmed && <p className="ml-12 text-sm text-[#D9534F] font-extrabold"> Wrong code! Try again. </p> }
+                  { !confirmed && <p className="ml-12 text-sm text-[#D9534F] font-extrabold"> Error! Please Try again. </p> }
                 </div>
                 <div className="flex place-content-center gap-3 pt-1">
                   <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2"  type="submit" value="Send" > Confirm </button>
