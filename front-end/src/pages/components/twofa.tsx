@@ -13,7 +13,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
 
 
   useEffect(() => {
-  // if (!codeFetched) {
+    // if (!codeFetched) {
     axios.get("http://localhost:1337/2fa/generate",
       {
         withCredentials: true,
@@ -52,7 +52,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
           Cookies.set('user',JSON.stringify(user.data));
         }
       })
-    .catch( (err) => {
+      .catch( (err) => {
         // console.log("dang an error: ", err)
       })
   }
@@ -117,7 +117,9 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
           }
           {!enable && !switchValue && <>
             <div className="grid place-content-center py-5 place-self-center">
-              <p className="text-cente place-self-center"> Please scan the QR code to enable 2fa </p>
+              <p className="text-cente place-self-center">Please Use this
+                <a className="m-1 text-purple-sh-2 hover:text-purple-sh-1" href="https://play.google.com/store/apps/details?id=two.factor.authenticator.generator.code" target="_blank">App</a>
+                to enable 2fa </p>
               <img src={qrCode} className="w-40 h-40 my-4 place-self-center"/>
               <form onSubmit={verifyCode} action='' className=" grid place-self-center ">
                 <input type='text' name="verfCode" placeholder="Enter verification code" className='w-48 h-12 bg-purple-sh-2 outline-none rounded-lg text-impure-white px-2 place-self-center' />
