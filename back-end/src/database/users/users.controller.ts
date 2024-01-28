@@ -200,6 +200,12 @@ export class UsersController {
   async hasSentNotification(@Query('receiverId') Id: number, @Req() req: IRequestWithUser): Promise<any> {
     return this.userService.hasSentNotification(req.user.id, Id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('check_notification')
+  async getBlockedStatus(@Query('otherUserId') otherUserId: number, @Req() req: IRequestWithUser): Promise<any> {
+    return this.userService.getBlockStatus(req.user.id, otherUserId);
+  }
   
   //!
 

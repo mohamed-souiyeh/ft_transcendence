@@ -680,11 +680,56 @@ export class UsersService {
         receiverId,
       },  
     });
+
+    const friendship = await this.prismaService.user.findFirst({
+      where: {
+        id: senderId,
+        friends: {
+          some: {
+            id: receiverId,
+          },
+        },
+      },
+    });
   
     return {
       IsPending: !!notification,
-      Notification: notification
+      Notification: notification,
+      isFriend: !!friendship,
       }; 
   }
+
+
+
+  async getBlockStatus(userId: number, otherUserId: number): Promise<any> {
+    const hasBlocked = await this.prismaService.user.findFirst({
+      where: {
+        OR: [
+          {
+            id: userId,
+            blockedUsers: {
+              some: {
+                id: otherUserId,
+              },
+            },
+          },
+          {
+            id: userId,
+            blockedBy: {
+              some: {
+                id: otherUserId,
+              },
+            },
+          },
+        ],
+      },
+    });
+  
+    return {
+      isBlocked:!!hasBlocked
+    };
+
+  }
+  
   // !
 }
