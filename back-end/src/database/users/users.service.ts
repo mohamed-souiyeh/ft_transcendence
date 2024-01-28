@@ -698,5 +698,38 @@ export class UsersService {
       isFriend: !!friendship,
       }; 
   }
+
+
+
+  async getBlockStatus(userId: number, otherUserId: number): Promise<any> {
+    const hasBlocked = await this.prismaService.user.findFirst({
+      where: {
+        OR: [
+          {
+            id: userId,
+            blockedUsers: {
+              some: {
+                id: otherUserId,
+              },
+            },
+          },
+          {
+            id: userId,
+            blockedBy: {
+              some: {
+                id: otherUserId,
+              },
+            },
+          },
+        ],
+      },
+    });
+  
+    return {
+      isBlocked:!!hasBlocked
+    };
+
+  }
+  
   // !
 }
