@@ -574,11 +574,17 @@ export class UsersService {
 
 
   //! Jojo's section
-  async searchUsersByUsernamePrefix(prefix: string): Promise<UserDto[]> {
+  async searchUsersByUsernamePrefix(prefix: string, authenticatedUserId: number): Promise<UserDto[]> {
     const users = await this.prismaService.user.findMany({
       where: {
         username: {
           startsWith: prefix,
+        },  
+
+        blockedBy: {
+          none: {
+            id: authenticatedUserId,
+          },
         },
       },
     });
@@ -667,6 +673,18 @@ export class UsersService {
     return leaderboard;
   }
 
-
+  async hasSentNotification(senderId: number, receiverId: number): Promise<any> {
+    const notification = await this.prismaService.notification.findFirst({
+      where: {
+        senderId,
+        receiverId,
+      },  
+    });
+  
+    return {
+      IsPending: !!notification,
+      Notification: notification
+      }; 
+  }
   // !
 }
