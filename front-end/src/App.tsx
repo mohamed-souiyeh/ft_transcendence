@@ -26,6 +26,8 @@ import { PwdPopupProvider } from "./contexts/pwdPopupContext";
 import { AddFriendsPopupProvider } from "./contexts/addFriendsPopupContext";
 import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
 import Search from "./pages/search";
+import { useAvatarContext } from "./contexts/avatar";
+import locale from "antd/es/date-picker/locale/en_US";
 
 
 
@@ -142,12 +144,12 @@ function App() {
     requests: {},
   });
 
+  const {setAvatar} = useAvatarContext()
   //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
 
   // const navigate = useNavigate();
   useEffect(() => {
     const userData = Cookies.get('user');
-
 
     if (userData) {
       //prevUser => ({...prevUser, data: resp.data})
@@ -155,6 +157,11 @@ function App() {
       setUser(prevUser => ({ ...prevUser, data: JSON.parse(userData) }));
     }
 
+
+    const userAvatar = localStorage.getItem('avatar')
+    if (userAvatar) {
+      setAvatar(userAvatar)
+    }
 
   }, []);
 

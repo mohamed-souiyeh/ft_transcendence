@@ -1,13 +1,13 @@
 import NavBar from "./components/navbar";
 import SideBar from "./components/sidebar";
 import Popup from "./components/twofa";
-import  img  from "../assets/taha.jpg";
 import trophy from "../assets/trophy.png";
 import star from "../assets/star.png";
 import games from "../assets/controller.png"
 import { Switch, ConfigProvider } from "antd";
 import { useContext, useState } from "react";
 import { UserContext } from "../App";
+import { useAvatarContext } from "../contexts/avatar";
 
 
 
@@ -15,10 +15,11 @@ import { UserContext } from "../App";
 function Profile () {
 
 
-
+  const {avatar} = useAvatarContext()
   const {user} = useContext(UserContext)
   const [switchValue, setSwitchValue] = useState(user.data.TFAisEnabled);
   const [prompt, setPrompt] = useState(false);
+
 
   return(
     <>
@@ -32,19 +33,19 @@ function Profile () {
         <div className="bg-purple bg-opacity-10 backdrop-blur-lg border-[1px] border-purple/20 h-64 mt-20 mb-16 rounded-3xl flex">
           <div className="grid place-content-center">
             <div className="bg-purple-sh-2 m-12 rounded-full h-48 w-48 grid place-content-center ">
-              <img className="rounded-full h-44 w-44" src={img} />
+              <img className="rounded-full h-44 w-44" src={avatar} />
             </div>
           </div >
           <div className=" m-6 grid place-content-center">
             <p className="text-2xl m-2"> Nickname </p>
-            <p className="text-2xl m-2"> Current level </p>
-            <p className="text-2xl m-2"> Rank on server </p>
+            <p className="text-2xl m-2"> Level </p>
+            <p className="text-2xl m-2"> Matches</p>
             <p className="text-2xl m-2"> 2fa state </p>
           </div>
           <div className=" m-6 grid place-content-center">
             <p className="text-2xl m-2">:  {user.data.username}</p>
-            <p className="text-2xl m-2">:  20</p>
-            <p className="text-2xl m-2">:  05</p>
+            <p className="text-2xl m-2">:  {user.data.score}</p>
+            <p className="text-2xl m-2">:  {user.data.matchesPlayed}</p>
             <div className="flex ">
               <p className="text-2xl m-2">:  </p>
               <div className="pt-3">

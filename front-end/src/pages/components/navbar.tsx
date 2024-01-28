@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import pic from '../../assets/taha.jpg'
+import { useAvatarContext } from '../../contexts/avatar'
 
 function NavBar() {
+  const {avatar} = useAvatarContext()
   return (
     <>
       <div className="absolute top-0 right-0 flex gap-1">
@@ -22,7 +23,7 @@ function NavBar() {
 
         <Link to = "/profile">
           <div className=" h-12 w-12 grid place-content-center ">
-            <img className="h-11 w-11 rounded-full" src={pic}/>
+            <img className="h-11 w-11 rounded-full" src={avatar}/>
           </div>
         </Link>
 

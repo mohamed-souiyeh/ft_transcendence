@@ -88,7 +88,7 @@ export const useChannelContext = () => {
   const context = useContext(ChannelContext);
 
   if (!context) {
-    throw new Error('useThemeContext must be used inside the ThemeProvider');
+    throw new Error('Context must be used inside the Provider');
   }
 
   return context;

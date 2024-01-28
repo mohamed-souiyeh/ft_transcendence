@@ -3,6 +3,7 @@ import { UserContext } from "../App"
 import axios from "axios"
 import {useNavigate} from "react-router-dom"
 import Cookies from 'js-cookie';
+import { useAvatarContext } from "../contexts/avatar";
 
 
 
@@ -12,6 +13,7 @@ import Cookies from 'js-cookie';
 function Loading() {
 
   const {user, setUser}  = useContext(UserContext)
+  const {setAvatar} = useAvatarContext()
   const navigate = useNavigate();
 
   axios.get("http://localhost:1337/users/allforhome", {
@@ -20,17 +22,40 @@ function Loading() {
     .then((resp) => {
       setUser(prevUser => ({ ...prevUser, data: resp.data }))
       Cookies.set('user', JSON.stringify(resp.data) );
+      setAvararFunction(resp.data.id)
       if (!user.data.isProfileSetup){
-        // console.log('hhhhhhh')
         navigate("/setup")
       }
       else
-        navigate("/home")
+      navigate("/home")
     })
-    .catch((err)=> {
-      // console.log("My sad potato we have an error:", err)
+    .catch(()=> {
       navigate("/login")
     })
+
+
+  const setAvararFunction = (id : string) => { 
+    axios.get("http://localhost:1337/users/"+ id+ '/avatar',
+      {
+        withCredentials: true,
+        responseType: 'arraybuffer'
+      })
+      .then((response) => {
+        if (response.status == 200) {
+          let image = btoa(
+            new Uint8Array(response.data)
+              .reduce((data, byte) => data + String.fromCharCode(byte), '')
+          );
+
+          const base64Image =`data:${response.headers['content-type'].toLowerCase()};base64,${image}` 
+
+          setAvatar(base64Image)
+          localStorage.setItem('avatar', base64Image);
+        }
+      }).catch((err) => {
+        console.log("an error occured in Loading.tsx while trying to get the avatar ", err)
+      });
+  }
 
   return (
     <>
