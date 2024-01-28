@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState , useContext} from "react";
 import taha from "../assets/taha.jpg"
 import Navbar from "./components/navbar";
 import SearchResaults from "./components/searchResaults";
 import SideBar from "./components/sidebar";
+import { UserContext } from "../App";
 
 function Search() {
   const [val, setVal] = useState("")
+
 
   var FakeData = [
     {name: 'joe', state: 'notAdded', id: 1},
@@ -15,7 +17,7 @@ function Search() {
 
   const getFriends = (e: React.FormEvent) =>{
     e.preventDefault()
-    console.log("searching for: ", val)
+    console.log("search for :", val)  
   } 
 
   return (

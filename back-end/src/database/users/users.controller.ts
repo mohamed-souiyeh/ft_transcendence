@@ -138,9 +138,12 @@ export class UsersController {
   }
 
 //! jojo's part
+  @UseGuards(JwtAuthGuard)
   @Get('search')
-  async searchUsersByUsernamePrefix(@Query('prefix') prefix: string): Promise<any> {
-    const users = await this.userService.searchUsersByUsernamePrefix(prefix);
+  async searchUsersByUsernamePrefix(@Query('prefix') prefix: string, @Req() req: IRequestWithUser): Promise<any> {
+
+    console.log("prefix => ", prefix);
+    const users = await this.userService.searchUsersByUsernamePrefix(prefix, req.user.id);
 
     const finalUsers = users.map((user) => {
       return {
@@ -155,6 +158,9 @@ export class UsersController {
 
     return finalUsers;
   }
+
+  
+
 
   @Get(':userId/avatar')
   async getUserAvatar(@Param('userId', ParseIntPipe) userId: number, @Res() res: Response): Promise<void> {
@@ -189,6 +195,11 @@ export class UsersController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('check_notification')
+  async hasSentNotification(@Query('receiverId') Id: number, @Req() req: IRequestWithUser): Promise<any> {
+    return this.userService.hasSentNotification(req.user.id, Id);
+  }
   
   //!
 
