@@ -26,6 +26,7 @@ import { PwdPopupProvider } from "./contexts/pwdPopupContext";
 import { AddFriendsPopupProvider } from "./contexts/addFriendsPopupContext";
 import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
 import Search from "./pages/search";
+import NotFoundPage from "./pages/notfoundpage";
 
 
 
@@ -191,7 +192,9 @@ function App() {
                         <Route path="/chat" element={<Chat />} />
                         <Route path="/setup" element={<Setup />} />
                         <Route path="/profile" element={<Profile />} />
-                        <Route path="/userprofile" element={<UserProfile />} />
+                        <Route path="/:username" element={<UserProfile />} />
+                        <Route path="/not-found" element={<NotFoundPage />} />
+                        {/* <Route path="/userprofile" element={<UserProfile />} /> */}
                         <Route path="/groups" element={<ManageGoups/>} />
                         <Route path="/search" element={<Search/>} />
                         {/* <Route path="/game" element={<Game/>} /> */}
