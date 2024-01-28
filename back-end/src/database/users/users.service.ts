@@ -680,10 +680,22 @@ export class UsersService {
         receiverId,
       },  
     });
+
+    const friendship = await this.prismaService.user.findFirst({
+      where: {
+        id: senderId,
+        friends: {
+          some: {
+            id: receiverId,
+          },
+        },
+      },
+    });
   
     return {
       IsPending: !!notification,
-      Notification: notification
+      Notification: notification,
+      isFriend: !!friendship,
       }; 
   }
   // !
