@@ -120,7 +120,10 @@ function SetupSockets() {
 
 
   axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
-  { responseType: 'arraybuffer' })
+  { 
+    withCredentials: true,
+    responseType: 'arraybuffer' 
+  })
   .then((res) =>
   {
     const blob = new Blob([res.data], {type: 'image/jpeg'});
