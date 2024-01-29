@@ -5,6 +5,7 @@ import { Strategy } from 'passport-google-oauth20';
 import { UsersService } from 'src/database/users/users.service';
 import { UserDto } from '../../database/users/User_DTO/User.dto';
 import { UserStatus } from '@prisma/client';
+import { join } from 'path';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -25,6 +26,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     //FIXME - look for the case of the profile returned by google is empty
     // const { id, name, emails } = profile;
 
+    const cwd = process.cwd();
     const user: UserDto = {
       id: null,
       provider: 'google',
@@ -33,7 +35,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       machesPlayed: 0,
       status: UserStatus.online,
       friendRequests: false,
-      avatar: process.env.DEFAULT_AVATAR,
+      avatar: join(cwd, process.env.DEFAULT_AVATAR),
       email: profile._json.email,
       activeRefreshToken: null,
       redirectUrl: null,

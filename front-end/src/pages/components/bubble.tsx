@@ -10,7 +10,11 @@ function Bubble(props) {
   const navigate = useNavigate()
   const { user } = useContext(UserContext);
   const { isBanned } = props;
-  let isAdmin = true;
+  let isAdmin = false;
+
+  // console.log("userInfo: ", props.authorInfo);
+  // console.log("userState: ", props.authorState);
+
 
   if (Object.keys(channel).length) {
     isAdmin = (channel.usersState.find(fuser => fuser.userId === user.data.id)?.role === "modirator" || channel.usersState.find(fuser => fuser.userId === user.data.id)?.role === "owner") && !isBanned;
@@ -22,27 +26,86 @@ function Bubble(props) {
   }
 
   const setAsAdmin = () => {
-    console.log("oh you got promoted, now back to work promoted slave")
+
+    if (user.chat) {
+      user.chat.emit('giveAdminRole', {
+        convType: channel.type,
+        convId: channel.id,
+        targetedUserId: props.authorInfo.id,
+      });
+    }
   }
 
+  const removeAdmin = () => {
+    if (user.chat) {
+      user.chat.emit('removeAdminRole', {
+        convType: channel.type,
+        convId: channel.id,
+        targetedUserId: props.authorInfo.id,
+      });
+    }
+  }
+
+
   const kickUser = () => {
-    console.log("bye bye")
+    if (user.chat) {
+      user.chat.emit('kickUser', {
+        convType: channel.type,
+        convId: channel.id,
+        targetedUserId: props.authorInfo.id,
+      });
+    }
   }
 
   const ban = () => {
-    console.log("for ever bye bye ??")
+    if (user.chat) {
+      const now: Date = new Date();
+
+      now.setFullYear(now.getFullYear() + 1);
+
+
+      user.chat.emit('banUser', {
+        convType: channel.type,
+        convId: channel.id,
+        targetedUserId: props.authorInfo.id,
+        until: now.toISOString(),
+      });
+    }
   }
 
   const unban = () => {
-    console.log("unbaned");
+    if (user.chat) {
+      user.chat.emit('unbanUser', {
+        convType: channel.type,
+        convId: channel.id,
+        targetedUserId: props.authorInfo.id,
+      });
+    }
   }
 
   const mute = () => {
-    console.log("SHUT UPP MEG!")
+    if (user.chat) {
+      const now: Date = new Date();
+
+      now.setFullYear(now.getFullYear() + 1);
+
+      user.chat.emit('muteUser', {
+        convType: channel.type,
+        convId: channel.id,
+        targetedUserId: props.authorInfo.id,
+        until: now.toISOString(),
+      });
+    }
   }
 
   const unmute = () => {
-    console.log("unmuted");
+    if (user.chat) {
+      user.chat.emit('unmuteUser', {
+        convType: channel.type,
+        convId: channel.id,
+        targetedUserId: props.authorInfo.id,
+      });
+    } console.log("unmuted");
   }
 
   return (
@@ -52,7 +115,7 @@ function Bubble(props) {
           <div className="grid max-w-[70%]">
             <div className="flex p-3 pb-0" >
               {/* make username clickable */}
-              {Object.keys(channel).length ?
+              {Object.keys(channel).length && props.authorInfo.role !== "kicked" ?
 
                 <Menu>
                   <MenuHandler>
@@ -62,14 +125,33 @@ function Bubble(props) {
                   </MenuHandler>
                   <MenuList className="bg-purple-sh-2 border border-purple">
                     <MenuItem onClick={() => { visitProfile() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Visit profile</MenuItem>
-                    {isAdmin && <MenuItem onClick={() => { setAsAdmin() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Set as admin</MenuItem>}
-                    {isAdmin && <MenuItem onClick={() => { ban() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Ban user</MenuItem>}
+                    {isAdmin &&
+                      (props.authorInfo.role === "modirator" ?
+                        <MenuItem onClick={() => { removeAdmin() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Remove admin</MenuItem>
+                        : <MenuItem onClick={() => { setAsAdmin() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Set as admin</MenuItem>)}
+                    {isAdmin &&
+                      (props.authorState === "banned" ?
+                        <MenuItem onClick={() => { unban() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">unban user</MenuItem>
+                        : <MenuItem onClick={() => { ban() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Ban user</MenuItem>)
+                    }
+                    {
+                      (isAdmin && props.authorState !== "banned") &&
+                      (props.authorState === "muted" ?
+                        <MenuItem onClick={() => { unmute() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">unmute user</MenuItem>
+                        : <MenuItem onClick={() => { mute() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Mute for 10 mins</MenuItem>)
+                    }
+
+
+
                     {isAdmin && <MenuItem onClick={() => { kickUser() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Kick user</MenuItem>}
-                    {isAdmin && <MenuItem onClick={() => { mute() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Mute for 10 mins</MenuItem>}
                   </MenuList>
                 </Menu>
                 :
-                <p className="text-purple-tone-2 font-bold"> {props.username} </p>
+                <p className="text-purple-tone-2 font-bold"> {
+                  props.authorInfo.role === "kicked" ?
+                    `kicked user (${props.username})`
+                    :
+                  props.username} </p>
               }
             </div>
             <div className='flex bg-purple rounded-b-xl rounded-tr-xl p-2 m-3 mt-0 break-words shadow-xl'>

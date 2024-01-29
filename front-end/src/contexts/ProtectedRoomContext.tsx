@@ -1,15 +1,24 @@
-import React, { createContext, useContext, useState, PropsWithChildren  } from 'react';
+import React, { createContext, useContext, useState, PropsWithChildren } from 'react';
 
-  interface MyContextType {
-  protectedRoom: boolean,
-  setProtectedRoom: React.Dispatch<React.SetStateAction<boolean>>
+
+type ProtectedRoom = {
+  state: boolean,
+  password: string | undefined,
 };
 
-export const ProtectedRoomContext  = createContext<MyContextType | undefined>(undefined);
+interface MyContextType {
+  protectedRoom: ProtectedRoom,
+  setProtectedRoom: React.Dispatch<React.SetStateAction<ProtectedRoom>>
+};
+
+export const ProtectedRoomContext = createContext<MyContextType | undefined>(undefined);
 
 
 export const ProtectedRoomProvider = ({ children }: PropsWithChildren<{}>) => {
-  const [protectedRoom, setProtectedRoom] = useState(false);
+  const [protectedRoom, setProtectedRoom] = useState<ProtectedRoom>({
+    state: false,
+    password: undefined,
+  });
 
   return (
     <ProtectedRoomContext.Provider value={{ protectedRoom, setProtectedRoom }}>

@@ -335,6 +335,37 @@ export class UsersService {
     return user;
   }
 
+
+  async removeNotification(userId: number, otherUserId: number): Promise<any> {
+    const notification = await this.prismaService.notification.findFirst({
+      where: {
+        senderId: otherUserId,
+        receiverId: userId,
+      }
+    });
+
+    if (notification)
+      await this.prismaService.notification.delete({
+        where: {
+          id: notification.id,
+        }
+      });
+    
+    const otherNotification = await this.prismaService.notification.findFirst({
+      where: {
+        senderId: userId,
+        receiverId: otherUserId,
+      }
+    });
+
+    if (otherNotification)
+      await this.prismaService.notification.delete({
+        where: {
+          id: otherNotification.id,
+        }
+      });
+  }
+
   async blockUser(userId: number, blockedUserId: number): Promise<any> {
     const findUser = await this.findUserById(userId);
     const findBlockedUser = await this.findUserById(blockedUserId);
@@ -342,7 +373,12 @@ export class UsersService {
     if (findUser === null || findBlockedUser === null)
       throw new NotFoundException('User not found');
 
+    //TODO - we need to check if there is a notification too and remove it
+
     await this.removeFriendship(userId, blockedUserId);
+
+    await this.removeNotification(userId, blockedUserId);
+
     const user = await this.prismaService.user.update({
       where: {
         id: userId,
@@ -500,6 +536,7 @@ export class UsersService {
   }
 
   async updateAvatar(id: number, avatar: any): Promise<any> {
+    // console.log("avatar => ", avatar);
     const user = await this.prismaService.user.update({
       where: {
         id: id,
@@ -705,7 +742,7 @@ export class UsersService {
     });
   
     return {
-      IsPending: !!notification,
+      isPending: !!notification,
       Notification: notification,
       isFriend: !!friendship,
       }; 
@@ -713,7 +750,7 @@ export class UsersService {
 
 
 
-  async getBlockStatus(userId: number, otherUserId: number): Promise<any> {
+  async getBlockStatus(userId: number, otherUserUsername: string): Promise<any> {
     const hasBlocked = await this.prismaService.user.findFirst({
       where: {
         OR: [
@@ -721,7 +758,7 @@ export class UsersService {
             id: userId,
             blockedUsers: {
               some: {
-                id: otherUserId,
+                username: otherUserUsername,
               },
             },
           },
@@ -729,7 +766,7 @@ export class UsersService {
             id: userId,
             blockedBy: {
               some: {
-                id: otherUserId,
+                username: otherUserUsername,
               },
             },
           },
@@ -738,7 +775,7 @@ export class UsersService {
     });
   
     return {
-      isBlocked:!!hasBlocked
+      isBlocked: !!hasBlocked
     };
 
   }

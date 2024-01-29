@@ -15,11 +15,7 @@ function Friends(props) {
         console.log("dm created");
         console.log("dm is: ", res.data);
 
-        setDm({
-          id: res.data.id,
-          username: friend.username,
-          userId: friend.id,
-        })
+        setDm(res.data)
       }).catch((err) => {
         console.log("error in creating dm: ", err);
       });

@@ -44,6 +44,10 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
       server.to(`${guestID}`).emit('private',
         roomID, user.username);
     });
+
+    eventBus.on('reconnect', async (id: number) => {
+      server.to(`${id}`).emit('reconnect');
+    });
   }
 
   async handleConnection(client: Socket) {

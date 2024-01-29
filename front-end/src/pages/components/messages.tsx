@@ -45,6 +45,7 @@ function Messages() {
   
   useEffect(() => {
     const setIntervalId: NodeJS.Timeout = setInterval(() => {
+      // console.log("dm is: ", dm);
       user.chat.timeout(1000).emit('checkDmpls', {
         convId: dm.id,
         convType: dm.type,
@@ -63,7 +64,7 @@ function Messages() {
     return () => {
       clearInterval(setIntervalId);
     }
-  }, []);
+  }, [dm]);
 
 
   useEffect(() => {

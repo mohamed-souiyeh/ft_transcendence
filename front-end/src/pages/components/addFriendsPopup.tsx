@@ -1,18 +1,43 @@
 import logo from "../../assets/Logo.svg"
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import GroupMembers from "./groupMembers"
 import { useAddFriendsPopupContext } from "../../contexts/addFriendsPopupContext"
+import { UserContext } from "../../App"
+import { useChannelContext } from "../../contexts/channelContext"
 
 function AddFriendsPopup() {
   const {setAddFriendsPopup} = useAddFriendsPopupContext()
-  const [createdGroup, setCreatedGroup] = useState({
+  const [createdGroup, setCreatedGroup] = useState<{
+    members: {
+      id: number,
+      username: string,
+      added: boolean,
+    }[],
+  }>({
     members: [],
-  })
+  });
+
+  const { channel } = useChannelContext();
+
+  const { user } = useContext(UserContext);
+
+  useEffect(() => {
+    console.log("createdGroup: ", createdGroup);
+  }, [createdGroup])
 
   const handleSubmit = (e : React.FormEvent) => {
     e.preventDefault()
-    console.log("Functionality isn't added yet !! i am just closing the popup as if we implemented submition action..")
+    // console.log("Functionality isn't added yet !! i am just closing the popup as if we implemented submition action..")
     //-------------Functionality needed here ...
+    if (user.chat) {
+      for (const member of createdGroup.members) {
+        user.chat.emit('addUser', {
+          convId: channel.id,
+          convType: channel.type,
+          targetedUserId: member.id,
+        });
+      }
+    }
     //------------------------------------------
     setAddFriendsPopup(false)
   }
@@ -28,7 +53,7 @@ function AddFriendsPopup() {
         </div>
           <form onSubmit={handleSubmit} className=" h-[22rem]">
             <div className="h-[100%] border-4 rounded-lg border-purple-sh-1 overflow-y-scroll scrollbar-thin scrollbar-thumb-purple-sh-0  py-2">
-              <GroupMembers createdGroup={createdGroup} setCreatedGroup={setCreatedGroup}/>
+              <GroupMembers createdGroup={createdGroup} setCreatedGroup={setCreatedGroup} isChannel={true}/>
             </div>
             <div className="grid place-content-center my-4">
               <button type="submit" className="bg-purple hover:bg-purple-tone-1 hover:text-purple-sh-1 rounded-lg "> Confirm Changes </button>

@@ -32,7 +32,7 @@ import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
 import Search from "./pages/search";
 import NotFoundPage from "./pages/notfoundpage";
 import axios from "axios";
-
+//TODO - channel doesnt send msgs and the users dont get added in the channel creation
 
 const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
                 { withCredentials: true });
@@ -120,7 +120,10 @@ function SetupSockets() {
 
 
   axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
-  { responseType: 'arraybuffer' })
+  { 
+    withCredentials: true,
+    responseType: 'arraybuffer' 
+  })
   .then((res) =>
   {
     const blob = new Blob([res.data], {type: 'image/jpeg'});
@@ -166,12 +169,29 @@ function SetupSockets() {
       }));
       // console.log(err); // Prints the error message
     });
-
+    
     const setIntervalId = setInterval(() =>
     {
       ping_socket.emit('ping');
     }, 3 * 60 * 1000);
+    
+    
+    //TODO - this maybe broken it need testing because the notification event is sent from the main gateway not the chat gateway
+    ping_socket.on("notification", (msg) => {
+      console.log("notification msg is :", msg);
+      //TODO - here we need to create the logic to start the notification logic
+      //TODO - mark the network icon in the sidebar with a small red dot
+      //TODO - and send a toastify notification
+      toast(`${msg.from} sent u a friend request`);
+    });
 
+    ping_socket.on('reconnect', () => {
+      console.log("reconnected");
+      ping_socket.disconnect();
+      ping_socket.connect();
+      chat_socket.disconnect();
+      chat_socket.connect();
+    })
     ping_socket.on('private', (roomID:number,username:string) => 
     {
       const message = username + " Invited you to a game in room " + roomID + " !";
@@ -189,7 +209,9 @@ function SetupSockets() {
     console.log("the user context is in setup sockets :", user);
     return () => {
       ping_socket.disconnect();
+      ping_socket.off();
       chat_socket.disconnect();
+      chat_socket.off();
       clearInterval(setIntervalId);
     };
   }, []);

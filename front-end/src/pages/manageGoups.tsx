@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Groups from "./components/groups";
 import SideBar from "./components/sidebar";
 import GroupMembers from "./components/groupMembers";
 import ProtectedRoomPopup from "./components/protectedRoomPopup";
 import { useProtectedRoomContext } from "../contexts/ProtectedRoomContext";
 import axios from "axios";
+import { UserContext } from "../App";
+import Cookies from 'js-cookie';
+
 
 function ManageGoups() {
   const [badInput, setBadInput] = useState({
@@ -21,10 +24,16 @@ function ManageGoups() {
   const [createdGroup, setCreatedGroup] = useState({
     name: "",
     privacy:"",
-    password:"",
+    password: undefined,
     description: "",
     members: [],
-  })
+  });
+  const [refreshMembers, setRefreshMembers] = useState(false);
+
+
+  useEffect(() => {
+    console.log("manage groups page is mounted");
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -50,11 +59,35 @@ function ManageGoups() {
   }
 
   const [groupData, setGroupData] = useState([]);
+  const [refreshGroups, setRefreshGroups] = useState(false);
+  const { user, setUser } = useContext(UserContext)
+  useEffect(() => {
+    if (!val) return setGroupData([]);
+
+
+    axios.get(`http://localhost:1337/conv/search?prefix=${val}`, {
+      withCredentials: true,
+    })
+      .then(response => {
+        setGroupData(response.data);
+        console.log("response from channel is here :D", response.data)
+      })
+      .catch(error => {
+        console.error('There was an error!', error);
+      });
+      setRefreshGroups(false);
+
+  }, [refreshGroups])
 
   const getGroups = (e : React.FormEvent) => {
     e.preventDefault()
     
-    axios.get(`http://localhost:1337/conv/search?prefix=${val}`)
+    if (!val) return setGroupData([]);
+
+
+    axios.get(`http://localhost:1337/conv/search?prefix=${val}`, {
+      withCredentials: true,
+    })
     .then(response => {
       setGroupData(response.data);
   console.log("response from channel is here :D" , response.data)    })
@@ -75,30 +108,63 @@ function ManageGoups() {
     // console.log("pwd:",createdGroup.password, 'conf pwd:', confirmationPwd, 'members:', createdGroup.members)
     if(!Object.keys(createdGroup.members).length){
       setBadInput({...badInput, badMembers: true})
+      return ;
     }
-    if(createdGroup.privacy === "Protected" && (createdGroup.password != confirmationPwd || !createdGroup.password)) {
+    if(createdGroup.privacy === "protected" && (createdGroup.password != confirmationPwd || !createdGroup.password)) {
       setBadInput({...badInput, badPwd: true})
+      return ;
     }
     if(!createdGroup.privacy) {
       setBadInput({...badInput, badPrv: true})
+      return ;
     }
     if(!createdGroup.name) {
       setBadInput({...badInput, badName: true})
+      return ;
     }
+    // console.log("this is what should be sent:", createdGroup);
+    axios.post("http://localhost:1337/conv/createChannel", {
+      channelName: createdGroup.name,
+      channelDescription: createdGroup.description,
+      type: createdGroup.privacy,
+      channelPassword: createdGroup.password,
+      members: createdGroup.members,
+    }, {
+      withCredentials: true,
+    })
+      .then(response => {
+        setCreatedGroup({
+          name: "",
+          privacy:"",
+          password: undefined,
+          description: "",
+          members: [],
+        })
+        axios.get("http://localhost:1337/users/allforhome", {
+          withCredentials: true
+        })
+          .then((resp) => {
+            console.log("refreshed the user data: ", resp);
+            setUser(prevUser => ({ ...prevUser, data: resp.data }))
+            Cookies.set('user', JSON.stringify(resp.data));
+            setRefreshGroups(true)
+          })
+          .catch((err) => {
+            console.log("error while getting user data in groops", err);
+          })
+        setRefreshMembers(true)
+        console.log("response from creat channel is here: ", response.data)
+      })
+      .catch(error => {
+        console.error('There was an error!: ', error);
+      });
   }
-
-  var FakeData = [
-    {groupName: "One", privacy: "Protected", joined: false, id: 0},
-    {groupName: "Two", privacy: "Public", joined: false, id: 1},
-    {groupName: "Three", privacy: "Public", joined: false, id: 2},
-    {groupName: "Four", privacy: "Public", joined: false, id: 3},
-  ]
 
 
   return (
     <>
       <SideBar/>
-      { protectedRoom  && <ProtectedRoomPopup />}
+      { protectedRoom.state  && <ProtectedRoomPopup />}
       {/* --------------------------------{ JOIN  a Group }----------------------------------- */}
       <div className="h-screen w-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple flex gap-10 justify-center items-center">
         <div className="basis-1/4 h-[80%] ">
@@ -116,7 +182,7 @@ function ManageGoups() {
 
             <div className={`grid w-[100%] ${ !groupData.length && 'place-content-center'}`}>
               
-              {groupData.length ? groupData.map((grp) => <Groups group={grp} key={grp.id} />) : <p className="text-xl text-purple/50 p-5"> search for a group </p>}
+              {groupData.length ? groupData.map((grp) => <Groups group={grp} refreshGroups={setRefreshGroups} key={grp.id} />) : <p className="text-xl text-purple/50 p-5"> search for a group </p>}
             </div>
 
           </div>
@@ -148,19 +214,19 @@ function ManageGoups() {
                 { badInput.badPrv && <p className="text-[#D9534F] font-bold text-sm" > Please choose privacy </p> }
                 { state && 
                   <div ref={menuRef} className="border border-purple  shadow-xl shadow-purple-sh-2 bg-purple-sh-0 rounded-lg mt-1 absolute w-72">
-                    <div onClick={() => {setPrivacy("Public")}} className="hover:bg-purple-sh-1 hover:cursor-pointer rounded-lg p-2">
+                    <div onClick={() => {setPrivacy("public")}} className="hover:bg-purple-sh-1 hover:cursor-pointer rounded-lg p-2">
                       Public
                     </div>
-                    <div onClick={() => {setPrivacy("Protected")}} className="hover:bg-purple-sh-1  hover:cursor-pointer rounded-lg p-2">
+                    <div onClick={() => {setPrivacy("protected")}} className="hover:bg-purple-sh-1  hover:cursor-pointer rounded-lg p-2">
                       Protected
                     </div>
-                    <div onClick={() => {setPrivacy("Private")}} className="hover:bg-purple-sh-1 rounded-lg p-2 hover:cursor-pointer ">
+                    <div onClick={() => {setPrivacy("private")}} className="hover:bg-purple-sh-1 rounded-lg p-2 hover:cursor-pointer ">
                       Private
                     </div>
                   </div>
                 }
 
-                { createdGroup.privacy === "Protected" &&                 
+                { createdGroup.privacy === "protected" &&                 
                   <div >
                     <p className="text-2xl pt-3" > Password: </p>
                     <input type="password" name="password" placeholder="enter password" onChange={handleInputChange} className="bg-purple-sh-0 rounded-lg w-72 h-12 focus:outline-none p-2 placeholder:text-impure-white/30 " />
@@ -181,7 +247,7 @@ function ManageGoups() {
                 <div className="border-4 rounded-lg border-purple-sh-1 h-[80%] overflow-y-scroll scrollbar-thin scrollbar-thumb-purple-sh-0 p-4">
                   {/* <div className={`grid w-[100%] ${ !FakeData.length && 'place-content-center'}  `}> */}
                     {/* {FakeData.length ? FakeData.map((grp) => <GroupMembers userName={grp.groupName} added={grp.joined} key={grp.id}/>) : <p className="text-xl text-purple/50 p-5"> You have no friends </p>} */}
-                  <GroupMembers createdGroup={createdGroup} setCreatedGroup={setCreatedGroup}/>
+                  <GroupMembers refreshMembers={refreshMembers} setRefreshMembers={setRefreshMembers} createdGroup={createdGroup} setCreatedGroup={setCreatedGroup}/>
                   {/* </div> */}
                 </div>
                     {badInput.badMembers && <p className="text-[#D9534F] pl-1 font-bold text-sm" > Please add some members </p> }
