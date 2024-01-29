@@ -8,7 +8,7 @@ import Game from "./pages/game/game";
 import LandingPage from "./pages/landingpage";
 import Setup from "./pages/userSetup";
 import RequireAuth from "./pages/components/requireAuth";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react"; 
 import { createContext } from "react";
 import TwoFAConfirmation from "./pages/twofaconfirm";
 import Loading from "./pages/loading";
@@ -32,6 +32,7 @@ import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
 import Search from "./pages/search";
 import NotFoundPage from "./pages/notfoundpage";
 import axios from "axios";
+import NotFoundPage from "./pages/notfoundpage";
 
 
 const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
@@ -267,15 +268,18 @@ function App() {
                   <Route path="/search" element={<Search/>} />
                   <Route path="/setup" element={<Setup />} />
                   <Route path="/profile" element={<Profile />} />
-                  <Route path="/userprofile" element={<UserProfile />} />
+                  <Route path="/:username" element={<UserProfile />} />
                   <Route path="/groups" element={<ManageGoups/>} />
+                  <Route path="/search" element={<Search/>} />
+                  <Route path="/not-found" element={<NotFoundPage />} />
                   <Route path="/game" element={
                     <SocketContext.Provider value={game_socket}>
                       <Game />
                     </SocketContext.Provider>
                   } />
                   <Route path="/bot" element={<BotMode />} />
-                </Route>
+                      </Route>
+                    </Routes>
                   </ProtectedRoomProvider>
                 </AddFriendsPopupProvider>
               </PwdPopupProvider >
