@@ -73,7 +73,7 @@ function Chat() {
   useEffect(() => {
     console.log("user: ", user);
     console.log("dms refreshed");
-    axios.get('http://localhost:1337/conv/dms',
+    axios.get(`${process.env.REACT_URL}:1337/conv/dms`,
       {
         withCredentials: true,
       }).then((res) => {
@@ -116,7 +116,7 @@ function Chat() {
 
   useEffect(() => {
     console.log("channels refreshed");
-    axios.get('http://localhost:1337/conv/channels',
+    axios.get(`${process.env.REACT_URL}:1337/conv/channels`,
       {
         withCredentials: true,
       }).then((res) => {

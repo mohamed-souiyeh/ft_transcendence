@@ -172,6 +172,7 @@ export class UsersController {
       // console.log("avatarPath => ", avatarPath);
       res.sendFile(avatarPath);
     } catch (error) {
+      console.log(error);
       throw new NotFoundException('Utilisateur ou Avatar non trouvé');
     }
   }

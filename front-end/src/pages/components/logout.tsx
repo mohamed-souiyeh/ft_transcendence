@@ -11,7 +11,7 @@ function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
   const {user, setUser} = useContext(UserContext)
 
   const logout = () => {
-    axios.get("http://localhost:1337/auth/logout", {
+    axios.get(`${process.env.REACT_URL}:1337/auth/logout`, {
       withCredentials: true
     })
     .then((resp) => {

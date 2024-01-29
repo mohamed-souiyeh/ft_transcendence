@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { useChannelContext } from "../../contexts/channelContext"
+import { SocketContext } from "../../clientSocket"
 import GroupsIcons from "./groupsIcons"
 
 const mokChannel = {

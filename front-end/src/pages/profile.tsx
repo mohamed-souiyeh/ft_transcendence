@@ -6,11 +6,11 @@ import trophy from "../assets/trophy.png";
 import star from "../assets/star.png";
 import games from "../assets/controller.png"
 import { Switch, ConfigProvider } from "antd";
-import { useContext, useState } from "react";
+import { useState, useContext } from "react";
+import newComerPic from "../assets/newcomer.png";
+import playerPic from "../assets/player.png";
+import veteranPic from "../assets/veteran.png";
 import { UserContext } from "../App";
-
-
-
 
 function Profile () {
 
@@ -19,6 +19,10 @@ function Profile () {
   const {user} = useContext(UserContext)
   const [switchValue, setSwitchValue] = useState(user.data.TFAisEnabled);
   const [prompt, setPrompt] = useState(false);
+  const [qrCode, setCode] = useState(null);
+  const isNewComer = true;
+  const isPlayer = false;
+  const isVeteran = false;
 
   return(
     <>
@@ -60,41 +64,16 @@ function Profile () {
           </div>
         </div>
 
-        <div className="h-32 flex place-content-center mb-16">
-          <div className="bg-purple bg-opacity-10 border-[1px] border-purple/30 h-44 w-44 mx-8 mt-2 rounded-3xl grid place-content-center hover:bg-opacity-30">
-            <div className="grid place-content-center">
-              <img className="h-28 w-28 pt-2" src={star} />
-            </div>
-            <div className="grid place-content-center pt-5">
-              <p className="text-xl text-purple-tone-2 text-opacity-50">Achievs</p>
-            </div>
-          </div>
-          <div className="bg-purple bg-opacity-10 backdrop-blur-lg border-[1px] border-purple/30 h-48 w-48 mx-8 rounded-3xl grid place-content-center hover:bg-opacity-30">
-            <div className="grid place-content-center">
-              <img className="h-28 w-28 pt-2" src={trophy} />
-            </div>
-            <div className="grid place-content-center pt-9">
-              <p className="text-xl text-purple-tone-2 text-opacity-50">Wins</p>
-            </div>
-          </div>
-          <div className="bg-purple bg-opacity-10 border-[1px] border-purple/30 h-44 w-44 mx-8 mt-2 rounded-3xl grid place-content-center hover:bg-opacity-30">
-            <img className="h-28 w-28 pt-2" src={games} />
-            <div className="grid place-content-center pt-5">
-              <p className="text-xl text-purple-tone-2 text-opacity-50">Matchs</p>
-            </div>
-          </div>
-        </div>
-
 
         <div className="flex  overflow-hidden mt-16">
 
-          <div className="grid justify-center mx-4">
+          <div className="grid justify-center mx-5">
             <div className="h-[100%]  w-[500px] rounded-t-3xl overflow-hidden">
               <div className="bg-purple-sh-2 h-[100%]  w-[500px] rounded-t-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1 ">
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
-                  <p className="text-xl text-purple-tone-2 text-opacity-50">Matchs History:</p>
+                  <p className="text-xl text-purple-tone-2 text-opacity-100">Matchs History:</p>
                 </div>
-                <p className=" text-2xl text-impure-white text-opacity-50"> Player Vs Player</p> 
+
                 {/* we need a component for opponents, that will show their name, image, and score from that match*/}
               </div>
             </div>
@@ -104,14 +83,32 @@ function Profile () {
             <div className="h-[100%]  w-[350px] rounded-t-3xl overflow-hidden">
               <div className="bg-purple-sh-2 h-[100%]  w-[350px] rounded-t-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1">
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
-                  <p className="text-xl text-purple-tone-2 text-opacity-50">acheivements:</p>
+                  <p className="text-xl text-purple-tone-2 text-opacity-100">acheivements:</p>
                 </div>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
-                <p className="text-xl text-purple-tone-2 text-opacity-50">acheivement</p>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img style={{
+                      width: '60px',
+                      filter: !isNewComer ? 'sepia(100%)': 'none',
+                    }} src={newComerPic} />
+                    {isNewComer && (<h1 style={{fontSize:"35px"}}>New comer</h1>)}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img style={{
+                      width: '60px',
+                      filter: !isPlayer ? 'sepia(100%)': 'none',
+                    }} src={playerPic} />
+                    {isPlayer && (<h1 style={{fontSize:"35px"}}>Player</h1>)}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img style={{
+                      width: '60px',
+                      filter: !isVeteran ? 'sepia(100%)': 'none',
+                    }} src={veteranPic} />
+                    {isVeteran && (<h1 style={{fontSize:"35px"}}>Veteran</h1>)}
+                  </div>
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </>

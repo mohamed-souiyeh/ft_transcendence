@@ -14,7 +14,7 @@ export function setupSocket(url: string) {
     // Handle the error here
     console.log("this is the 401 socket event error : ", err);
 
-    axios.get("http://localhost:1337/auth/refresh", {
+    axios.get(`${process.env.REACT_URL}:1337/auth/refresh`, {
       withCredentials: true
     }).then(() => {
       console.log("Token refreshed in socket!")

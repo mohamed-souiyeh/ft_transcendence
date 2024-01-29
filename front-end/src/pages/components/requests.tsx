@@ -8,7 +8,7 @@ function Requests(props) {
   const sender = request.sender;
 
   const acceptRequest = () => {
-    axios.post('http://localhost:1337/notifications/friend-request/accept',request , {
+    axios.post(`${process.env.REACT_URL}:1337/notifications/friend-request/accept`,request , {
       withCredentials: true,
     }).then(() => {
       console.log("friend request accepted");
@@ -19,7 +19,7 @@ function Requests(props) {
   };
 
   const declineRequest = () => {
-    axios.post('http://localhost:1337/notifications/friend-request/refuse',request, {
+    axios.post(`${process.env.REACT_URL}:1337/notifications/friend-request/refuse`,request, {
       withCredentials: true,
     }).then(() => {
       console.log("friend request declined");
@@ -30,7 +30,7 @@ function Requests(props) {
   };
 
   const blockUser = () => {
-    axios.post('http://localhost:1337/notifications/friend-request/block',request, {
+    axios.post(`${process.env.REACT_URL}:1337/notifications/friend-request/block`,request, {
       withCredentials: true,
     }).then(() => {
       console.log("friend request blocked");

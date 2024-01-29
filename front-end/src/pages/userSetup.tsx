@@ -60,7 +60,7 @@ function Setup()
       formdata.set("avatar", srcImg);
 
     axios.
-      post("http://localhost:1337/users/update", formdata,
+      post(`${process.env.REACT_URL}:1337/users/update`, formdata,
         {
           withCredentials: true
         })
@@ -72,7 +72,7 @@ function Setup()
           // navigate("/home");
           // ----------------------
 
-          axios.get("http://localhost:1337/users/allforhome", {
+          axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
             withCredentials: true
           })
             .then((resp) => {
