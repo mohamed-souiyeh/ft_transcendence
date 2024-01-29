@@ -38,7 +38,7 @@ function Profile () {
           </div >
           <div className=" m-6 grid place-content-center">
             <p className="text-2xl m-2"> Nickname </p>
-            <p className="text-2xl m-2"> Level </p>
+            <p className="text-2xl m-2"> Score </p>
             <p className="text-2xl m-2"> Matches</p>
             <p className="text-2xl m-2"> 2fa state </p>
           </div>
