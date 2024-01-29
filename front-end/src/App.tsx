@@ -32,7 +32,6 @@ import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
 import Search from "./pages/search";
 import NotFoundPage from "./pages/notfoundpage";
 import axios from "axios";
-import NotFoundPage from "./pages/notfoundpage";
 
 
 const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
