@@ -169,6 +169,7 @@ export class UsersController {
       const avatarPath = await this.userService.getUserAvatar(userId);
       res.sendFile(join(cwd, avatarPath));
     } catch (error) {
+      console.log(error);
       throw new NotFoundException('Utilisateur ou Avatar non trouvé');
     }
   }

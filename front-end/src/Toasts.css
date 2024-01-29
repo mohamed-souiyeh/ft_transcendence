@@ -1,0 +1,19 @@
+
+.Toastify__toast {
+  background: linear-gradient(to right, rgb(173, 145, 223), rgb(159, 104, 247));}
+
+  .Toastify__toast-body {
+    color: white;
+    font-weight: bold;
+    text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
+  }
+
+.Toastify__progress-bar {
+  background: rgb(70, 39, 121) !important;
+}
+
+.Toastify__toast {
+  pointer-events: none;
+}
+
+

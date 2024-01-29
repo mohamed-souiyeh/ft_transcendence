@@ -17,7 +17,7 @@ function TwoFAConfirmation () {
     const Code = e.target.verfCode.value; 
     formdata.set("code", Code);
 
-    axios.post("http://localhost:1337/2fa/verify", formdata ,{
+    axios.post(`${process.env.REACT_URL}:1337/2fa/verify`, formdata ,{
       withCredentials: true, 
       headers:{
         'Content-Type' : 'multipart/formdata'

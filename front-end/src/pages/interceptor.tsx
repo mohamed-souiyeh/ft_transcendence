@@ -3,5 +3,5 @@
 // import axios from "axios";
 
 // export let apiGlobal = axios.create({
-//     baseURL: "http://localhost:1337"
+//     baseURL: `${process.env.REACT_URL}:1337"
 // });

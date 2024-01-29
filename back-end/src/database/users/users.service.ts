@@ -75,6 +75,18 @@ export class UsersService {
 
   //SECTION - READ OPERATIONS
 
+  async getScore(id: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: id,
+      }
+    });
+
+    if (user === null) throw new NotFoundException('User not found');
+
+    return user.score;
+  }
+
 
   async getNetworkData(userId: number) {
     const user = await this.prismaService.user.findUnique({

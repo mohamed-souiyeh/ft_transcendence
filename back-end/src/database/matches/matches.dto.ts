@@ -12,7 +12,7 @@ export class MatchDto {
     endedAt: Date;
 
     mode: string;
-
+    
     @IsNotEmpty()
     @IsObject()
     winnerStats: Prisma.JsonObject;
@@ -30,7 +30,7 @@ export class MatchDto {
 
 
 
-    constructor(partial: Partial<MatchDto>) {
-        Object.assign(this, partial);
-    }
+    // constructor(partial: Partial<MatchDto>) {
+    //     Object.assign(this, partial);
+    // }
 }
