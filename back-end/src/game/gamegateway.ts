@@ -108,7 +108,6 @@ export class gameServer implements OnModuleInit {
 		}
 	}
 
-
 	@SubscribeMessage('botMode')
 	async setGameAsBotMode(client: Socket) {
 		await console.log("BOT MODE !!!!!", client);
@@ -300,6 +299,26 @@ export class gameServer implements OnModuleInit {
 				this.gameService.matchesService.create(match);
 			}
 			this.roomsList.delete(roomCheck.id);
+		}
+	}
+
+	@SubscribeMessage('requestOpponentID')
+	async requestOpponentID(client: Socket)
+	{
+		let roomCheck = Array.from(this.roomsList.values()).find(room => room.secondClient === client ||
+			room.firstClient === client);
+		if (roomCheck)
+		{
+			if (roomCheck.firstClient == client)
+			{
+				console.log("ID 2: ", roomCheck.user2ID);
+				this.server.to(roomCheck.firstClient.id).emit("opponentID", roomCheck.user2ID);
+			}
+			if (roomCheck.secondClient == client)
+			{
+				console.log("ID 1: ", roomCheck.user1ID);
+				this.server.to(roomCheck.secondClient.id).emit("opponentID", roomCheck.user1ID);
+			}
 		}
 	}
 

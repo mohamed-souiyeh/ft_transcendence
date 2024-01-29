@@ -20,7 +20,6 @@ let gl:WebGLRenderingContext | null;
 function Game() 
 {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const reff = useRef<Cube | null>(null);
   let user = useContext(UserContext);
   let [score1, setScore1] = useState(0);
   let [score2, setScore2] = useState(0);
@@ -29,6 +28,7 @@ function Game()
   let [foundMatch, setMatchState] = useState(false);
   let navigate = useNavigate();
   const frameRef = useRef<number>(0);
+  let [opponentID, setID] = useState(0);
 
   const socket = useContext(SocketContext);
 
@@ -209,9 +209,16 @@ function Game()
     {
       setScore1((score1));
       setScore2((score2));
+      socket.emit('requestOpponentID');
       if (socket)
       {
           socket.emit('playing');
+          socket.on("opponentID", (v:number)=>{
+            setID(v);
+            opponentID = v;
+            console.log("OponentID: " + opponentID);
+          }
+            );
           socket.on('score', (v:number, v1:number) => {
             score1 = v;
             score2 = v1;
