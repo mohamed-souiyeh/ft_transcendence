@@ -87,15 +87,16 @@ export class UsersController {
   @Post('update') 
   @UseGuards(JwtAuthGuard)
   @FormDataRequest(uploadConfig)
-  async updateUserData(@Req() req: IRequestWithUser, @Body() data: UploadDTO) {
+  async updateUserData(@Req() req: IRequestWithUser, @Body() data: any) {
 
+    console.log("data => ", data);
     if (data.username !== undefined)
       await this.userService.updateUserUsername(req.user.id, data.username);
     if (data.avatar !== undefined){
-      // console.log("data.avatar => ", data.avatar);
+      console.log("data.avatar => ", data.avatar);
       await this.userService.updateAvatar(req.user.id, data.avatar as any);
     }
-    await this.userService.setProfileSetup(req.user.id, true);
+    await this.userService.setProfileSetup(req.user.id, true); //FIXME - uncomment this line
 
     // console.log("updatd successfully");
     return true;
@@ -137,21 +138,13 @@ export class UsersController {
     return { message: 'user unfriended successfully' };
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('friends')
-  async getUserFriends(@Req() req: IRequestWithUser) {
-    const user = await this.userService.getUserFriends(req.user.id);
-
-    return user.friends;
-  }
-
-
 //! jojo's part
-
   @UseGuards(JwtAuthGuard)
   @Get('search')
-  async searchUsersByUsernamePrefix(@Query('prefix') prefix: string): Promise<any> {
-    const users = await this.userService.searchUsersByUsernamePrefix(prefix);
+  async searchUsersByUsernamePrefix(@Query('prefix') prefix: string, @Req() req: IRequestWithUser): Promise<any> {
+
+    console.log("prefix => ", prefix);
+    const users = await this.userService.searchUsersByUsernamePrefix(prefix, req.user.id);
 
     const finalUsers = users.map((user) => {
       return {
@@ -167,13 +160,17 @@ export class UsersController {
     return finalUsers;
   }
 
+  
+
+
+
   @UseGuards(JwtAuthGuard)
   @Get(':userId/avatar')
   async getUserAvatar(@Param('userId', ParseIntPipe) userId: number, @Res() res: Response): Promise<void> {
     try {
-      const cwd = process.cwd();
       const avatarPath = await this.userService.getUserAvatar(userId);
-      res.sendFile(join(cwd, avatarPath));
+      // console.log("avatarPath => ", avatarPath);
+      res.sendFile(avatarPath);
     } catch (error) {
       throw new NotFoundException('Utilisateur ou Avatar non trouvé');
     }
@@ -203,6 +200,17 @@ export class UsersController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('check_notification')
+  async hasSentNotification(@Query('receiverId', ParseIntPipe) Id: number, @Req() req: IRequestWithUser): Promise<any> {
+    return this.userService.hasSentNotification(req.user.id, Id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('check_blocked')
+  async getBlockedStatus(@Query('otherUserUsername') otherUserusername: string, @Req() req: IRequestWithUser): Promise<any> {
+    return this.userService.getBlockStatus(req.user.id, otherUserusername);
+  }
   
   //!
 

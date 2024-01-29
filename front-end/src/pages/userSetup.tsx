@@ -48,7 +48,7 @@ function Setup()
   const changeBoth = () =>
 {
     // console.log("username is :", `|${userName}|`);
-    // console.log("image is :", `|${srcImg}|`);
+    console.log("image is :", srcImg);
 
 
     if (userName.length)
@@ -56,7 +56,7 @@ function Setup()
     // I need mohamad to test if this is working ..
     // if(!srcImg)
     //   setProfilePic("../assets/star.png")
-    if (srcImg.length)
+    if (srcImg)
       formdata.set("avatar", srcImg);
 
     axios.

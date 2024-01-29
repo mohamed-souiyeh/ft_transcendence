@@ -22,6 +22,7 @@ import { ChangeChannelTypeGuard } from './change-channel-type/change-channel-typ
 import { ChangeChannelPasswordGuard } from './change-channel-password/change-channel-password.guard';
 import { JoinChannelGuard } from './join-channel/join-channel.guard';
 import { RemoveChannelGuard } from './remove-channel/remove-channel.guard';
+import { eventBus } from 'src/eventBus';
 // import { eventBus } from 'src/eventBus';
 // import { UserDto } from 'src/database/users/User_DTO/User.dto';
 
@@ -44,6 +45,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   afterInit(server: Server) {
     this.server = server;
+
+    const onChannelCreated = async (channelData: any) => {
+      eventBus.emit('reconnect', channelData.userId);
+    }
+
+    eventBus.on('channelCreated', onChannelCreated);
+
+    const onDMCreated = async (dmData: any) => {
+      eventBus.emit('reconnect', dmData.userId);
+    }
+
+    eventBus.on('DMCreated', onDMCreated);
 
     // console.log('chat gateway configured', chatGatewayConfig);
     // console.log('chat gateway initialized');
@@ -158,7 +171,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
     
     const adapter = this.server.adapter as any;
-    const room = adapter.rooms.get(`${msg.convType}.${msg.convId}`);
+    const room = adapter.rooms.get(`channel.${msg.convId}`);
     
     if (room && room.size > 0) {
       const db_msg = {
@@ -501,7 +514,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     // return ;
     
     const adapter = this.server.adapter as any;
-    const room = adapter.rooms.get(`${msg.convType}.${msg.convId}`);
+    const room = adapter.rooms.get(`dm.${msg.convId}`);
     
     if (room && room.size > 0) {
       const db_msg = {

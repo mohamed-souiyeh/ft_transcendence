@@ -44,6 +44,10 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
     }
 
     eventBus.on('privateGame', handleGameInvitation);
+
+    eventBus.on('reconnect', async (id: number) => {
+      server.to(`${id}`).emit('reconnect');
+    });
   }
 
   async handleConnection(client: Socket) {

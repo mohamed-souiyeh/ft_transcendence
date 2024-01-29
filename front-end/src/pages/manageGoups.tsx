@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Groups from "./components/groups";
 import SideBar from "./components/sidebar";
 import GroupMembers from "./components/groupMembers";
 import ProtectedRoomPopup from "./components/protectedRoomPopup";
 import { useProtectedRoomContext } from "../contexts/ProtectedRoomContext";
 import axios from "axios";
+import { UserContext } from "../App";
+import Cookies from 'js-cookie';
+
 
 function ManageGoups() {
   const [badInput, setBadInput] = useState({
@@ -24,7 +27,8 @@ function ManageGoups() {
     password: undefined,
     description: "",
     members: [],
-  })
+  });
+  const [refreshMembers, setRefreshMembers] = useState(false);
 
 
   useEffect(() => {
@@ -56,7 +60,7 @@ function ManageGoups() {
 
   const [groupData, setGroupData] = useState([]);
   const [refreshGroups, setRefreshGroups] = useState(false);
-
+  const { user, setUser } = useContext(UserContext)
   useEffect(() => {
     if (!val) return setGroupData([]);
 
@@ -104,24 +108,57 @@ function ManageGoups() {
     // console.log("pwd:",createdGroup.password, 'conf pwd:', confirmationPwd, 'members:', createdGroup.members)
     if(!Object.keys(createdGroup.members).length){
       setBadInput({...badInput, badMembers: true})
+      return ;
     }
     if(createdGroup.privacy === "protected" && (createdGroup.password != confirmationPwd || !createdGroup.password)) {
       setBadInput({...badInput, badPwd: true})
+      return ;
     }
     if(!createdGroup.privacy) {
       setBadInput({...badInput, badPrv: true})
+      return ;
     }
     if(!createdGroup.name) {
       setBadInput({...badInput, badName: true})
+      return ;
     }
+    // console.log("this is what should be sent:", createdGroup);
+    axios.post("http://localhost:1337/conv/createChannel", {
+      channelName: createdGroup.name,
+      channelDescription: createdGroup.description,
+      type: createdGroup.privacy,
+      channelPassword: createdGroup.password,
+      members: createdGroup.members,
+    }, {
+      withCredentials: true,
+    })
+      .then(response => {
+        setCreatedGroup({
+          name: "",
+          privacy:"",
+          password: undefined,
+          description: "",
+          members: [],
+        })
+        axios.get("http://localhost:1337/users/allforhome", {
+          withCredentials: true
+        })
+          .then((resp) => {
+            console.log("refreshed the user data: ", resp);
+            setUser(prevUser => ({ ...prevUser, data: resp.data }))
+            Cookies.set('user', JSON.stringify(resp.data));
+            setRefreshGroups(true)
+          })
+          .catch((err) => {
+            console.log("error while getting user data in groops", err);
+          })
+        setRefreshMembers(true)
+        console.log("response from creat channel is here: ", response.data)
+      })
+      .catch(error => {
+        console.error('There was an error!: ', error);
+      });
   }
-
-  var FakeData = [
-    {groupName: "One", privacy: "Protected", joined: false, id: 0},
-    {groupName: "Two", privacy: "Public", joined: false, id: 1},
-    {groupName: "Three", privacy: "Public", joined: false, id: 2},
-    {groupName: "Four", privacy: "Public", joined: false, id: 3},
-  ]
 
 
   return (
@@ -210,7 +247,7 @@ function ManageGoups() {
                 <div className="border-4 rounded-lg border-purple-sh-1 h-[80%] overflow-y-scroll scrollbar-thin scrollbar-thumb-purple-sh-0 p-4">
                   {/* <div className={`grid w-[100%] ${ !FakeData.length && 'place-content-center'}  `}> */}
                     {/* {FakeData.length ? FakeData.map((grp) => <GroupMembers userName={grp.groupName} added={grp.joined} key={grp.id}/>) : <p className="text-xl text-purple/50 p-5"> You have no friends </p>} */}
-                  <GroupMembers createdGroup={createdGroup} setCreatedGroup={setCreatedGroup}/>
+                  <GroupMembers refreshMembers={refreshMembers} setRefreshMembers={setRefreshMembers} createdGroup={createdGroup} setCreatedGroup={setCreatedGroup}/>
                   {/* </div> */}
                 </div>
                     {badInput.badMembers && <p className="text-[#D9534F] pl-1 font-bold text-sm" > Please add some members </p> }

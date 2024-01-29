@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState , useContext} from "react";
 import taha from "../assets/taha.jpg"
 import Navbar from "./components/navbar";
 import SearchResaults from "./components/searchResaults";
 import SideBar from "./components/sidebar";
+import { UserContext } from "../App";
 import axios from "axios";
 
 

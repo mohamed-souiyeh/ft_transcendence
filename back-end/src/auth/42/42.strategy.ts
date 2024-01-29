@@ -6,6 +6,7 @@ import Strategy from 'passport-42';
 import { UsersService } from 'src/database/users/users.service';
 import { UserDto } from '../../database/users/User_DTO/User.dto';
 import { UserStatus } from '@prisma/client';
+import { join } from 'path';
 
 @Injectable()
 export class ftStrategy extends PassportStrategy(Strategy, '42') {
@@ -22,6 +23,8 @@ export class ftStrategy extends PassportStrategy(Strategy, '42') {
     refreshToken: string,
     profile: any,
   ): Promise<any> {
+
+    const cwd = process.cwd();
     const user: UserDto = {
       id: null,
       provider: '42',
@@ -30,7 +33,7 @@ export class ftStrategy extends PassportStrategy(Strategy, '42') {
       username: profile.username,
       status: UserStatus.online,
       friendRequests: false,
-      avatar: process.env.DEFAULT_AVATAR,
+      avatar: join(cwd, process.env.DEFAULT_AVATAR),
       email: profile.emails[0].value,
       activeRefreshToken: null,
       redirectUrl: null,

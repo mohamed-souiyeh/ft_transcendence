@@ -548,14 +548,16 @@ export class ConversationsService {
       where: { id: channelId },
     });
 
-    console.log('password => ', password);
-
+    
     if (!channel) {
       throw new BadRequestException('Channel does not exist');
     }
-
-    if (channel.type === ChannelType.private) {
+    
+    console.log('password => ', password);
+    // console.log('channel => ', channel);
+    if (channel.type === ChannelType.protected && password) {
       const isCorrect = await bcrypt.compare(password, channel.channelPassword);
+      console.log('isCorrect => ', isCorrect);
       if (!isCorrect) {
         throw new BadRequestException('Incorrect password');
       }

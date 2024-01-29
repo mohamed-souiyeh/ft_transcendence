@@ -80,17 +80,17 @@ export class NotificationsService {
     if (notification)
       return notification;
 
-    // const createdNotification = await this.prismaService.notification.create({
-    //   data: {
-    //     senderId: notificationDto.senderId,
-    //     receiverId: notificationDto.receiverId,
-    //     // createdAt est géré automatiquement par la base de données, pas besoin de le spécifier ici
-    //   },
-    // });
+    const createdNotification = await this.prismaService.notification.create({
+      data: {
+        senderId: notificationDto.senderId,
+        receiverId: notificationDto.receiverId,
+        // createdAt est géré automatiquement par la base de données, pas besoin de le spécifier ici
+      },
+    });
 
     eventBus.emit('newNotification', notificationDto.receiverId, user.username);
-    // this.usersService.updatefriendRequests(notificationDto.receiverId, true);
-    // return createdNotification;
+    this.usersService.updatefriendRequests(notificationDto.receiverId, true);
+    return createdNotification;
   }
 
   async getNotificationById(id: number) {

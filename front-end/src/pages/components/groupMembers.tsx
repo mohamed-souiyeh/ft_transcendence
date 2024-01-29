@@ -32,7 +32,12 @@ const mokChannel = {
 type channelType = typeof mokChannel;
 
 
-function GroupMembers({createdGroup, setCreatedGroup, isChannel = false} : {createdGroup: { name: "", privacy:"", password:"", description: "", members: [], } , setCreatedGroup: Dispatch<SetStateAction<Object>>} ) {
+function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refreshMembers, setRefreshMembers }: 
+  { refreshMembers: any, 
+    setRefreshMembers: any, 
+    isChannel: boolean, 
+    createdGroup: { name: "", privacy:"", password:"", description: "", members: [], } , 
+    setCreatedGroup: Dispatch<SetStateAction<Object>>} ) {
 
 const [ data, setData ] = useState<{
   id: number,
@@ -47,14 +52,22 @@ const [ data, setData ] = useState<{
     console.log("data: ", data);
   }, [data])
 
+  useEffect(() => {
+    if (refreshMembers && !isChannel) {
+      setData(prevData => prevData.map((friend) => ({...friend, added: false})));
+      setRefreshMembers(false);
+    }
+  }, [refreshMembers]);
 
   useEffect(() => {
+    console.log("useEffect data: ", data);
+    setData([]);
     axios.get('http://localhost:1337/users/friends',
     {
       withCredentials: true,
     }).then((res) => {
       // console.log("this is the friends response :", res);
-      // console.log("friends: ", res.data);
+      console.log("friends: ", res.data);
       let friends: {
         id: number,
         username: string,
@@ -66,7 +79,6 @@ const [ data, setData ] = useState<{
 
         friends = friends.filter((friend) => tmp_channel.users.find((user) => user.id === friend.id) === undefined);
       }
-
       setData(friends);
     }).catch((err) => {
       console.log("error in friends page: ", err);

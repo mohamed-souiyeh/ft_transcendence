@@ -28,7 +28,7 @@ import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
 import Search from "./pages/search";
 import NotFoundPage from "./pages/notfoundpage";
 
-
+//TODO - channel doesnt send msgs and the users dont get added in the channel creation
 
 
 export const UserContext = createContext({
@@ -84,16 +84,9 @@ function SetupSockets() {
       // console.log(err); // Prints the error message
     });
 
-    chat_socket.on("notification", (msg) => {
-      console.log("notification msg is :", msg);
-      //TODO - here we need to create the logic to start the notification logic
-      //TODO - mark the network icon in the sidebar with a small red dot
-      //TODO - and send a toastify notification
-      toast(`${msg.from} sent u a friend request`);
-    });
-
+    
     const ping_socket = setupSocket("http://localhost:1337");
-
+    
     ping_socket.on("exception", (err) => {
       // Handle the error here
       setUser(prevUser => ({
@@ -102,11 +95,28 @@ function SetupSockets() {
       }));
       // console.log(err); // Prints the error message
     });
-
+    
     const setIntervalId = setInterval(() => {
       ping_socket.emit('ping');
     }, 3 * 60 * 1000);
+    
+    
+    //TODO - this maybe broken it need testing because the notification event is sent from the main gateway not the chat gateway
+    ping_socket.on("notification", (msg) => {
+      console.log("notification msg is :", msg);
+      //TODO - here we need to create the logic to start the notification logic
+      //TODO - mark the network icon in the sidebar with a small red dot
+      //TODO - and send a toastify notification
+      toast(`${msg.from} sent u a friend request`);
+    });
 
+    ping_socket.on('reconnect', () => {
+      console.log("reconnected");
+      ping_socket.disconnect();
+      ping_socket.connect();
+      chat_socket.disconnect();
+      chat_socket.connect();
+    })
 
     setUser(prevUser => ({
       ...prevUser,
@@ -116,7 +126,9 @@ function SetupSockets() {
 
     return () => {
       ping_socket.disconnect();
+      ping_socket.off();
       chat_socket.disconnect();
+      chat_socket.off();
       clearInterval(setIntervalId);
     };
   }, []);
