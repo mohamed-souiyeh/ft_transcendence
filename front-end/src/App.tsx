@@ -30,6 +30,7 @@ import { PwdPopupProvider } from "./contexts/pwdPopupContext";
 import { AddFriendsPopupProvider } from "./contexts/addFriendsPopupContext";
 import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
 import Search from "./pages/search";
+import NotFoundPage from "./pages/notfoundpage";
 import axios from "axios";
 
 
@@ -273,6 +274,35 @@ function App() {
                 </Route>
               </Routes>
 
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route path="/" element={<LandingPage />} />
+                      <Route path="/login" element={<SignUp />} />
+                      <Route path="/loading" element={<Loading />} />
+                      <Route path="*" element={<NotFound />} />
+
+                      <Route path="/2fa" element={
+                        <TwoFAConfirmation />
+                      } />
+                      {/* Private Routes */}
+                      <Route element={
+                        <>
+                          <SetupSockets />
+                          <RequireAuth />
+                        </>
+                      }>
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/chat" element={<Chat />} />
+                        <Route path="/setup" element={<Setup />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/:username" element={<UserProfile />} />
+                        <Route path="/not-found" element={<NotFoundPage />} />
+                        {/* <Route path="/userprofile" element={<UserProfile />} /> */}
+                        <Route path="/groups" element={<ManageGoups/>} />
+                        <Route path="/search" element={<Search/>} />
+                        {/* <Route path="/game" element={<Game/>} /> */}
+                      </Route>
+                    </Routes>
                   </ProtectedRoomProvider>
                 </AddFriendsPopupProvider>
               </PwdPopupProvider >

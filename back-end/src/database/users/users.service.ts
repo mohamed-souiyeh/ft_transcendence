@@ -586,11 +586,17 @@ export class UsersService {
 
 
   //! Jojo's section
-  async searchUsersByUsernamePrefix(prefix: string): Promise<UserDto[]> {
+  async searchUsersByUsernamePrefix(prefix: string, authenticatedUserId: number): Promise<UserDto[]> {
     const users = await this.prismaService.user.findMany({
       where: {
         username: {
           startsWith: prefix,
+        },  
+
+        blockedBy: {
+          none: {
+            id: authenticatedUserId,
+          },
         },
       },
     });
@@ -679,6 +685,63 @@ export class UsersService {
     return leaderboard;
   }
 
+  async hasSentNotification(senderId: number, receiverId: number): Promise<any> {
+    const notification = await this.prismaService.notification.findFirst({
+      where: {
+        senderId,
+        receiverId,
+      },  
+    });
 
+    const friendship = await this.prismaService.user.findFirst({
+      where: {
+        id: senderId,
+        friends: {
+          some: {
+            id: receiverId,
+          },
+        },
+      },
+    });
+  
+    return {
+      IsPending: !!notification,
+      Notification: notification,
+      isFriend: !!friendship,
+      }; 
+  }
+
+
+
+  async getBlockStatus(userId: number, otherUserId: number): Promise<any> {
+    const hasBlocked = await this.prismaService.user.findFirst({
+      where: {
+        OR: [
+          {
+            id: userId,
+            blockedUsers: {
+              some: {
+                id: otherUserId,
+              },
+            },
+          },
+          {
+            id: userId,
+            blockedBy: {
+              some: {
+                id: otherUserId,
+              },
+            },
+          },
+        ],
+      },
+    });
+  
+    return {
+      isBlocked:!!hasBlocked
+    };
+
+  }
+  
   // !
 }
