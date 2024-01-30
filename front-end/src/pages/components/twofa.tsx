@@ -13,8 +13,12 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
 
 
   useEffect(() => {
-    // if (!codeFetched) {
-    axios.get("http://localhost:1337/2fa/generate",
+// <<<<<<< HEAD
+//     // if (!codeFetched) {
+//     axios.get("http://localhost:1337/2fa/generate",
+// =======
+    axios.get(`${process.env.REACT_URL}:1337/2fa/generate`,
+// >>>>>>> master
       {
         withCredentials: true,
         responseType: 'arraybuffer'
@@ -38,7 +42,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
 
   const handleDisable = () => {
     // console.log("send request here");
-    axios.get("http://localhost:1337/2fa/deactivate", {
+    axios.get(`${process.env.REACT_URL}:1337/2fa/deactivate`, {
       withCredentials: true
     })
       .then((resp) => {
@@ -67,7 +71,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
     const Code = e.target.verfCode.value; 
     formdata.set("code", Code);
 
-    axios.post("http://localhost:1337/2fa/activate", formdata ,{
+    axios.post(`${process.env.REACT_URL}:1337/2fa/activate`, formdata ,{
       withCredentials: true, 
       headers:{
         'Content-Type' : 'multipart/formdata'

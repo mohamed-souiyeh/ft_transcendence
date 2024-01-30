@@ -16,7 +16,7 @@ axios.interceptors.response.use(
 
     console.log("response interceptor :", error.response);
     console.log("original config :", error.config);
-    const isRefreshRequest = error.request.responseURL === "http://localhost:1337/auth/refresh";
+    const isRefreshRequest = error.request.responseURL === `${process.env.REACT_URL}:1337/auth/refresh`;
 
     if (isRefreshRequest) {
       // console.log("isRefreshRequest :", isRefreshRequest);
@@ -28,7 +28,7 @@ axios.interceptors.response.use(
 
       // Trying to refresh the Token:
       console.log("Trying to refresh Token..")
-      return axios.get("http://localhost:1337/auth/refresh", {
+      return axios.get(`${process.env.REACT_URL}:1337/auth/refresh`, {
         withCredentials: true
       }).then(() => {
           console.log("Token refreshed ma nigga!")

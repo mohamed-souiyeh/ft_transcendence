@@ -7,8 +7,9 @@ import Ranked from "./components/ranked";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
-import axios from "axios";
-import { useAvatarContext } from "../contexts/avatar";
+// <<<<<<< HEAD
+// import axios from "axios";
+// import { useAvatarContext } from "../contexts/avatar";
 
 
 
@@ -17,6 +18,17 @@ function Home() {
   const navigate = useNavigate();
   const { user } = useContext(UserContext)
   
+// =======
+// import { ToastContainer, toast } from "react-toastify";
+// import { SocketContext } from "../clientSocket";
+
+// function Home() {
+//   const navigate = useNavigate();
+//   
+//   const { user, setUser } = useContext(UserContext);
+//   const game_socket = useContext(SocketContext);
+
+// >>>>>>> master
   return (
     <>
       <div className="grid justify-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
@@ -41,22 +53,42 @@ function Home() {
 
 
           <div className="h-[120px] w-[850px] flex place-content-between">
-            <div className="bg-purple w-[400px] h-[120px] rounded-3xl border-[1px] border-purple-tone-1 bg-opacity-30 backdrop-blur-lg flex place-content-between">
-              <div onClick={
+            <div 
+              onClick={
                 () => {
+                  // game_socket.emit("queuing");
                   navigate("/game");
                 }
-              } className="">
+              } 
+              style={{
+                cursor: "pointer" ,
+                transition: "all 0.5s ease"}}
+              className="group bg-purple w-[400px] h-[120px] rounded-3xl 
+                border-[1px] border-purple-tone-1 bg-opacity-30 
+                backdrop-blur-lg flex place-content-between 
+                hover:w-[420px] hover:h-[130px]">
+              <div>
                 <p className="p-2 text-2xl"> Random matching </p>
-                <p className="p-2"> In this mode, players will be randomly matched with each other.</p>
+                <p className="opacity-0 group-hover:opacity-100 transition-opacity"> Play with real players online.</p>
               </div>
               <img className="mt-4 mr-4 mb-4 h-[86px] w-[86px]" src={controllers} />
             </div>
 
-            <div className="bg-purple w-[400px] h-[120px] rounded-3xl border-[1px] border-purple-tone-1 bg-opacity-30 backdrop-blur-lg flex place-content-between">
-              <div className="">
+            <div 
+              style={{
+                cursor: "pointer",
+                transition: "all 0.5s ease"
+              }}
+              className="group bg-purple w-[400px] h-[120px] rounded-3xl 
+                border-[1px] border-purple-tone-1 bg-opacity-30 
+                backdrop-blur-lg flex place-content-between 
+                hover:w-[420px] hover:h-[130px]"
+              onClick={() => navigate("/bot")}
+            >
+              <div>
                 <p className="p-2 text-2xl"> Against Bot </p>
-                <p className="p-2"> In this mode, players will play against a bot.</p>
+                <p className="opacity-0 group-hover:opacity-100 transition-opacity">
+                Game tutorial, learn how to play</p>
               </div>
               <img className="mt-4 mr-4 mb-4 h-[86px] w-[86px]" src={bot} />
             </div>
@@ -74,8 +106,6 @@ function Home() {
               <p className="text-xl text-purple text-opacity-50">Matches</p>
               <p className="text-xl text-purple text-opacity-50">Rank</p>
             </div>
-            <Ranked />
-            <Ranked />
             {/* we need some data in here, top players and their amount, so we could loop on them, put their names and number of matches they played and render them using a an element i will code later */}
           </div>
 

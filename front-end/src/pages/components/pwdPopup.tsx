@@ -1,6 +1,8 @@
 import logo from "../../assets/Logo.svg"
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { usePwdPopupContext } from "../../contexts/pwdPopupContext"
+import { useChannelContext } from "../../contexts/channelContext"
+import { UserContext } from "../../App"
 
 function PwdPopup() {
 
@@ -8,11 +10,11 @@ function PwdPopup() {
   const [badPwd, setBadPwd] = useState(false)
   const [confirmationPwd, setConfirmationPwd] = useState("")
   const {setPwdPopup} = usePwdPopupContext()
-
+  const { channel } = useChannelContext();
+  const { user } = useContext(UserContext);
   //we're using this to temporary store the privacy and pwds. should be replaced ------------
   const [temporaryObj, setTemporaryObj] = useState({
-    privacy : "Protected",
-    Password: "",
+    privacy : channel.type,
   })
   //----------------------------------
   const menuRef = useRef(null);
@@ -42,12 +44,19 @@ function PwdPopup() {
 
   const handleSubmit = (e : React.FormEvent) => {
     e.preventDefault()
-    if(temporaryObj.privacy === "Protected" && (temporaryObj.Password != confirmationPwd || !temporaryObj.Password)) {
+    if(temporaryObj.privacy === "protected" && (temporaryObj.Password != confirmationPwd || !temporaryObj.Password)) {
       setBadPwd(true)
     }
     else {
-      console.log("we good to go!")
-      setPwdPopup(true)
+      if (user.chat) {
+        user.chat.emit('changeChannelType',{
+          convType: channel.type,
+          convId: channel.id,
+          newType: temporaryObj.privacy,
+          password: temporaryObj.Password
+        })
+      }      
+      setPwdPopup(false)
     }
   }
 
@@ -71,18 +80,18 @@ function PwdPopup() {
           </div>
           { state && 
             <div ref={menuRef} className=" shadow-xl shadow-purple-sh-2 bg-purple-sh-1 rounded-lg mt-1 absolute w-64">
-              <div onClick={() => {setPrivacy("Public")}} className="hover:bg-purple-sh-2 hover:cursor-pointer rounded-lg p-2">
-                Public
+              <div onClick={() => {setPrivacy("public")}} className="hover:bg-purple-sh-2 hover:cursor-pointer rounded-lg p-2">
+                public
               </div>
-              <div onClick={() => {setPrivacy("Protected")}} className="hover:bg-purple-sh-2  hover:cursor-pointer rounded-lg p-2">
-                Protected
+              <div onClick={() => {setPrivacy("protected")}} className="hover:bg-purple-sh-2  hover:cursor-pointer rounded-lg p-2">
+                protected
               </div>
-              <div onClick={() => {setPrivacy("Private")}} className="hover:bg-purple-sh-2 rounded-lg p-2 hover:cursor-pointer ">
-                Private
+              <div onClick={() => {setPrivacy("private")}} className="hover:bg-purple-sh-2 rounded-lg p-2 hover:cursor-pointer ">
+                private
               </div>
             </div>
           }
-          { temporaryObj.privacy === "Protected" &&                 
+          { temporaryObj.privacy === "protected" &&                 
             <div className="grid place-content-center">
               <p className="text-xl font-bold pt-4 " > Or change Password </p>
               {/* <p className="text-lg pt3" > Password: </p> */}

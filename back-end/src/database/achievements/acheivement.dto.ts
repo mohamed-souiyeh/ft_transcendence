@@ -19,3 +19,5 @@ export class AchievementDto {
         Object.assign(this, partial);
   }
 }
+
+// sooo whar the functions u need and what services u want

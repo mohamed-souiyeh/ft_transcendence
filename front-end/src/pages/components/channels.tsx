@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { useChannelContext } from "../../contexts/channelContext"
+import { SocketContext } from "../../clientSocket"
 import GroupsIcons from "./groupsIcons"
 
 const mokChannel = {
@@ -63,11 +64,13 @@ const mokChannel = {
 
 type channelType = typeof mokChannel;
 
-function Channels (props:object) {
+function Channels(props: object) {
 
 
-  const {channel, setChannel} = useChannelContext()
+  const { channel, setChannel } = useChannelContext()
   const currentChannel: channelType = props.currentChannel;
+
+  const { setRefreshChannels } = props;
 
 
   // useEffect(() => {
@@ -84,12 +87,15 @@ function Channels (props:object) {
     <div className={` ${channel.name === currentChannel.channelName ? 'bg-purple-sh-0' : 'bg-transparent'} flex border border-transparent border-b-purple-sh-0 p-4`} onClick={() => clicked()}>
       <div className='flex basis-2/3 hover:cursor-pointer'>
         <div className="grid px-2">
-          <p className="text-xl font-bold text-purple-tone-2"> {currentChannel.channelName} </p>
+          <div className="flex flex-row gap-1 align-bottom justify-center items-baseline">
+            <p className="text-xl font-bold text-purple-tone-2"> {currentChannel.channelName} </p>
+            <p className="text-sm text-impure-white/40  truncate"> {currentChannel.type} </p>
+          </div>
           <p className="text-sm text-impure-white/40  truncate"> {currentChannel.channelDescription} </p>
         </div>
       </div>
       <div className='flex flex-row-reverse basis-1/3 self-center'>
-        <GroupsIcons channel={currentChannel}/>
+        <GroupsIcons channel={currentChannel} refreshChannels={setRefreshChannels}/>
       </div>
     </div>
   )

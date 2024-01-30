@@ -174,6 +174,18 @@ export class ConversationsService {
   }
 
   async addUserToChannel(channelId: number, userId: number) {
+
+    const userState = await this.prismaService.userState.findFirst({
+      where: {
+        userId: userId,
+        channelId: channelId,
+      },
+    });
+
+    if (userState) {
+      return;
+    }
+
     const channel = await this.prismaService.channel.update({
       where: {
         id: channelId,
@@ -205,6 +217,10 @@ export class ConversationsService {
         channelId: channelId,
       },
     });
+
+    if (!userState) {
+      return;
+    }
 
     const channel = await this.prismaService.channel.update({
       where: {
@@ -526,25 +542,37 @@ export class ConversationsService {
 
 
 
-  async joinChannel(channelId: number, userId: number): Promise<void> {
+  async joinChannel(channelId: number, userId: number, password: string | null = null): Promise<void> {
     // Check if the channel and user exist
     const channel = await this.prismaService.channel.findUnique({
       where: { id: channelId },
     });
 
+    
+    if (!channel) {
+      throw new BadRequestException('Channel does not exist');
+    }
+    
+    console.log('password => ', password);
+    // console.log('channel => ', channel);
+    if (channel.type === ChannelType.protected && password) {
+      const isCorrect = await bcrypt.compare(password, channel.channelPassword);
+      console.log('isCorrect => ', isCorrect);
+      if (!isCorrect) {
+        throw new BadRequestException('Incorrect password');
+      }
+    }
+
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
     });
 
+    if (!user) {
+      throw new BadRequestException('User does not exist');
+    }
+
   
-    await this.prismaService.channel.update({
-      where: { id: channelId },
-      data: {
-        users: {
-          connect: { id: userId },
-        },
-      },
-    });
+    await this.addUserToChannel(channelId, userId);
 
     // i need to think about user state :D here 
 

@@ -2,9 +2,9 @@ import { useNavigate } from "react-router-dom";
 import pong from "../../assets/pong.png";
 
 
-function IconButtom({ val , url}: { val: string , url: string}) {
+function IconButtom({ val, url }: { val: string, url: string }) {
   return (
-    <a  target="_blank"  href={url}  className="relative inline-flex items-center justify-center p-4 px-20 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out border-2 border-purple rounded-full shadow-md group">
+    <a target="_blank" href={url} className="relative inline-flex items-center justify-center p-4 px-8 md:px-20 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out border-2 border-purple rounded-full shadow-md group">
       <span className="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-purple group-hover:translate-x-0 ease">
         <svg
           className="w-6 h-6"
@@ -30,42 +30,39 @@ function IconButtom({ val , url}: { val: string , url: string}) {
 }
 
 export default function Hero() {
-
   const navigate = useNavigate()
-
   return (
-
-    <div className="flex m-10">
-
-      <div className="flex basis-1/2">
-        <div className="grid"> 
-          <div className="flex-col pl-5"> 
-            <p className="text-purple text-6xl font-extrabold p-0 m-0 leading-none"> Dive Into The Most </p>
-            <p className="text-6xl  font-extrabold">  Exciting Pong Game.</p>
-          </div>
-          <p className="text-justify mr-0 m-5 text-lg "> 
-            Ready to serve up an epic win? <br /> 
-            Dive into our new web game - a ping pong crafted by 
-            passionate players just like you. <br /> 
-            Experience the thrill of the rally, perfected through teamwork and 
-            dedication.
+    <div className="bg-purple-sh-1 w-full ml-auto">
+      <div className="md:flex justify-end ml-4 pt-10">
+        <div className="md:w-1/2 md:text-left">
+          <h1 className="mb-4 text-3xl font-extrabold text-white dark:text-white md:text-5xl lg:text-6xl">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r to-purple from-violet">
+              Dive Into The Most
+              <br />
+            </span>{" "}
+            Exciting Pong Game.
+          </h1>
+          <p className="text-lg font-normal text-white lg:text-xl pb-5">
+            Ready to serve up an epic win? <br />
+            Dive into our new web game - a ping pong frenzy crafted by
+            passionate players just like you. <br />
+            Experience the thrill of the rally, perfected through teamwork and
+            dedication. It's game, set, matchless.
           </p>
-          <div className="flex "> 
-            <button className="mr-5" onClick={() => {navigate("/home")}}> 
-              <IconButtom val="Play Now" /> 
-            </button>
-          </div>
+
+
+          <button className="mr-5" onClick={() => { navigate("/home") }}>
+            <IconButtom val="Play Now" />
+          </button>
+        </div>
+        <div className="md:w-1/2">
+          <img
+            src={pong}
+            className="h-auto ms-auto -mt-10 animate-trans-right"
+            alt="Pong Game Image"
+          />
         </div>
       </div>
-
-      <div className="flex flex-row-reverse basis-1/2 mr-10">
-        <img 
-          src={pong} 
-          className="animate-trans-right" 
-          alt="Pong Game Image" 
-        /> 
-      </div>
-
     </div>
   );
 }

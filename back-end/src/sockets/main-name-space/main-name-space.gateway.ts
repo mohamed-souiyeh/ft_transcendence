@@ -24,7 +24,6 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
   @WebSocketServer()
   private server: Server;
 
-
   afterInit(server: Server) {
     this.server = server;
 
@@ -38,12 +37,17 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
 
     eventBus.on('newNotification', sendNotification);
 
-    const handleGameInvitation = async (id:number, event: string, payload: any) => {
+    eventBus.on('privateGame', async (senderID: number, guestID: number, roomID: number) =>
+    {
+      const user = await this.usersService.findUserById(senderID);
+      console.log("user in private game => ", user);
+      server.to(`${guestID}`).emit('private',
+        roomID, user.username);
+    });
 
-      server.to(`${id}`).emit(event, payload);
-    }
-
-    eventBus.on('privateGame', handleGameInvitation);
+    eventBus.on('reconnect', async (id: number) => {
+      server.to(`${id}`).emit('reconnect');
+    });
   }
 
   async handleConnection(client: Socket) {

@@ -16,7 +16,7 @@ function Loading() {
   const {setAvatar} = useAvatarContext()
   const navigate = useNavigate();
 
-  axios.get("http://localhost:1337/users/allforhome", {
+  axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
     withCredentials: true
   })
     .then((resp) => {

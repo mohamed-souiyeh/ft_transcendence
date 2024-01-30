@@ -8,18 +8,14 @@ function Friends(props) {
   const {dm, setDm } = useDmContext();
 
   const handleChat = () => {
-    axios.post('http://localhost:1337/conv/createDM', friend, {
+    axios.post(`${process.env.REACT_URL}:1337/conv/createDM`, friend, {
       withCredentials: true,
       }).then((res) => {
         refreshDms(true);
         console.log("dm created");
         console.log("dm is: ", res.data);
 
-        setDm({
-          id: res.data.id,
-          username: friend.username,
-          userId: friend.id,
-        })
+        setDm(res.data)
       }).catch((err) => {
         console.log("error in creating dm: ", err);
       });

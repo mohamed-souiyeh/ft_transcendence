@@ -8,6 +8,7 @@ import { ConfigModuleOptions } from './ConfigModuleOptions';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 import { SocketsModule } from './sockets/sockets.module';
 import { DatabaseModule } from './database/database.module';
+import { gameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { DatabaseModule } from './database/database.module';
     TwoFaModule,
     ConfigModule.forRoot(ConfigModuleOptions),
     NestjsFormDataModule.config({ isGlobal: true, autoDeleteFile: false }),
+    gameModule,
     SocketsModule,
     DatabaseModule,
   ],

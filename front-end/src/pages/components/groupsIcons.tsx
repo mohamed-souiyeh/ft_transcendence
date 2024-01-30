@@ -6,7 +6,7 @@ import { useAddFriendsPopupContext } from "../../contexts/addFriendsPopupContext
 
 function GroupsIcons(props: object) {
   
-  const { channel } = props;
+  const { channel, refreshChannels } = props;
   const { user } = useContext(UserContext);
   const { setPwdPopup} = usePwdPopupContext()
   const {setAddFriendsPopup} = useAddFriendsPopupContext()
@@ -25,6 +25,7 @@ function GroupsIcons(props: object) {
         convId: channel.id,
         convType: channel.type,
       });
+      refreshChannels(true);
       console.log("I'm outta here")
     }
   }
