@@ -124,20 +124,20 @@ function SetupSockets() {
 
   
   useEffect(() => {
-    axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
-    { 
-      withCredentials: true,
-      responseType: 'arraybuffer' 
-    })
-    .then((res) =>
-    {
-      const blob = new Blob([res.data], {type: 'image/jpeg'});
-      const url = URL.createObjectURL(blob);
-      console.log("we got the image");
-      setUser(prevUser => ({...prevUser, avatar: url}));
-    }).catch((err) => {
-      console.log("Ooooooopsiii ", err.message);
-    });
+  //   axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
+  //   { 
+  //     withCredentials: true,
+  //     responseType: 'arraybuffer' 
+  //   })
+  //   .then((res) =>
+  //   {
+  //     const blob = new Blob([res.data], {type: 'image/jpeg'});
+  //     const url = URL.createObjectURL(blob);
+  //     console.log("we got the image");
+  //     setUser(prevUser => ({...prevUser, avatar: url}));
+  //   }).catch((err) => {
+  //     console.log("Ooooooopsiii ", err.message);
+  //   });
   
   
     game_socket.on("inviteAccepted", ()=>{
@@ -233,8 +233,8 @@ function SetupSockets() {
       ping_socket.off();
       chat_socket.disconnect();
       chat_socket.off();
-      game_socket.disconnect();
-      game_socket.off();
+      // game_socket.disconnect();
+      // game_socket.off();
       clearInterval(setIntervalId);
     };
   }, []);

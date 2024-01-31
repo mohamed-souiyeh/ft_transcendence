@@ -21,6 +21,7 @@ function Contacts(props) {
       username: user.username,
       userId: user.id,
     })
+    console.log("User id ", user.id);
     // console.log("user => ", user);
     // console.log("clicked on the contact");
     // console.log("the user is: ", user);
