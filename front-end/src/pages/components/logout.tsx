@@ -18,6 +18,7 @@ function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
         if (resp.status == 200){
           // console.log("user successfully logged out")
           Cookies.remove('user')
+          localStorage.removeItem('avatar');
           user.chat.disconnect();
           setUser({ data: {} })
           nav("/login")

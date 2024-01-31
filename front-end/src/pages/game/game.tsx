@@ -9,6 +9,7 @@ import './spinner.css';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from '../../clientSocket';
 import { UserContext } from '../../App';
+import { useAvatarContext } from '../../contexts/avatar';
 
 function rad2Degree(angle:number) : number
 {
@@ -19,6 +20,9 @@ let gl:WebGLRenderingContext | null;
 
 function Game() 
 {
+  //modified/ruined by laila==========================================
+  const {avatar} = useAvatarContext()
+  //================================================================
   const canvasRef = useRef<HTMLCanvasElement>(null);
   let user = useContext(UserContext);
   let [score1, setScore1] = useState(0);
@@ -299,8 +303,13 @@ function Game()
                       height: "100%"}}>
           {<Profile score = {score1}
                     score2= {score2}
-                    pic1={user.user.avatar}
-                    pic2={user.user.avatar}/>}
+          //modified/ruined by laila==========================================
+                    pic1={avatar}
+                    pic2={avatar}
+                    // pic1={user.user.avatar}
+                    // pic2={user.user.avatar}
+          //====================================================================================
+        />}
           <canvas style={{right:"300px",
                           width: "100%",
                           height: "100%"}} 

@@ -78,8 +78,8 @@ function Icons(props) {
   }
 
   return (
-    <div className="flex">
-      <div className="px-3 cursor-pointer" onClick={() => 
+    <div className="flex items-center">
+      <div  title="Invite to a game" className="px-3 cursor-pointer" onClick={() => 
           {
               if (game_socket)
                 game_socket.emit("invite", 5);

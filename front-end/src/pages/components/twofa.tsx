@@ -13,8 +13,12 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
 
 
   useEffect(() => {
-  // if (!codeFetched) {
+// <<<<<<< HEAD
+//     // if (!codeFetched) {
+//     axios.get("http://localhost:1337/2fa/generate",
+// =======
     axios.get(`${process.env.REACT_URL}:1337/2fa/generate`,
+// >>>>>>> master
       {
         withCredentials: true,
         responseType: 'arraybuffer'
@@ -52,7 +56,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
           Cookies.set('user',JSON.stringify(user.data));
         }
       })
-    .catch( (err) => {
+      .catch( (err) => {
         // console.log("dang an error: ", err)
       })
   }
@@ -91,7 +95,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
       })
       .catch((e) => {
         // console.log('an Error occured!!', e.response.data.message);
-        // setConfirmed(false)
+        setConfirmed(false)
       })
     // console.log('Code inserted by user is:', Code);
   }
@@ -117,12 +121,14 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
           }
           {!enable && !switchValue && <>
             <div className="grid place-content-center py-5 place-self-center">
-              <p className="text-cente place-self-center"> Please scan the QR code to enable 2fa </p>
+              <p className="text-cente place-self-center">Please Use this
+                <a className="m-1 text-purple-sh-2 hover:text-purple-sh-1" href="https://play.google.com/store/apps/details?id=two.factor.authenticator.generator.code" target="_blank">App</a>
+                to enable 2fa </p>
               <img src={qrCode} className="w-40 h-40 my-4 place-self-center"/>
               <form onSubmit={verifyCode} action='' className=" grid place-self-center ">
                 <input type='text' name="verfCode" placeholder="Enter verification code" className='w-48 h-12 bg-purple-sh-2 outline-none rounded-lg text-impure-white px-2 place-self-center' />
                 <div className="grid h-7">
-                  { !confirmed && <p className="ml-12 text-sm text-[#D9534F] font-extrabold"> Wrong code! Try again. </p> }
+                  { !confirmed && <p className="ml-12 text-sm text-[#D9534F] font-extrabold"> Error! Please Try again. </p> }
                 </div>
                 <div className="flex place-content-center gap-3 pt-1">
                   <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2"  type="submit" value="Send" > Confirm </button>

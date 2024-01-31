@@ -7,22 +7,34 @@ import Ranked from "./components/ranked";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
-import { ToastContainer, toast } from "react-toastify";
-import { SocketContext } from "../clientSocket";
+// <<<<<<< HEAD
+// import axios from "axios";
+// import { useAvatarContext } from "../contexts/avatar";
+
+
+
 
 function Home() {
   const navigate = useNavigate();
+  const { user } = useContext(UserContext)
   
-  const { user, setUser } = useContext(UserContext);
-  const game_socket = useContext(SocketContext);
+// =======
+// import { ToastContainer, toast } from "react-toastify";
+// import { SocketContext } from "../clientSocket";
 
+// function Home() {
+//   const navigate = useNavigate();
+//   
+//   const { user, setUser } = useContext(UserContext);
+//   const game_socket = useContext(SocketContext);
+
+// >>>>>>> master
+  console.log(user)
   return (
     <>
       <div className="grid justify-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
         {<SideBar />}
-        {<NavBar
-        // name={user.profilePicture}
-        />}
+        {<NavBar />}
 
         <div className="w-[850px] h-[50%]">
           <div className="my-16 bg-purple-sh-2 h-[120px] w-[850px] flex border-4 border-purple-tone-1 rounded-3xl ">

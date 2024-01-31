@@ -4,11 +4,13 @@ import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../App";
 import Cookies from 'js-cookie';
+import { useAvatarContext } from "../contexts/avatar";
 
 
 function Setup()
 {
   const {user, setUser} = useContext(UserContext)
+  const {setAvatar} = useAvatarContext()
 
   //NOTE - from here start the code comunicationg with the back_end
   let inputRef = useRef(null);
@@ -79,6 +81,10 @@ function Setup()
               setUser(prevUser => ({ ...prevUser, data: resp.data }))
               Cookies.remove('user')
               Cookies.set('user', JSON.stringify(resp.data));
+              //re-set avatar.
+
+              localStorage.removeItem('avatar')
+              setAvatarFunction(user.data.id)
             })
             .catch((err)=> {
               console.log("My sad potato we have an error:", err);
@@ -95,6 +101,29 @@ function Setup()
         setUsername(e.response);
       });
 
+
+  const setAvatarFunction = (id : string) => { 
+    axios.get(`${process.env.REACT_URL}:1337/users/${id}/avatar`,
+      {
+        withCredentials: true,
+        responseType: 'arraybuffer'
+      })
+      .then((response) => {
+        if (response.status == 200) {
+          let image = btoa(
+            new Uint8Array(response.data)
+              .reduce((data, byte) => data + String.fromCharCode(byte), '')
+          );
+
+          const base64Image =`data:${response.headers['content-type'].toLowerCase()};base64,${image}` 
+
+          setAvatar(base64Image)
+          localStorage.setItem('avatar', base64Image);
+        }
+      }).catch((err) => {
+        console.log("an error occured in Loading.tsx while trying to get the avatar ", err)
+      });
+  }
     // setBadUserName(true);
   }
 
