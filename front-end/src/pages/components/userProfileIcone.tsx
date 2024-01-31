@@ -17,7 +17,7 @@ function Profile({score, score2, pic1, pic2}:
                             float:"right"
                         }
                     } 
-                    src={pic}/>
+                    src={pic1}/>
                 <h1 style={
                         {
                             borderRadius:"50%",

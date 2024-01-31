@@ -352,6 +352,9 @@ export class gameServer implements OnModuleInit {
 					room.user2ID = user.id;
 					console.log("player " + room.user2ID + "here");
 					this.server.to(`${room.id}`).emit("matchFound", true);
+					this.server.to(`${room.id}`).emit("userIDs", 
+								room.user1ID, 
+								room.user2ID);
 					return;
 				}
 			}

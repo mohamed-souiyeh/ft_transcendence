@@ -22,9 +22,12 @@ function Game()
 {
   //modified/ruined by laila==========================================
   const {avatar} = useAvatarContext()
+
   //================================================================
   const canvasRef = useRef<HTMLCanvasElement>(null);
   let user = useContext(UserContext);
+  let [avatar1, setAvatar1] = useState('');
+  let [avatar2, setAvatar2] = useState('');
   let [score1, setScore1] = useState(0);
   let [score2, setScore2] = useState(0);
   let [gameState, setState] = useState(false);
@@ -32,7 +35,6 @@ function Game()
   let [foundMatch, setMatchState] = useState(false);
   let navigate = useNavigate();
   const frameRef = useRef<number>(0);
-  let [opponentID, setID] = useState(0);
 
   const socket = useContext(SocketContext);
 
@@ -207,22 +209,52 @@ function Game()
         0, 0, 0, 1
       ];
       if (socket)
+      {
         socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
+        socket.on('userIDs', (user1:number, user2:number)=>
+        {
+              console.log("User 1 : ", user1);
+              console.log("User 2 : ", user2);
+              if (avatar1 == '')
+              {
+                axios.get(`${process.env.REACT_URL}:1337/users/${user1}/avatar`,
+                {
+                  withCredentials: true,
+                  responseType: 'arraybuffer'
+                }).then((res) =>
+                {
+                    const blob = new Blob([res.data], {type: 'image/jpeg'});
+                    const url = URL.createObjectURL(blob);
+                    setAvatar1(url);
+                  }).catch((err) => {
+                    console.log("Ooooooopsiii ", err.message);
+                });
+              }
+              if (avatar2 == '')
+              {
+                axios.get(`${process.env.REACT_URL}:1337/users/${user2}/avatar`,
+                {
+                  withCredentials: true,
+                  responseType: 'arraybuffer'
+                }).then((res) =>
+                {
+                    const blob = new Blob([res.data], {type: 'image/jpeg'});
+                    const url = URL.createObjectURL(blob);
+                    setAvatar2(url);
+                  }).catch((err) => {
+                    console.log("Ooooooopsiii ", err.message);
+                });
+              }
+        })
+      }
 
     if (foundMatch)
     {
       setScore1((score1));
       setScore2((score2));
-      socket.emit('requestOpponentID');
       if (socket)
       {
           socket.emit('playing');
-          socket.on("opponentID", (v:number)=>{
-            setID(v);
-            opponentID = v;
-            console.log("OponentID: " + opponentID);
-          }
-            );
           socket.on('score', (v:number, v1:number) => {
             score1 = v;
             score2 = v1;
@@ -233,13 +265,13 @@ function Game()
           socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
           socket.on('balllaunched', (v:boolean)=>{ballLaunched=v;});
         }
-        
+
         if (gl)
         {
           gl.clearColor(0.282, 0.17, 0.37, 1.0);
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           gl.enable(gl.DEPTH_TEST);
-  
+
           terrain.renderEntity(gl, 36);
           terrain.setColor(gl, [0.41, 0.26,0.5]);
           terrain.rotateX(gl, rad2Degree(0.004));
@@ -253,7 +285,7 @@ function Game()
           first.setColor(gl, [0.7, 0.6, 1.8]);
           first.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
           first.set3DMatrices(gl, projection, viewMatrix);
-          
+
           second.renderEntity(gl, 36);
           second.rotateX(gl, rad2Degree(0.004));
           second.rotateY(gl, rad2Degree(0.0));
