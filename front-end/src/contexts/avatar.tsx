@@ -5,9 +5,7 @@ type ContextType = {
   setAvatar: (avatar: string) => void;
 };
 
-
 export const AvatarContext = createContext<ContextType | undefined>(undefined);
-
 
 export const AvatarProvider = ({ children }: PropsWithChildren<{}>) => {
   // const [avatar, setAvatar] = useState("")
