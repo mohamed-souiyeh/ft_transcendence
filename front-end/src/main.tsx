@@ -4,6 +4,7 @@ import './index.css'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { eventBus } from './eventBus.tsx';
+import React from 'react'
 import { AvatarProvider } from './contexts/avatar.tsx'
 import { NotificationProvider } from './contexts/notificationContext.tsx'
 

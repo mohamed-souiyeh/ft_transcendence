@@ -492,6 +492,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('dmmsg')
   async handleDMMessage(@MessageBody() msg, @ConnectedSocket() client: Socket) {
 
+    // console.log("msg => ", msg);
+
     await this.validateDmMsg(msg);
 
     const { jwt } = await this.chatService.getTokensFromSocket(client);
@@ -500,11 +502,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
     const dm = await this.convService.getDm(msg.convId);
 
-    const user = dm.users.find(user => user.id === payload.id);
+    const user1 = dm.users.find(user => user.id === payload.id);
 
     const user2 = dm.users.find(user => user.id !== payload.id);
 
-    const isBlocked = (user.blockedUsers.find(user => user.id === user2.id) || user2.blockedUsers.find(user => user.id === user.id)) === undefined ? false : true;
+    const isBlocked = (user1.blockedUsers.find(user => user.id === user2.id) || user2.blockedUsers.find(user => user.id === user1.id)) === undefined ? false : true;
+
+    // console.log("is first user blocked second user: ", user1.blockedUsers.find(user => user.id === user2.id));
+    // console.log("is second user blocked first user: ", user2.blockedUsers.find(user => user.id === user1.id));
+
+    // console.log("isBlocked => ", isBlocked);
 
     if (isBlocked)
       return { message: 'you are blocked by the other user in this conversation' };
@@ -515,19 +522,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     
     const adapter = this.server.adapter as any;
     const room = adapter.rooms.get(`dm.${msg.convId}`);
-    
+
+    // console.log("room => ", room);
+
+
     if (room && room.size > 0) {
+      // console.log("we are sending the msge to : ", `dm.${msg.convId}`)
       const db_msg = {
         text: msg.message,
-        senderId: user.id,
+        senderId: user1.id,
         dmId: msg.convId,
       }
       const toSend = await this.convService.createMessage(db_msg);
       this.server.to(`dm.${msg.convId}`).emit('broadcast', {
         id: toSend.id,
         authorInfo: {
-          username: user.username,
-          authorId: user.id
+          username: user1.username,
+          authorId: user1.id
         },
         message: msg.message,
         convType: msg.convType,
