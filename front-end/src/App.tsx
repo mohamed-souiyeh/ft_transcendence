@@ -122,32 +122,32 @@ function SetupSockets() {
   const navigate = useNavigate();
 
 
-  //modified/ruined by laila==============================================================================================================================
-  // axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
-  //   { 
-  //     withCredentials: true,
-  //     responseType: 'arraybuffer' 
-  //   })
-  //   .then((res) =>
-  //   {
-  //       const blob = new Blob([res.data], {type: 'image/jpeg'});
-  //       const url = URL.createObjectURL(blob);
-  //       setUser(prevUser => ({...prevUser, avatar: url}));
-  //     }).catch((err) => {
-  //     console.log("Ooooooopsiii ", err.message);
-  //   });
-
-  //==============================================================================================================================
-
-  game_socket.on("inviteAccepted", ()=>{
-    navigate("/game");
-  })
-
+  
   useEffect(() => {
+    axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
+    { 
+      withCredentials: true,
+      responseType: 'arraybuffer' 
+    })
+    .then((res) =>
+    {
+      const blob = new Blob([res.data], {type: 'image/jpeg'});
+      const url = URL.createObjectURL(blob);
+      console.log("we got the image");
+      setUser(prevUser => ({...prevUser, avatar: url}));
+    }).catch((err) => {
+      console.log("Ooooooopsiii ", err.message);
+    });
+  
+  
+    game_socket.on("inviteAccepted", ()=>{
+      navigate("/game");
+    })
 
     const chat_socket = setupSocket(`${process.env.REACT_URL}:1337/chat`);
     chat_socket.on("exception", (err) => {
       // Handle the error here
+      console.log("in the chat exception");
       setUser(prevUser => ({
         ...prevUser,
         chatException: err,
@@ -167,14 +167,15 @@ function SetupSockets() {
 
     ping_socket.on("exception", (err) =>
     {
-        // Handle the error here
-        setUser(prevUser => ({
-          ...prevUser,
-          chatException: err,
-        }));
-        // console.log(err); // Prints the error message
-      });
-
+      console.log("in the ping exception");
+      // Handle the error here
+      setUser(prevUser => ({
+        ...prevUser,
+        chatException: err,
+      }));
+      // console.log(err); // Prints the error message
+    });
+    
     const setIntervalId = setInterval(() =>
     {
         ping_socket.emit('ping');
@@ -217,6 +218,8 @@ function SetupSockets() {
       ping_socket.off();
       chat_socket.disconnect();
       chat_socket.off();
+      game_socket.disconnect();
+      game_socket.off();
       clearInterval(setIntervalId);
     };
   }, []);
@@ -244,8 +247,10 @@ function App() {
   //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
 
 
-
-
+  useEffect(() => {
+    console.log("the user context is in app :", user);
+  }, [user]);
+  
   // const navigate = useNavigate();
   useEffect(() => {
     const userData = Cookies.get('user');
@@ -253,7 +258,7 @@ function App() {
 
     if (userData) {
       //prevUser => ({...prevUser, data: resp.data})
-
+      console.log("we are in the app useeffect and we have the user data");
       setUser(prevUser => ({ ...prevUser, data: JSON.parse(userData) }));
     }
 

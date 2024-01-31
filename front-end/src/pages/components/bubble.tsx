@@ -148,7 +148,7 @@ function Bubble(props) {
                 </Menu>
                 :
                 <p className="text-purple-tone-2 font-bold"> {
-                  props.authorInfo.role === "kicked" ?
+                  props.authorInfo?.role === "kicked" ?
                     `kicked user (${props.username})`
                     :
                   props.username} </p>
