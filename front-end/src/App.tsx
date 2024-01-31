@@ -34,6 +34,7 @@ import { useAvatarContext } from "./contexts/avatar";
 import locale from "antd/es/date-picker/locale/en_US";
 import NotFoundPage from "./pages/notfoundpage";
 import axios from "axios";
+import { NotificationProvider, useNotificationContext } from "./contexts/notificationContext";
 //TODO - channel doesnt send msgs and the users dont get added in the channel creation
 
 const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
@@ -239,6 +240,7 @@ function App() {
   });
 
   const {setAvatar} = useAvatarContext()
+  const {setNotification} = useNotificationContext()
   //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
 
 
@@ -262,6 +264,13 @@ function App() {
     }
 
   }, []);
+
+  useEffect( () => {
+    if (user.data.friendRequests){
+      setNotification(true)
+      console.log('user have a new fr req')
+    }
+  }, [user.data.friendRequests])
 
   return (
     <>

@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useAvatarContext } from '../../contexts/avatar'
+import { useNotificationContext } from '../../contexts/notificationContext'
 
 function NavBar() {
   const {avatar} = useAvatarContext()
+  const {notification} = useNotificationContext()
   return (
     <>
       <div className="absolute top-0 right-0 flex gap-1">
@@ -17,7 +19,7 @@ function NavBar() {
 
         <Link to = "/chat">
           <div className=" h-12 w-12 bg-purple-sh-2 grid place-content-center  rounded-full">
-            <div className='h-3 w-3 rounded-full bg-red-500 absolute m-px'> </div>
+          {notification &&  <div className='h-3 w-3 rounded-full bg-red-500 absolute m-px'> </div> }
             <svg className="h-9 w-9 cursor-pointer stroke-purple stroke-[1.5px]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" >
               <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
             </svg>

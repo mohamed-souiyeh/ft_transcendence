@@ -5,6 +5,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { eventBus } from './eventBus.tsx';
 import { AvatarProvider } from './contexts/avatar.tsx'
+import { NotificationProvider } from './contexts/notificationContext.tsx'
 
 
 
@@ -52,7 +53,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   // <React.StrictMode> 
 
   <AvatarProvider>
-    <App />
+    <NotificationProvider>
+      <App />
+    </NotificationProvider>
   </AvatarProvider>
   // </React.StrictMode>
 )

@@ -29,6 +29,7 @@ function Home() {
 //   const game_socket = useContext(SocketContext);
 
 // >>>>>>> master
+  console.log(user)
   return (
     <>
       <div className="grid justify-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
