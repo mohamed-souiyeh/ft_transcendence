@@ -204,7 +204,7 @@ model match {
 model achievement {
   id Int @id @default(autoincrement())
 
-  name        String
+  name        String @unique
   description String
   image       String
 
