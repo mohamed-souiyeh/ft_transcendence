@@ -19,5 +19,6 @@ npm run push
 
 npm run generate
 
-npm run seed &
+npm run seed
+
 npm run dev

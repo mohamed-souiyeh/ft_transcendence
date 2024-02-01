@@ -8,6 +8,7 @@
   "scripts": {
     "migrate": "npx prisma migrate dev",
     "generate": "npx prisma generate",
+    "seed": "prisma db seed",
     "push": "npx prisma db push",
     "studio": "npx prisma studio",
     "build": "nest build",
