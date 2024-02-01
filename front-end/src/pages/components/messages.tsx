@@ -43,28 +43,28 @@ function Messages() {
     }
   }, [msgs]);
   
-  // useEffect(() => {
-  //   const setIntervalId: NodeJS.Timeout = setInterval(() => {
-  //     // console.log("dm is: ", dm);
-  //     user.chat.timeout(1000).emit('checkDmpls', {
-  //       convId: dm.id,
-  //       convType: dm.type,
-  //     }, (err, res) => {
-  //       if (err) {
-  //         console.log("error in checking if the user is blocked: ", err)
-  //         // console.log("the res is: ", res);
-  //         return;
-  //       }
-  //       // console.log("isBlocked is: ", res);
-  //       if (res.isBlocked !== isBlockedRef.current)
-  //         setIsBlocked(res.isBlocked);
-  //     });
-  //   }, 1000);
+  useEffect(() => {
+    const setIntervalId: NodeJS.Timeout = setInterval(() => {
+      // console.log("dm is: ", dm);
+      user.chat.timeout(1000).emit('checkDmpls', {
+        convId: dm.id,
+        convType: dm.type,
+      }, (err, res) => {
+        if (err) {
+          console.log("error in checking if the user is blocked: ", err)
+          // console.log("the res is: ", res);
+          return;
+        }
+        // console.log("isBlocked is: ", res);
+        if (res.isBlocked !== isBlockedRef.current)
+          setIsBlocked(res.isBlocked);
+      });
+    }, 1000);
 
-  //   return () => {
-  //     clearInterval(setIntervalId);
-  //   }
-  // }, [dm]);
+    return () => {
+      clearInterval(setIntervalId);
+    }
+  }, [dm]);
 
 
   useEffect(() => {
