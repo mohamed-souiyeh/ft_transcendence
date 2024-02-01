@@ -133,7 +133,7 @@ export class gameServer implements OnModuleInit {
 		let user = await this.gameService.chatService.getUserFromSocket(client); 
 		console.log("Invite player");
 		if (!user)
-		return; 
+			return; 
 		if (await this.userService.getStatus(invitedUserID) == "busy") {
 			return;
 		}
