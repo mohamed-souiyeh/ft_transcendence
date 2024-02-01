@@ -42,8 +42,6 @@ const game_socket = io(`${process.env.REACT_URL}:1337/game`,
 
 function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any, declineGame?:any})
 {
-  const navigate = useNavigate();
-
   return (
     <div>
       <h3>{msg}</h3>
@@ -56,7 +54,7 @@ function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any
         onClick={() =>
         {
             if (joinGame)
-          {
+            {
               joinGame();
             }
           }}
