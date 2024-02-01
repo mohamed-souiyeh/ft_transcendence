@@ -54,7 +54,7 @@ function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any
         onClick={() =>
         {
             if (joinGame)
-            {
+          {
               joinGame();
             }
           }}

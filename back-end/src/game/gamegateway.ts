@@ -242,6 +242,7 @@ export class gameServer implements OnModuleInit {
 		if (roomCheck && roomCheck.roomState != "gameOver") {
 			if (this.roomsList.has(roomCheck.id))
 			{
+
 				this.roomsList.get(roomCheck.id).roomState = "gameOver";
 				console.log("Set game over now !!");
 			}
@@ -294,9 +295,18 @@ export class gameServer implements OnModuleInit {
 					this.userService.setOnlineStatus(user.id);
 				}
 				if (user1)
+				{
+					const playedMatches = (await this.userService.getUserDataForHome(user1.id)).matchesPlayed;
+					console.log("Played matches user1: " + playedMatches);
 					this.userService.setOnlineStatus(user1.id);
+				}
 				if (user2)
+				{
+					const playedMatches = (await this.userService.getUserDataForHome(user1.id)).matchesPlayed;
+					console.log("Played matches user2: " + playedMatches);
 					this.userService.setOnlineStatus(user2.id);
+				}
+
 				this.gameService.matchesService.create(match);
 			}
 			this.roomsList.delete(roomCheck.id);

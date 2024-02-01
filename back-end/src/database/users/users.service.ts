@@ -659,7 +659,6 @@ export class UsersService {
   }
 
 
-
   async getUserData(username: string): Promise<any> {
     const user = await this.prismaService.user.findUnique({
       where: { username },
