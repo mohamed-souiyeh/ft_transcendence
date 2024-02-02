@@ -1,11 +1,16 @@
 import axios from 'axios';
-import img from '../../assets/taha.jpg'
 import Icons from './icons'
 import { useDmContext } from '../../contexts/chatContext';
+import { useEffect, useState } from 'react';
 
 function Friends(props) {
   const { friend, unmount, refreshDms } = props;
   const {dm, setDm } = useDmContext();
+  const [img, setImg] = useState('')
+
+  useEffect( ()=> {
+    setImg(`http://localhost:1337/users/${props.id}/avatar`);
+  },[])
 
   const handleChat = () => {
     axios.post(`${process.env.REACT_URL}:1337/conv/createDM`, friend, {

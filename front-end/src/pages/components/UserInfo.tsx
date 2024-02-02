@@ -1,5 +1,4 @@
 import souiyeh from "../../assets/souiyeh.jpeg";
-import taha from "../../assets/taha.jpg";
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
