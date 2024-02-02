@@ -297,12 +297,27 @@ export class gameServer implements OnModuleInit {
 				if (user1)
 				{
 					const playedMatches = (await this.userService.getUserDataForHome(user1.id)).matchesPlayed;
+					const wonMatches = (await this.userService.getUserDataForHome(user1.id)).wins;
+					await this.userService.createAchievement(user1.id, "newComer");
+					if (playedMatches == 1)
+						await this.userService.createAchievement(user1.id, "newComer");
+					if (playedMatches >= 5)
+						await this.userService.createAchievement(user1.id, "Player");
+					if (playedMatches > 5 && wonMatches >= 5)
+						await this.userService.createAchievement(user1.id, "Veteran");
 					console.log("Played matches user1: " + playedMatches);
 					this.userService.setOnlineStatus(user1.id);
 				}
 				if (user2)
 				{
 					const playedMatches = (await this.userService.getUserDataForHome(user1.id)).matchesPlayed;
+					const wonMatches = (await this.userService.getUserDataForHome(user1.id)).wins;
+					if (playedMatches == 1)
+						await this.userService.createAchievement(user2.id, "newComer");
+					if (playedMatches >= 5)
+						await this.userService.createAchievement(user2.id, "Player");
+					if (playedMatches > 5 && wonMatches >= 5)
+						await this.userService.createAchievement(user2.id, "Veteran");
 					console.log("Played matches user2: " + playedMatches);
 					this.userService.setOnlineStatus(user2.id);
 				}
