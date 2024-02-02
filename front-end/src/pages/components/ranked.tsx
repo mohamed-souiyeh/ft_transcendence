@@ -1,32 +1,33 @@
-import pic from '../../assets/taha.jpg'
+import { useEffect, useState } from 'react';
 
-//so.. this function should be taking args, bc we gon use them in showing Player's infos
-
-function Ranked() {
+function Ranked(player : Object) {
+  const [img, setImagePath] = useState('')
+  useEffect(() => {
+    setImagePath(`http://localhost:1337/users/${player.id}/avatar`);
+  },[])
   return(
   <>
       <div className='mb-5 mx-14 h-14 bg-[#343045] flex place-content-between rounded-2xl '>
         
         <div className=' flex '>
           <div className='grid place-content-center ml-2 w-12'>
-            <img className='rounded-full h-10 w-10' src={pic}/>
+            <img className='rounded-full h-10 w-10' src={img}/>
           </div>
           <div className='grid place-content-center ml-2'>
-            <p> Player's name </p>
+            <p> {player.name} </p>
           </div>
         </div>
 
         <div className='w-[160px] grid place-content-center'>
-          <p> 51 </p>
+          <p> {player.matchesPlayed} </p>
         </div>
         
         <div className='w-[160px] grid place-content-center'>
-          <p> 1 </p>
+          <p> {player.score} </p>
         </div>
       </div>
   </>
   )
 }
-
 
 export default Ranked;
