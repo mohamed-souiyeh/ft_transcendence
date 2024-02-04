@@ -1,7 +1,6 @@
 import Icons from "./icons"
-import img from "../../assets/taha.jpg"
 import {useDmContext} from "../../contexts/chatContext.tsx"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Contacts(props) {
 
@@ -9,6 +8,8 @@ function Contacts(props) {
   const [status, setStatus] = useState("online");
 
   const { user, dmInfo } = props;
+  const [img, setImg] = useState('')
+
 
   // console.log("this is the user in contacts :", user);
 
@@ -27,6 +28,10 @@ function Contacts(props) {
     // console.log("the user is: ", user);
     // console.log("the dm is: ", dm);
   }
+
+  useEffect( ()=> {
+    setImg(`http://localhost:1337/users/${user.id}/avatar`);
+  },[])
 
   return (
     <div className={` ${dm.id === dmInfo.id ? 'bg-purple-sh-0' : 'bg-transparent'} flex border border-transparent border-b-purple-sh-0 p-4`} onClick={() => clicked()}>

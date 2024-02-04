@@ -1,11 +1,17 @@
 import axios from 'axios';
-import img from '../../assets/taha.jpg'
 import { networkTabs } from '../chat.enums';
+import { useEffect, useState } from 'react';
 
 function Blocked(props) {
   const { blocked, unmount } = props;
 
   console.log("blocked is: ", blocked);
+
+  const [img, setImg] = useState('')
+
+  useEffect( ()=> {
+    setImg(`http://localhost:1337/users/${props.id}/avatar`);
+  },[])
 
   const UnblockUser = () => {
     axios.post(`${process.env.REACT_URL}:1337/users/unblock`, blocked, {

@@ -1,4 +1,3 @@
-import img from "../../assets/taha.jpg"
 import { useContext, useEffect, useRef, useState } from "react"
 import { useDmContext } from "../../contexts/chatContext"
 import Icons from "./icons"
@@ -25,24 +24,25 @@ function Messages() {
   const [msgs, setMsgs] = useState<msgType[]>([]);
   const [isBlocked, setIsBlocked] = useState(false);
   const isBlockedRef = useRef(isBlocked);
+  const [img, setImg] = useState('')
 
   useEffect(() => {
     isBlockedRef.current = isBlocked;
   }, [isBlocked]);
 
   const maxLength = 42;
-  
+
   const { user } = useContext(UserContext);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  
+
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
     }
   }, [msgs]);
-  
+
   useEffect(() => {
     const setIntervalId: NodeJS.Timeout = setInterval(() => {
       // console.log("dm is: ", dm);
@@ -50,15 +50,15 @@ function Messages() {
         convId: dm.id,
         convType: dm.type,
       }, (err, res) => {
-        if (err) {
-          console.log("error in checking if the user is blocked: ", err)
-          // console.log("the res is: ", res);
-          return;
-        }
-        // console.log("isBlocked is: ", res);
-        if (res.isBlocked !== isBlockedRef.current)
+          if (err) {
+            console.log("error in checking if the user is blocked: ", err)
+            // console.log("the res is: ", res);
+            return;
+          }
+          // console.log("isBlocked is: ", res);
+          if (res.isBlocked !== isBlockedRef.current)
           setIsBlocked(res.isBlocked);
-      });
+        });
     }, 1000);
 
     return () => {
@@ -74,20 +74,20 @@ function Messages() {
       convId: dm.id,
       convType: dm.type,
     }, (err, res) => {
-      if (err) return console.log("error in checking if the user is blocked: ", err);
-      console.log("isBlocked is: ", res);
-      setIsBlocked(res.isBlocked);
-    })
+        if (err) return console.log("error in checking if the user is blocked: ", err);
+        console.log("isBlocked is: ", res);
+        setIsBlocked(res.isBlocked);
+      })
 
     //NOTE - fetch the messages of the dm using the dm.id and dm.type from the chatGatway
     user.chat.timeout(5000).emit('getAllMessages', {
       convId: dm.id,
       convType: dm.type,
     }, (err, messages) => {
-      if (err) return console.log("error in getting all messages: ", err);
-      console.log("messages are: ", messages);
-      setMsgs(messages);
-    })
+        if (err) return console.log("error in getting all messages: ", err);
+        console.log("messages are: ", messages);
+        setMsgs(messages);
+      })
     // console.log("user: ", user);
 
     user.chat.on('broadcast', (msg) => {
@@ -99,6 +99,9 @@ function Messages() {
     }
   }, [dm])
 
+  useEffect( ()=> {
+    setImg(`http://localhost:1337/users/${dm.userId}/avatar`);
+  },[])
 
   const sendMsg = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

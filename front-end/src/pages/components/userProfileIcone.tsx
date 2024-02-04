@@ -1,4 +1,3 @@
-import pic from '../../assets/taha.jpg'
 
 //so.. this function should be taking args, bc we gon use them in showing Player's infos
 

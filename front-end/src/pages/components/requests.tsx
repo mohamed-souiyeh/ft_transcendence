@@ -1,6 +1,6 @@
 import axios from 'axios';
-import img from '../../assets/taha.jpg'
 import { networkTabs } from '../chat.enums';
+import { useEffect, useState } from 'react';
 
 function Requests(props) {
   const { request, unmount } = props;
@@ -39,6 +39,12 @@ function Requests(props) {
       console.log("error in accepting friend request")
     });
   };
+
+  const [img, setImg] = useState('')
+
+  useEffect( ()=> {
+    setImg(`http://localhost:1337/users/${props.id}/avatar`);
+  },[])
 
   return (
     <div className='flex border border-transparent border-b-purple-sh-0 mx-14 py-3 '>
