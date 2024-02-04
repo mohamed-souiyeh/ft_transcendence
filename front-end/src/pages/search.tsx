@@ -1,5 +1,4 @@
 import { useState , useContext} from "react";
-import taha from "../assets/taha.jpg"
 import Navbar from "./components/navbar";
 import SearchResaults from "./components/searchResaults";
 import SideBar from "./components/sidebar";
@@ -54,7 +53,7 @@ function Search() {
             </form>
           </div>
           <div className={`grid w-[100%] ${!searchResaults.length && 'place-content-center'}`}>
-            {searchResaults.length ? searchResaults.map((grp) => <SearchResaults name={grp.username} avatar={taha} state={grp.status} key={grp.id} />) :
+            {searchResaults.length ? searchResaults.map((grp) => <SearchResaults name={grp.username} state={grp.status} id={grp.id} key={grp.id} />) :
               <p className="text-xl text-purple/50 p-5"> Enter a Valid name to search for a friend </p>
             }
           </div>

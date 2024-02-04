@@ -120,24 +120,24 @@ function SetupSockets() {
   const navigate = useNavigate();
 
 
-  
+
   useEffect(() => {
-  //   axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
-  //   { 
-  //     withCredentials: true,
-  //     responseType: 'arraybuffer' 
-  //   })
-  //   .then((res) =>
-  //   {
-  //     const blob = new Blob([res.data], {type: 'image/jpeg'});
-  //     const url = URL.createObjectURL(blob);
-  //     console.log("we got the image");
-  //     setUser(prevUser => ({...prevUser, avatar: url}));
-  //   }).catch((err) => {
-  //     console.log("Ooooooopsiii ", err.message);
-  //   });
-  
-  
+    //   axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
+    //   { 
+    //     withCredentials: true,
+    //     responseType: 'arraybuffer' 
+    //   })
+    //   .then((res) =>
+    //   {
+    //     const blob = new Blob([res.data], {type: 'image/jpeg'});
+    //     const url = URL.createObjectURL(blob);
+    //     console.log("we got the image");
+    //     setUser(prevUser => ({...prevUser, avatar: url}));
+    //   }).catch((err) => {
+    //     console.log("Ooooooopsiii ", err.message);
+    //   });
+
+
     game_socket.on("inviteAccepted", ()=>{
       navigate("/game");
     })
@@ -152,7 +152,7 @@ function SetupSockets() {
       }));
       // console.log(err); // Prints the error message
     });
-    
+
     //modified/ruined by laila==============================================================================================================================
     // axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
     //   { 
@@ -180,15 +180,15 @@ function SetupSockets() {
 
     ping_socket.on("exception", (err) =>
     {
-      console.log("in the ping exception");
-      // Handle the error here
-      setUser(prevUser => ({
-        ...prevUser,
-        chatException: err,
-      }));
-      // console.log(err); // Prints the error message
-    });
-    
+        console.log("in the ping exception");
+        // Handle the error here
+        setUser(prevUser => ({
+          ...prevUser,
+          chatException: err,
+        }));
+        // console.log(err); // Prints the error message
+      });
+
     const setIntervalId = setInterval(() =>
     {
         ping_socket.emit('ping');
@@ -202,6 +202,19 @@ function SetupSockets() {
       //TODO - mark the network icon in the sidebar with a small red dot
       //TODO - and send a toastify notification
       toast(`${msg.from} sent u a friend request`);
+
+      axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
+        withCredentials: true
+      })
+        .then((resp) => {
+          setUser(prevUser => ({ ...prevUser, data: resp.data }))
+          Cookies.remove('user')
+          Cookies.set('user', JSON.stringify(resp.data) );
+        })
+        .catch(()=> {
+          navigate("/login")
+        })
+
     });
 
     ping_socket.on('reconnect', () => {
@@ -263,7 +276,7 @@ function App() {
   useEffect(() => {
     console.log("the user context is in app :", user);
   }, [user]);
-  
+
   // const navigate = useNavigate();
   useEffect(() => {
     const userData = Cookies.get('user');
@@ -284,7 +297,7 @@ function App() {
   }, []);
 
   useEffect( () => {
-    if (user.data.friendRequests){
+    if (user.data && user.data.friendRequests){
       setNotification(true)
       console.log('user have a new fr req')
     }

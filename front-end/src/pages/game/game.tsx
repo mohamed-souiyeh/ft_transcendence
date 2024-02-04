@@ -4,7 +4,6 @@ import Profile from "../components/userProfileIcone";
 import {Cube} from './cube';
 import quitButton from './exitGame.png';
 import { useSocket } from '../../clientSocket';
-import pic from '../../assets/taha.jpg'
 import './spinner.css';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from '../../clientSocket';

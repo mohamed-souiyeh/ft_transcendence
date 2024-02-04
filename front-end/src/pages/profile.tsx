@@ -11,19 +11,58 @@ import playerPic from "../assets/player.png";
 import veteranPic from "../assets/veteran.png";
 import { UserContext } from "../App";
 import { useAvatarContext } from "../contexts/avatar";
+import axios from "axios";
+import Cookies from 'js-cookie';
 
 function Profile () {
 
 
   const {avatar} = useAvatarContext()
-  const {user} = useContext(UserContext)
+  const {user, setUser} = useContext(UserContext)
   const [switchValue, setSwitchValue] = useState(user.data.TFAisEnabled);
   const [prompt, setPrompt] = useState(false);
-  const [qrCode, setCode] = useState(null);
   const isNewComer = true;
   const isPlayer = false;
   const isVeteran = false;
+  const [name, setName] = useState(user.data.username)
+  const [badName, setBadName] = useState(false);
+  const [success, setSuccess] = useState(false);
+  let formdata = new FormData();
 
+  const changeUserName = (e : React.FormEvent) => {
+    e.preventDefault()
+    //send req, set err msg if bad username
+    //
+
+    if (name.length)
+    formdata.set("username", name);
+
+    axios.post(`${process.env.REACT_URL}:1337/users/update/username`, formdata, {
+      withCredentials: true
+    })
+      .then( (res)=> {
+        if (res.status == 200) {
+          setBadName(false)
+          setSuccess(true)
+          axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
+            withCredentials: true
+          })
+            .then((resp) => {
+              setUser(prevUser => ({ ...prevUser, data: resp.data }))
+              Cookies.remove('user')
+              Cookies.set('user', JSON.stringify(resp.data));
+            })
+            .catch((err)=> {
+              console.log("My sad potato we have an error in updating user cookie in profile smh:", err);
+            })
+        }
+      })
+      .catch(() => {
+        setSuccess(false)
+        setBadName(true)
+      })
+
+  }
 
   return(
     <>
@@ -47,7 +86,13 @@ function Profile () {
             <p className="text-2xl m-2"> 2fa state </p>
           </div>
           <div className=" m-6 grid place-content-center">
-            <p className="text-2xl m-2">:  {user.data.username}</p>
+            <form className="flex w-[100%]" onSubmit={changeUserName}>
+              <p className="text-2xl m-2">:</p>
+              <input title="Click To edit" className="w-[40%] bg-transparent border-none focus:outline-none focus:border-none text-2xl" type="text" value={name} onChange={(e) => setName(e.target.value)}/>
+              {badName &&  <p className="font-bold text-red-500 text-lg m-3"> bad Name! </p>}
+              {success &&  <p className="font-bold text-light-green-500 text-lg m-3"> Updated! </p>}
+              <button className="rounded-lg bg-purple-sh-2 hover:border hover:border-purple-sh-2 hover:bg-purple-sh-1 h-11" type="submit"> change </button>
+            </form>
             <p className="text-2xl m-2">:  {user.data.score}</p>
             <p className="text-2xl m-2">:  {user.data.matchesPlayed}</p>
             <div className="flex ">
@@ -86,27 +131,27 @@ function Profile () {
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-100">acheivements:</p>
                 </div>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img style={{
-                      width: '60px',
-                      filter: !isNewComer ? 'sepia(100%)': 'none',
-                    }} src={newComerPic} />
-                    {isNewComer && (<h1 style={{fontSize:"35px"}}>New comer</h1>)}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img style={{
-                      width: '60px',
-                      filter: !isPlayer ? 'sepia(100%)': 'none',
-                    }} src={playerPic} />
-                    {isPlayer && (<h1 style={{fontSize:"35px"}}>Player</h1>)}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img style={{
-                      width: '60px',
-                      filter: !isVeteran ? 'sepia(100%)': 'none',
-                    }} src={veteranPic} />
-                    {isVeteran && (<h1 style={{fontSize:"35px"}}>Veteran</h1>)}
-                  </div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <img style={{
+                    width: '60px',
+                    filter: !isNewComer ? 'sepia(100%)': 'none',
+                  }} src={newComerPic} />
+                  {isNewComer && (<h1 style={{fontSize:"35px"}}>New comer</h1>)}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <img style={{
+                    width: '60px',
+                    filter: !isPlayer ? 'sepia(100%)': 'none',
+                  }} src={playerPic} />
+                  {isPlayer && (<h1 style={{fontSize:"35px"}}>Player</h1>)}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <img style={{
+                    width: '60px',
+                    filter: !isVeteran ? 'sepia(100%)': 'none',
+                  }} src={veteranPic} />
+                  {isVeteran && (<h1 style={{fontSize:"35px"}}>Veteran</h1>)}
+                </div>
               </div>
             </div>
           </div>

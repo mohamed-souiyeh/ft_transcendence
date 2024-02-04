@@ -55,9 +55,6 @@ function Setup()
 
     if (userName.length)
       formdata.set("username", userName);
-    // I need mohamad to test if this is working ..
-    // if(!srcImg)
-    //   setProfilePic("../assets/star.png")
     if (srcImg)
       formdata.set("avatar", srcImg);
 
