@@ -19,12 +19,8 @@ let gl:WebGLRenderingContext | null;
 
 function Game() 
 {
-  //modified/ruined by laila==========================================
-  const {avatar} = useAvatarContext()
-
   //================================================================
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  let user = useContext(UserContext);
   let [avatar1, setAvatar1] = useState('');
   let [avatar2, setAvatar2] = useState('');
   let [score1, setScore1] = useState(0);
@@ -214,16 +210,17 @@ function Game()
         {
               console.log("User 1 : ", user1);
               console.log("User 2 : ", user2);
-              if (avatar1 == '')
+              // if (avatar1 == '')
               {
-                  // axios.get(`http://localhost:1337/users/Public_data/${user.username}`,
-                  //   { withCredentials: true }
-                  // ).then((response) => {
-                  //   setAvatar1(`http://localhost:1337/users/${user}/avatar`);
-                  // }).catch(error => {
-                  //   console.error('Error fetching user data:', error);
-                  //   navigate("/not-found");
-                  // });
+                  axios.get(`http://localhost:1337/users/${user2}/avatar`,
+                    {
+                      withCredentials: true
+                    }
+                  ).then((response) => {
+                    setAvatar1(`http://localhost:1337/users/${user2}/avatar`);
+                  }).catch(error => {
+                    console.error('Error fetching user data:', error);
+                  });
               };
         })
       }
@@ -315,12 +312,8 @@ function Game()
                       height: "100%"}}>
           {<Profile score = {score1}
                     score2= {score2}
-          //modified/ruined by laila==========================================
-                    pic1={avatar}
-                    pic2={avatar}
-                    // pic1={user.user.avatar}
-                    // pic2={user.user.avatar}
-          //====================================================================================
+                    pic1={avatar1}
+                    pic2={avatar1}
         />}
           <canvas style={{right:"300px",
                           width: "100%",

@@ -169,7 +169,7 @@ export class UsersController {
   async getUserAvatar(@Param('userId', ParseIntPipe) userId: number, @Res() res: Response): Promise<void> {
     try {
       const avatarPath = await this.userService.getUserAvatar(userId);
-      res.sendFile(avatarPath);
+      res.sendFile(join(cwd, avatarPath));
     } catch (error) {
       console.log(error);
       throw new NotFoundException('Utilisateur ou Avatar non trouvé');
