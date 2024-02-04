@@ -45,7 +45,6 @@ function Game()
 
   useEffect(() => 
   {
-    socket.emit("queuing");
     const handleWinner = (v: boolean) => { setWinState(v); };
     const handleLeaveGame = () => { navigate("/home"); };
     const handleAlreadyPlaying = () => { navigate("/home"); };
@@ -58,6 +57,7 @@ function Game()
     };
     if (socket)
     {
+      socket.emit("queuing");
       socket.on("winner", handleWinner);
       socket.on("leaveGame", handleLeaveGame);
       socket.on("alreadyPlaying", handleAlreadyPlaying);
@@ -216,34 +216,15 @@ function Game()
               console.log("User 2 : ", user2);
               if (avatar1 == '')
               {
-                axios.get(`${process.env.REACT_URL}:1337/users/${user1}/avatar`,
-                {
-                  withCredentials: true,
-                  responseType: 'arraybuffer'
-                }).then((res) =>
-                {
-                    const blob = new Blob([res.data], {type: 'image/jpeg'});
-                    const url = URL.createObjectURL(blob);
-                    setAvatar1(url);
-                  }).catch((err) => {
-                    console.log("Ooooooopsiii ", err.message);
-                });
-              }
-              if (avatar2 == '')
-              {
-                axios.get(`${process.env.REACT_URL}:1337/users/${user2}/avatar`,
-                {
-                  withCredentials: true,
-                  responseType: 'arraybuffer'
-                }).then((res) =>
-                {
-                    const blob = new Blob([res.data], {type: 'image/jpeg'});
-                    const url = URL.createObjectURL(blob);
-                    setAvatar2(url);
-                  }).catch((err) => {
-                    console.log("Ooooooopsiii ", err.message);
-                });
-              }
+                  // axios.get(`http://localhost:1337/users/Public_data/${user.username}`,
+                  //   { withCredentials: true }
+                  // ).then((response) => {
+                  //   setAvatar1(`http://localhost:1337/users/${user}/avatar`);
+                  // }).catch(error => {
+                  //   console.error('Error fetching user data:', error);
+                  //   navigate("/not-found");
+                  // });
+              };
         })
       }
 

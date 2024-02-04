@@ -37,6 +37,7 @@ function BotMode()
   const leaveGame = () => {
     if (socket)
         socket.emit("leaveRoom")
+    navigate('/home');
   }
 
   useEffect(() => 
