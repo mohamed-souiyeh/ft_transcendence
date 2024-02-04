@@ -94,14 +94,12 @@ function Messages() {
       setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
+    setImg(`http://localhost:1337/users/${dm.userId}/avatar`);
     return () => {
       user.chat.off('broadcast');
     }
   }, [dm])
 
-  useEffect( ()=> {
-    setImg(`http://localhost:1337/users/${dm.userId}/avatar`);
-  },[])
 
   const sendMsg = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

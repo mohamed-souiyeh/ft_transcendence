@@ -44,7 +44,7 @@ function Network(props) {
 
   const handleUnmount = () => {
     console.log("unmounting tab: ", tab);
-    setRefresh(!refresh);
+    setRefresh(true);
   };
 
 

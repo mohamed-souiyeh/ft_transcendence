@@ -31,7 +31,7 @@ export class ConversationsController {
       dmId: createDM,
       userId: req.user.id,
     });
-    return ;
+    return createDM;
   }
 
 
@@ -49,7 +49,7 @@ export class ConversationsController {
       userId: req.user.id,
     });
 
-    return ;
+    return createdChannel;
   }
 
 
