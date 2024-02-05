@@ -128,12 +128,14 @@ export class UsersService {
           select: {
             id: true,
             username: true,
+            status: true,
           }
         },
         friends: {
           select: {
             id: true,
             username: true,
+            status: true,
           }
         },
         receivedNotifications: {

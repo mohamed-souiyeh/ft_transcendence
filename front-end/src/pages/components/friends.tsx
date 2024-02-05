@@ -31,6 +31,7 @@ function Friends(props) {
       <div className='flex place-items-center basis-1/2' >
         <img src={img} className='rounded-full h-12 w-12' />
         <p className='text-lg px-7' > {friend.username} </p>
+        <p className='text-lg px-7' > {friend.status} </p>
       </div>
       <div className='flex flex-row-reverse  place-items-center basis-1/2' >
         {/* bc we gon call those two icons tgther so much, i will make a component for it */}

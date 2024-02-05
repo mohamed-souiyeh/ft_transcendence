@@ -29,6 +29,7 @@ function Blocked(props) {
       <div className='flex place-items-center basis-1/2' >
         <img src={img} className='rounded-full h-12 w-12' />
         <p className='text-lg px-7' > {blocked.username} </p>
+        <p className='text-lg px-7' > {blocked.status} </p>
       </div>
       <div className='flex flex-row-reverse  place-items-center basis-1/2' >
          
