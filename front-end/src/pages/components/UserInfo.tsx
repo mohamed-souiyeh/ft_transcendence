@@ -80,16 +80,31 @@ export default function UserInfo() {
     });
   };
 
-  // const handleAddFriend = async () => {
-  //   try {
-  //     const friendUsername = username;
-  //     await axios.get(`http://localhost:1337/users/Public_data/${friendUsername}`);
-  //     setIsFriendAdded(true);
-  //   } catch (error) {
+  const alert2 =()=>{
+    Swal.fire({
+      title: "Are you sure?",
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: "yes",
+      denyButtonText: `No`,
+      iconColor: 'purple', 
+      customClass: {
+        popup: 'w-96 h-auto ',
+        confirmButton: 'w-32 h-12',
+        denyButtonText: 'w-32 h-12',
+        
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire("Unfriend successfully!", "", "success");
+      } else if (result.isDenied ) {
+        Swal.fire("Good, be more social bro", "", "success");
+        setIsFriendAdded(true);
+      }
+    });
+  }
 
-  //     console.error('Error adding friend:', error);
-  //   }
-  // };
+
 
   const handleAddFriend = async () => {
     try {
@@ -122,7 +137,7 @@ export default function UserInfo() {
       console.log(response.data);
       setIsFriendAdded(false);
       setIsFriendPending(false);
-      alert("Unfriended successfully", "You have removed the user from your friends list.", "success");
+      alert2();
     } catch (error) {
       console.error('Error unfriending user:', error);
       alert("Error", "An error occurred while trying to unfriend the user.", "error");
@@ -146,10 +161,7 @@ export default function UserInfo() {
     }
   };
 
-  const handleSendMessage = () => {
-    // Add logic to handle sending a message
-    console.log('Send message logic here');
-  };
+
 
   return (
     <div className="flex bg-purple bg-opacity-30  border-[2px] border-purple/20 rounded-3xl ">
@@ -177,23 +189,15 @@ export default function UserInfo() {
 
           <button
             onClick={handleBlockUser}
-            className="text-white bg-purple ring-2 ring-purple hover:bg-gradient-to-l focus:ring-4 focus:ring-purple-sh-1 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            className="text-white bg-purple ring-2 ring-purple hover:bg-gradient-to-l focus:ring-4 focus:ring-purple-sh-1 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 ml-8"
           >
             Block User
-          </button>
-
-          <button
-            onClick={handleSendMessage}
-            className="text-white bg-purple ring-2 ring-purple hover:bg-gradient-to-l focus:ring-4 focus:ring-purple-sh-1 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            Send Message
           </button>
         </div>}
       </div>
     </div>
   );
 }
-
 
 
 
