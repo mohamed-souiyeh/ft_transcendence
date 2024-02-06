@@ -10,6 +10,7 @@ import botPic from '../../assets/bot.png'
 import pic from '../../assets/taha.jpg'
 import './spinner.css';
 import { useNavigate } from 'react-router-dom';
+import { useAvatarContext } from '../../contexts/avatar';
 
 function rad2Degree(angle:number) : number
 {
@@ -20,17 +21,15 @@ let gl:WebGLRenderingContext | null;
 
 function BotMode() 
 {
+  const {avatar} = useAvatarContext();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   let [score1, setScore1] = useState(0);
   let [score2, setScore2] = useState(0);
   let [leftPic, setLeftPic] = useState(pic);
   let [gameState, setState] = useState(false);
-  let [win, setWinState] = useState(true);
-  let [profileImage, setImage] = useState('');
   let [foundMatch, setMatchState] = useState(false);
   let navigate = useNavigate();
   const frameRef = useRef<number>(0);
-  let formdata = new FormData();
 
   const socket = useSocket("game");
 
@@ -46,7 +45,6 @@ function BotMode()
         if (socket)
         {
             socket.emit("botMode");
-            socket.on("winner", (v:boolean)=>{setWinState(v);});
 
             setLeftPic(botPic);
                 socket.on("leaveGame", ()=>{
@@ -68,7 +66,7 @@ function BotMode()
         }
         if (!gl)
         {
-        return;
+         return;
         }
         let w = 0, h = 0;
         if (gl)
@@ -133,17 +131,16 @@ function BotMode()
         {
             if (socket)
             {
-            socket.emit('right', 1);
-            socket.emit('left', 1);
-
+                socket.emit('right', 1);
+                socket.emit('left', 1);
             }
         }
         if (e.code == 'KeyS')
         {
             if (socket)
             {
-            socket.emit('right', -1);
-            socket.emit('left', -1);
+                socket.emit('right', -1);
+                socket.emit('left', -1);
             }
         }
         })
@@ -153,16 +150,16 @@ function BotMode()
         {
             if (socket)
             {
-            socket.emit('right', 0);
-            socket.emit('left', 0);
+                socket.emit('right', 0);
+                socket.emit('left', 0);
             }
         }
         if (e.code == 'KeyS')
         {
             if (socket)
             {
-            socket.emit('right', 0);
-            socket.emit('left', 0);
+                socket.emit('right', 0);
+                socket.emit('left', 0);
             }
         }
         })
@@ -197,7 +194,9 @@ function BotMode()
             0, 0, 0, 1
         ];
         if (socket)
+        {
             socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
+        }
 
         if (foundMatch)
         {
@@ -215,7 +214,8 @@ function BotMode()
             socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
             socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
             socket.on('balllaunched', (v:boolean)=>{ballLaunched=v;});
-            }
+            
+        }
             
             if (gl)
             {
@@ -266,7 +266,8 @@ function BotMode()
         };
 
         window.addEventListener("resize", handle);
-        return () => {cancelAnimationFrame(frameRef.current);
+        return () => {
+            cancelAnimationFrame(frameRef.current);
         }
   }, [socket]);
 
@@ -278,7 +279,7 @@ function BotMode()
                       height: "100%"}}>
           {<Profile score = {score1}
                     score2= {score2}
-                    pic1={leftPic}
+                    pic1={avatar}
                     pic2={leftPic}/>}
           <canvas style={{right:"300px",
                           width: "100%",

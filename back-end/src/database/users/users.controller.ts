@@ -169,7 +169,7 @@ export class UsersController {
   async getUserAvatar(@Param('userId', ParseIntPipe) userId: number, @Res() res: Response): Promise<void> {
     try {
       const avatarPath = await this.userService.getUserAvatar(userId);
-      res.sendFile(join(cwd, avatarPath));
+      res.sendFile(avatarPath);
     } catch (error) {
       console.log(error);
       throw new NotFoundException('Utilisateur ou Avatar non trouvé');
@@ -180,12 +180,12 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('Public_data/:username')
-  async getUserByUsername(@Param('username') username: string): Promise<any> {
+  async getUserByUsername(@Param('username') username: string): Promise<any> { 
     try {
       const userData = await this.userService.getUserData(username);
       return userData;
     } catch (error) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found'); 
     }
   }
 
