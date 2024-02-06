@@ -39,12 +39,12 @@ function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refres
     createdGroup: { name: "", privacy:"", password:"", description: "", members: [], } , 
     setCreatedGroup: Dispatch<SetStateAction<Object>>} ) {
 
-const [ data, setData ] = useState<{
-  id: number,
-  username: string,
-  added: boolean,
-}[]>([]);
-  
+  const [ data, setData ] = useState<{
+    id: number,
+    username: string,
+    added: boolean,
+  }[]>([]);
+
   let { channel } = useChannelContext();
 
 
@@ -62,27 +62,28 @@ const [ data, setData ] = useState<{
   useEffect(() => {
     console.log("useEffect data: ", data);
     setData([]);
-    axios.get('http://localhost:1337/users/friends',
-    {
-      withCredentials: true,
-    }).then((res) => {
-      // console.log("this is the friends response :", res);
-      console.log("friends: ", res.data);
-      let friends: {
-        id: number,
-        username: string,
-        added: boolean,
-      }[] = res.data.map((friend) => ({...friend, added: false}));
-    
-      if (isChannel) {
-        const tmp_channel = channel as channelType;
+    // axios.get('http://localhost:1337/users/friends',
+    axios.get('http://localhost:1337/users/network',
+      {
+        withCredentials: true,
+      }).then((res) => {
+        // console.log("this is the friends response :", res);
+        console.log("friends: ", res.data.friends);
+        let friends: {
+          id: number,
+          username: string,
+          added: boolean,
+        }[] = res.data.friends.map((friend) => ({...friend, added: false}));
 
-        friends = friends.filter((friend) => tmp_channel.users.find((user) => user.id === friend.id) === undefined);
-      }
-      setData(friends);
-    }).catch((err) => {
-      console.log("error in friends page: ", err);
-    });
+        if (isChannel) {
+          const tmp_channel = channel as channelType;
+
+          friends = friends.filter((friend) => tmp_channel.users.find((user) => user.id === friend.id) === undefined);
+        }
+        setData(friends);
+      }).catch((err) => {
+        console.log("error in friends page: ", err);
+      });
   }, [])
 
 
