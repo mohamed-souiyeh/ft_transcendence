@@ -62,8 +62,8 @@ function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refres
   useEffect(() => {
     console.log("useEffect data: ", data);
     setData([]);
-    // axios.get('http://localhost:1337/users/friends',
-    axios.get('http://localhost:1337/users/network',
+    axios.get('http://localhost:1337/users/friends',
+    // axios.get('http://localhost:1337/users/network',
       {
         withCredentials: true,
       }).then((res) => {

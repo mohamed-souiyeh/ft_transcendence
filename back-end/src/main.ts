@@ -10,6 +10,8 @@ import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LoggingInterceptor } from './logging.interceptor';
+import { ErrorsInterceptor } from './errors.interceptor';
 
 
 // const swaggerOptions: SwaggerDocumentOptions = {
@@ -48,6 +50,8 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   
+  app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useGlobalInterceptors(new ErrorsInterceptor());
 
   //NOTE - swagger config
   // const config = new DocumentBuilder()
