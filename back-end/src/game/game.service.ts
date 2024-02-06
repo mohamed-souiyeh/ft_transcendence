@@ -14,8 +14,7 @@ import { MatchDto } from 'src/database/matches/matches.dto';
 @Injectable()
 export class gameService
 {
-    constructor(private readonly authService: AuthService,
-                public readonly chatService: ChatService,
+    constructor(public readonly chatService: ChatService,
                 public readonly matchesService: MatchesService) {}
     async paddleCollision(room: room)
     {
@@ -107,14 +106,14 @@ export class gameService
 							room.ballPosX = 0.94 - 0.05;
 							room.ballPosY = room.firstPaddlePos;
 							room.velocityAngle = 0;
-							room.ballVelocityX = 1;
-							room.ballVelocityY = 1;
+							room.ballVelocityX = -1;
+							room.ballVelocityY = -1;
 						}
 						if (room.secondPlayerHaveTheBall) {
 							room.ballPosX = -0.94 + 0.05;
 							room.ballPosY = room.secondPaddlePos;
-							room.ballVelocityX = -1;
-							room.ballVelocityY = -1;
+							room.ballVelocityX = 1;
+							room.ballVelocityY = 1;
 							if (room.gameMode == "robot")
 							{
 								room.ballLaunched = true; 
@@ -161,7 +160,7 @@ export class gameService
                     }
 	
 					room.ballPosX += (room.speed
-                                        * Math.cos(room.velocityAngle * Math.PI/180) 
+                                        * Math.cos(-room.velocityAngle * Math.PI/180)
                                         * room.ballVelocityX);
 					room.ballPosY += (room.speed
                                         * Math.sin(room.velocityAngle * Math.PI/180) 

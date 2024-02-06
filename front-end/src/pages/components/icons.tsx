@@ -82,7 +82,7 @@ function Icons(props) {
       <div  title="Invite to a game" className="px-3 cursor-pointer" onClick={() => 
           {
               if (game_socket)
-                game_socket.emit("invite", 4);
+                game_socket.emit("invite", user.id);
               console.log("invite sent", user.id);
           }}>
         <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none">

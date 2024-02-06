@@ -26,6 +26,35 @@ export class UsersService {
 
   //SECTION - CREATE OPERATIONS
 
+ 
+  async createAchievement(userId: number, achievementName: string):Promise<any>
+  {
+    console.log("User ", userId);
+    const achievement = await this.prismaService.achievement.findUnique({
+      where: { name: achievementName },
+    });
+    
+    if (!achievement) {
+      throw new Error(`Achievement with name ${achievementName} does not exist`);
+      return null;
+    }
+    
+    const user = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        achievements:{
+        connect:{
+          id: achievement.id
+        }
+       }
+      }
+    });
+
+    return user;
+  }
+
   async createFriendship(userId: number, friendId: number): Promise<any> {
     const user = await this.prismaService.user.update({
       where: {
@@ -73,6 +102,7 @@ export class UsersService {
   //!SECTION
 
 
+
   //SECTION - READ OPERATIONS
 
   async getScore(id: number) {
@@ -98,12 +128,14 @@ export class UsersService {
           select: {
             id: true,
             username: true,
+            status: true,
           }
         },
         friends: {
           select: {
             id: true,
             username: true,
+            status: true,
           }
         },
         receivedNotifications: {
@@ -191,6 +223,7 @@ export class UsersService {
         username: true,
         score: true,
         matchesPlayed: true,
+        wins: true,
         email: true,
         isProfileSetup: true,
         isAuthenticated: true,
@@ -659,7 +692,6 @@ export class UsersService {
   }
 
 
-
   async getUserData(username: string): Promise<any> {
     const user = await this.prismaService.user.findUnique({
       where: { username },
@@ -780,5 +812,6 @@ export class UsersService {
 
   }
   
+
   // !
 }

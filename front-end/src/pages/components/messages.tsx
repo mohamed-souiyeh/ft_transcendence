@@ -77,31 +77,32 @@ function Messages() {
         if (err) return console.log("error in checking if the user is blocked: ", err);
         console.log("isBlocked is: ", res);
         setIsBlocked(res.isBlocked);
+        if (res.isBlocked === false)
+        {
+        //NOTE - fetch the messages of the dm using the dm.id and dm.type from the chatGatway
+        user.chat.timeout(5000).emit('getAllMessages', {
+          convId: dm.id,
+          convType: dm.type,
+        }, (err, messages) => {
+            if (err) return console.log("error in getting all messages: ", err);
+            console.log("messages are: ", messages);
+            setMsgs(messages);
+          })
+        }
       })
 
-    //NOTE - fetch the messages of the dm using the dm.id and dm.type from the chatGatway
-    user.chat.timeout(5000).emit('getAllMessages', {
-      convId: dm.id,
-      convType: dm.type,
-    }, (err, messages) => {
-        if (err) return console.log("error in getting all messages: ", err);
-        console.log("messages are: ", messages);
-        setMsgs(messages);
-      })
     // console.log("user: ", user);
 
     user.chat.on('broadcast', (msg) => {
       setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
+    setImg(`http://localhost:1337/users/${dm.userId}/avatar`);
     return () => {
       user.chat.off('broadcast');
     }
   }, [dm])
 
-  useEffect( ()=> {
-    setImg(`http://localhost:1337/users/${dm.userId}/avatar`);
-  },[])
 
   const sendMsg = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -137,7 +138,9 @@ function Messages() {
       </div>
 
       <div className="h-[87%] overflow-scroll scrollbar-thin scrollbar-thumb-purple-sh-0" ref={messagesEndRef}>
-        {(msgs.length ? msgs.map((msg) => <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={msg.message} key={msg.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p>)}
+        {
+          isBlocked ? <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> One of you blocked the other</p> :
+        (msgs.length ? msgs.map((msg) => <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={msg.message} key={msg.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p>)}
       </div>
       <div className="fixed bottom-5 bg-purple-sh-0 w-[66%] h-12 m-2 rounded-lg px-2">
         {!isBlocked ? <form onSubmit={sendMsg} className="flex items-center">

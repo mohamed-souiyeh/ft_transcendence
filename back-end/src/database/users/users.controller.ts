@@ -169,7 +169,6 @@ export class UsersController {
   async getUserAvatar(@Param('userId', ParseIntPipe) userId: number, @Res() res: Response): Promise<void> {
     try {
       const avatarPath = await this.userService.getUserAvatar(userId);
-      // console.log("avatarPath => ", avatarPath);
       res.sendFile(avatarPath);
     } catch (error) {
       console.log(error);
