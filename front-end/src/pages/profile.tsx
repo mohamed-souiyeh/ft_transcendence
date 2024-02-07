@@ -64,7 +64,7 @@ function Profile () {
     { withCredentials: true } )
     .then(res => {
       setHistoty(res.data.allMatches)
-      // console.log("eeee: ", res.data.allMatches)
+      console.log("eeee: ", res.data.allMatches)
       })
   .catch(()=>{
       console.log("Error getting matches history!!")
