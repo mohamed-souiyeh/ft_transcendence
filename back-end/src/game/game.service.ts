@@ -151,7 +151,7 @@ export class gameService
 					}
                     else
                     {
-                        if (room.score1 >= 1 || room.score2 >= 1) 
+                        if (room.score1 >= 4 || room.score2 >= 4) 
                         {
                             server.to(room.id + '').emit('gameover');
                             room.endTime = new Date();
@@ -165,13 +165,17 @@ export class gameService
 					room.ballPosY += (room.speed
                                         * Math.sin(room.velocityAngle * Math.PI/180) 
                                         * room.ballVelocityY);
-					server.to(room.id + '').emit('ballPosX', (room.ballPosX));
-					server.to(room.id + '').emit('ballPosY', (room.ballPosY));
-					server.to(room.id + '').emit('score', room.score1, room.score2);
-					server.to(room.id + '').emit('left', room.firstPaddlePos);
-					server.to(room.id + '').emit('right', room.secondPaddlePos); 
-					server.to(room.id + '').emit('matchFound', true);
-					server.to(room.id + '').emit('ballPosetion', room.firstPlayerHaveTheBall, room.secondPlayerHaveTheBall);
+
+                    {
+                        console.log(`${room.id}`);
+                        server.to(`${room.id}`).emit('ballPosX', (room.ballPosX));
+                        server.to(`${room.id}`).emit('ballPosY', (room.ballPosY));
+                        server.to(`${room.id}`).emit('score', room.score1, room.score2);
+                        server.to(`${room.id}`).emit('left', room.firstPaddlePos);
+                        server.to(`${room.id}`).emit('right', room.secondPaddlePos);
+                        server.to(`${room.id}`).emit('matchFound', true);
+                        server.to(`${room.id}`).emit('ballPosetion', room.firstPlayerHaveTheBall, room.secondPlayerHaveTheBall);
+                    }
 				}
 			}
 		}, 1000 / 60);

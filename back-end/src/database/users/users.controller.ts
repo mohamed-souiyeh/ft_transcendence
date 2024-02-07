@@ -188,12 +188,12 @@ export class UsersController {
 
   //@UseGuards(JwtAuthGuard)
   @Get('Public_data/:username')
-  async getUserByUsername(@Param('username') username: string): Promise<any> {
+  async getUserByUsername(@Param('username') username: string): Promise<any> { 
     try {
       const userData = await this.userService.getUserData(username);
       return userData;
     } catch (error) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found'); 
     }
   }
 

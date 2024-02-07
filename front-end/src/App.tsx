@@ -192,7 +192,7 @@ function SetupSockets() {
     const setIntervalId = setInterval(() =>
     {
         ping_socket.emit('ping');
-      }, 3 * 60 * 1000);
+      }, 5 * 1);
 
 
     //TODO - this maybe broken it need testing because the notification event is sent from the main gateway not the chat gateway
@@ -345,7 +345,8 @@ function App() {
                         <Route path="/groups" element={<ManageGoups/>} />
                         <Route path="/search" element={<Search/>} />
                         <Route path="/not-found" element={<NotFoundPage />} />
-                        <Route path="/game" element={
+                        <Route path="/game" 
+                        element={
                           <SocketContext.Provider value={game_socket}>
                             <Game />
                           </SocketContext.Provider>
