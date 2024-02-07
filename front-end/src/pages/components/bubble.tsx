@@ -60,12 +60,11 @@ function Bubble(props) {
     }
   }
 
-  const ban = () => {
+  const ban = (duration: number) => {
     if (user.chat) {
       const now: Date = new Date();
 
-      now.setFullYear(now.getFullYear() + 1);
-
+      duration == 1 ? now.setMinutes(now.getMinutes() + 1) : (duration == 2 ? now.setMinutes(now.getMinutes() + 10) : now.setFullYear(now.getFullYear() + 1000000))
 
       user.chat.emit('banUser', {
         convType: channel.type,
@@ -86,12 +85,14 @@ function Bubble(props) {
     }
   }
 
-  const mute = () => {
+  const mute = (duration: number) => {
     if (user.chat) {
       const now: Date = new Date();
 
-      now.setFullYear(now.getFullYear() + 1);
+      //that is the only line we have to change, read docs
+      duration == 1 ? now.setMinutes(now.getMinutes() + 1) : (duration == 2 ? now.setMinutes(now.getMinutes() + 10) : now.setFullYear(now.getFullYear() + 1000000))
 
+      console.log("aaaaaaaaaa: ", now.toISOString())
       user.chat.emit('muteUser', {
         convType: channel.type,
         convId: channel.id,
@@ -126,7 +127,7 @@ function Bubble(props) {
 
                 <Menu>
                   <MenuHandler >
-                    <button className="bg-transparent p-0 m-0">
+                    <button className="bg-transparent p-0 m-0 border-none outline-none">
                       {props.username}
                     </button>
                   </MenuHandler>
@@ -150,9 +151,9 @@ function Bubble(props) {
                             </MenuItem>
                           </MenuHandler >
                           <MenuList className="bg-purple-sh-2 border border-purple">
-                            <MenuItem className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">1 Minute</MenuItem>
-                            <MenuItem className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">10 Minute</MenuItem>
-                            <MenuItem className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Forever</MenuItem>
+                            <MenuItem  onClick={() => {ban(1)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">1 Minute</MenuItem>
+                            <MenuItem  onClick={() => {ban(1)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">10 Minute</MenuItem>
+                            <MenuItem  onClick={() => {ban(1)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Forever</MenuItem>
                           </MenuList>
                         </Menu>
 
@@ -174,9 +175,9 @@ function Bubble(props) {
                             </MenuItem>
                           </MenuHandler >
                           <MenuList className="bg-purple-sh-2 border border-purple">
-                            <MenuItem className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">1 Minute</MenuItem>
-                            <MenuItem className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">10 Minute</MenuItem>
-                            <MenuItem className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Forever</MenuItem>
+                            <MenuItem onClick={() => {mute(1)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">1 Minute</MenuItem>
+                            <MenuItem onClick={() => {mute(2)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">10 Minute</MenuItem>
+                            <MenuItem onClick={() => {mute(3)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Forever</MenuItem>
                           </MenuList>
                         </Menu>
 
