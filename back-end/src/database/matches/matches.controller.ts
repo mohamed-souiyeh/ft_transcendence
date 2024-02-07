@@ -17,10 +17,10 @@ export class MatchesController {
   //   return await this.matchesService.findOne(Number(id));
   // }
 
-  @Post()
-  async create(@Body() createMatchDto: MatchDto) {
-    return await this.matchesService.create(createMatchDto);
-  }
+  // @Post()
+  // async create(@Body() createMatchDto: MatchDto) {
+  //   return await this.matchesService.create(createMatchDto);
+  // }
 
   // @Put(':id')
   // async update(@Param('id') id: string, @Body() updateMatchDto: MatchDto)  {
