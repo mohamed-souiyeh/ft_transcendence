@@ -190,7 +190,11 @@ export class UsersService {
         id: userId,
       },
       include: {
-        channels: true,
+        channels: {
+          include: {
+            usersState: true,
+          },
+        },
         dms: true,
       }
     });
@@ -740,6 +744,11 @@ export class UsersService {
       take: 10, 
       orderBy: {
         score: 'desc', 
+      },
+      where: {
+        matchesPlayed: {
+          gt: 0,
+        }
       },
       select: {
         id: true,
