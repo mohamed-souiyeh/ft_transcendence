@@ -1,9 +1,6 @@
 import NavBar from "./components/navbar";
 import SideBar from "./components/sidebar";
 import Popup from "./components/twofa";
-import trophy from "../assets/trophy.png";
-import star from "../assets/star.png";
-import games from "../assets/controller.png"
 import { Switch, ConfigProvider } from "antd";
 import { useState, useContext } from "react";
 import newComerPic from "../assets/newcomer.png";
@@ -13,6 +10,7 @@ import { UserContext } from "../App";
 import { useAvatarContext } from "../contexts/avatar";
 import axios from "axios";
 import Cookies from 'js-cookie';
+import History from "./components/history";
 
 function Profile () {
 
@@ -27,12 +25,11 @@ function Profile () {
   const [name, setName] = useState(user.data.username)
   const [badName, setBadName] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [history, setHistoty] = useState([])
   let formdata = new FormData();
 
   const changeUserName = (e : React.FormEvent) => {
     e.preventDefault()
-    //send req, set err msg if bad username
-    //
 
     if (name.length)
     formdata.set("username", name);
@@ -61,8 +58,17 @@ function Profile () {
         setSuccess(false)
         setBadName(true)
       })
-
   }
+
+  axios.get(`http://localhost:1337/users/Public_data/${user.data.username}`,
+    { withCredentials: true } )
+    .then(res => {
+      setHistoty(res.data.allMatches)
+      // console.log("eeee: ", res.data.allMatches)
+      })
+  .catch(()=>{
+      console.log("Error getting matches history!!")
+    })
 
   return(
     <>
@@ -119,8 +125,7 @@ function Profile () {
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-100">Matchs History:</p>
                 </div>
-
-                {/* we need a component for opponents, that will show their name, image, and score from that match*/}
+                {history.length ? history.map((matches) => <History key={matches.id} />) : <p className="text-xl text-purple/50 p-5"> No history made yet </p>}
               </div>
             </div>
           </div>

@@ -40,20 +40,20 @@ function Icons(props) {
   }, [menuRef]);
 
 
-  const unfriend = () => {
-    axios.post(`${process.env.REACT_URL}:1337/users/unfriend`, {id: user.id}, {
-      withCredentials: true
-    }).then((res) => {
-      if (unmount) {
-        unmount(networkTabs.FRIENDS);
-      }
-      console.log('remove from friends')
-    }).catch((err) => {
-      console.log('error in removing friend in Icons: ', err);
-    });
-    // console.log('remove from friends');
+  // const unfriend = () => {
+  //   axios.post(`${process.env.REACT_URL}:1337/users/unfriend`, {id: user.id}, {
+  //     withCredentials: true
+  //   }).then((res) => {
+  //     if (unmount) {
+  //       unmount(networkTabs.FRIENDS);
+  //     }
+  //     console.log('remove from friends')
+  //   }).catch((err) => {
+  //     console.log('error in removing friend in Icons: ', err);
+  //   });
+  //   // console.log('remove from friends');
 
-  }
+  // }
 
   const visitProfile = () => {
     navigate('/'+ username)
@@ -61,21 +61,21 @@ function Icons(props) {
     console.log("DONE");
   }
 
-  const blocUser = () => {
-    axios.post(`${process.env.REACT_URL}:1337/users/block`, {id: user.id}, {
-      withCredentials: true
-    }).then((res) => {
-      if (unmount) {
-        unmount(networkTabs.FRIENDS);
-      }
-      console.log('blocki zmar')
-    }).catch((err) => {
-      console.log('error in blocking user in Icons: ', err);
-    });
-    
-    // console.log('blocki zmar')
+  // const blocUser = () => {
+  //   axios.post(`${process.env.REACT_URL}:1337/users/block`, {id: user.id}, {
+  //     withCredentials: true
+  //   }).then((res) => {
+  //     if (unmount) {
+  //       unmount(networkTabs.FRIENDS);
+  //     }
+  //     console.log('blocki zmar')
+  //   }).catch((err) => {
+  //     console.log('error in blocking user in Icons: ', err);
+  //   });
+  //   
+  //   // console.log('blocki zmar')
 
-  }
+  // }
 
   return (
     <div className="flex items-center">
@@ -105,9 +105,9 @@ function Icons(props) {
         </button>
       </MenuHandler>
       <MenuList className="bg-purple-sh-2 border border-purple">
-        <MenuItem onClick={() => {unfriend()}} placeholder={"a"} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Unfriend</MenuItem>
+        {/* <MenuItem onClick={() => {unfriend()}} placeholder={"a"} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Unfriend</MenuItem> */}
         <MenuItem onClick={() => {visitProfile()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Visit profile</MenuItem>
-        <MenuItem onClick={() => {blocUser()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Bloc user</MenuItem>
+        {/* <MenuItem onClick={() => {blocUser()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Bloc user</MenuItem> */}
       </MenuList>
     </Menu>
 
