@@ -186,7 +186,7 @@ export class UsersController {
 
 
 
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Get('Public_data/:username')
   async getUserByUsername(@Param('username') username: string): Promise<any> { 
     try {
