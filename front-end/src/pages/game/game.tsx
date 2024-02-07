@@ -1,14 +1,11 @@
-import React , {useRef, useEffect, useState, useContext} from 'react';
+import {useRef, useEffect, useState, useContext} from 'react';
 import axios from 'axios';
 import Profile from "../components/userProfileIcone";
 import {Cube} from './cube';
 import quitButton from './exitGame.png';
-import { useSocket } from '../../clientSocket';
 import './spinner.css';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from '../../clientSocket';
-import { UserContext } from '../../App';
-import { useAvatarContext } from '../../contexts/avatar';
 
 function rad2Degree(angle:number) : number
 {
@@ -19,16 +16,13 @@ let gl:WebGLRenderingContext | null;
 
 function Game() 
 {
-  //modified/ruined by laila==========================================
-  const {avatar} = useAvatarContext()
-
   //================================================================
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  let user = useContext(UserContext);
   let [avatar1, setAvatar1] = useState('');
   let [avatar2, setAvatar2] = useState('');
   let [score1, setScore1] = useState(0);
   let [score2, setScore2] = useState(0);
+  let [fetchedAvatars, setFetchState] = useState(false);
   let [gameState, setState] = useState(false);
   let [win, setWinState] = useState(true);
   let [foundMatch, setMatchState] = useState(false);
@@ -51,13 +45,19 @@ function Game()
     const handleAlreadyQueuing = () => { navigate("/home"); };
     const handleGameOver = () => {
       if (!gameState) {
-        socket.emit("gameOver");
         setState(true);
+        socket.emit("gameOver");
       }
     };
     if (socket)
     {
       socket.emit("queuing");
+      socket.on("inviteAccepted", ()=>{
+        console.log("inviteAccepted");
+        console.log("Game state ", gameState);
+        setState(false); 
+        }
+      );
       socket.on("winner", handleWinner);
       socket.on("leaveGame", handleLeaveGame);
       socket.on("alreadyPlaying", handleAlreadyPlaying);
@@ -210,30 +210,36 @@ function Game()
       if (socket)
       {
         socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
-        socket.on('userIDs', (user1:number, user2:number)=>
+        if(!fetchedAvatars)
         {
-              console.log("User 1 : ", user1);
-              console.log("User 2 : ", user2);
-              if (avatar1 == '')
-              {
-                  // axios.get(`http://localhost:1337/users/Public_data/${user.username}`,
-                  //   { withCredentials: true }
-                  // ).then((response) => {
-                  //   setAvatar1(`http://localhost:1337/users/${user}/avatar`);
-                  // }).catch(error => {
-                  //   console.error('Error fetching user data:', error);
-                  //   navigate("/not-found");
-                  // });
-              };
-        })
+          socket.on('userIDs', (user1:number, user2:number)=>
+          {
+              console.log(user1, user2);
+              Promise.all([
+                axios.get(`http://localhost:1337/users/${user1}/avatar`, { withCredentials: true }),
+                axios.get(`http://localhost:1337/users/${user2}/avatar`, { withCredentials: true })
+              ])
+              .then(([response1, response2]) => {
+                setAvatar1(`http://localhost:1337/users/${user1}/avatar`);
+                setAvatar2(`http://localhost:1337/users/${user2}/avatar`);
+              })
+              .catch(error => {
+                console.error('Error fetching user data:', error);
+              });
+            })
+          }
+          fetchedAvatars = true;
+          setFetchState(true);
       }
 
     if (foundMatch)
     {
+      socket.on("gameStart", ()=>{gameState = false; setState(false)});
       setScore1((score1));
       setScore2((score2));
       if (socket)
       {
+        
           socket.emit('playing');
           socket.on('score', (v:number, v1:number) => {
             score1 = v;
@@ -315,12 +321,8 @@ function Game()
                       height: "100%"}}>
           {<Profile score = {score1}
                     score2= {score2}
-          //modified/ruined by laila==========================================
-                    pic1={avatar}
-                    pic2={avatar}
-                    // pic1={user.user.avatar}
-                    // pic2={user.user.avatar}
-          //====================================================================================
+                    pic1={avatar1}
+                    pic2={avatar2}
         />}
           <canvas style={{right:"300px",
                           width: "100%",
