@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useChannelContext } from "../../contexts/channelContext"
-import { Menu, MenuHandler, MenuList, MenuItem } from "@material-tailwind/react";
 import { UserContext } from "../../App";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { Menu, MenuHandler, MenuList, MenuItem, Button, } from "@material-tailwind/react";
+
+
+                        {/* <MenuItem onClick={() => { ban() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Ban user</MenuItem> */}
 
 function Bubble(props) {
 
@@ -57,12 +60,11 @@ function Bubble(props) {
     }
   }
 
-  const ban = () => {
+  const ban = (duration: number) => {
     if (user.chat) {
       const now: Date = new Date();
 
-      now.setFullYear(now.getFullYear() + 1);
-
+      duration == 1 ? now.setMinutes(now.getMinutes() + 1) : (duration == 2 ? now.setMinutes(now.getMinutes() + 10) : now.setFullYear(now.getFullYear() + 1000000))
 
       user.chat.emit('banUser', {
         convType: channel.type,
@@ -83,12 +85,14 @@ function Bubble(props) {
     }
   }
 
-  const mute = () => {
+  const mute = (duration: number) => {
     if (user.chat) {
       const now: Date = new Date();
 
-      now.setFullYear(now.getFullYear() + 1);
+      //that is the only line we have to change, read docs
+      duration == 1 ? now.setMinutes(now.getMinutes() + 1) : (duration == 2 ? now.setMinutes(now.getMinutes() + 10) : now.setFullYear(now.getFullYear() + 1000000))
 
+      console.log("aaaaaaaaaa: ", now.toISOString())
       user.chat.emit('muteUser', {
         convType: channel.type,
         convId: channel.id,
@@ -108,6 +112,10 @@ function Bubble(props) {
     } console.log("unmuted");
   }
 
+    const [openMenu, setOpenMenu] = useState(false);
+    const [openMute, setOpenMute] = useState(false);
+
+
   return (
     <>
       {props.left ?
@@ -118,8 +126,8 @@ function Bubble(props) {
               {Object.keys(channel).length && props.authorInfo.role !== "kicked" ?
 
                 <Menu>
-                  <MenuHandler>
-                    <button className="bg-transparent p-0 m-0">
+                  <MenuHandler >
+                    <button className="bg-transparent p-0 m-0 border-none outline-none">
                       {props.username}
                     </button>
                   </MenuHandler>
@@ -132,15 +140,51 @@ function Bubble(props) {
                     {isAdmin &&
                       (props.authorState === "banned" ?
                         <MenuItem onClick={() => { unban() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">unban user</MenuItem>
-                        : <MenuItem onClick={() => { ban() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Ban user</MenuItem>)
-                    }
+                        : 
+                        <Menu placement="right-start" open={openMenu} handler={setOpenMenu} allowHover offset={15} >
+                          <MenuHandler className="flex items-center justify-between text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">
+                            <MenuItem >
+                              Ban for
+                              <svg xmlns="http://www.w3.org/2000/svg" width="8" height="14" viewBox="0 0 8 14" fill="none">
+                                <path d="M7.99951 7.00098L0.499512 13.9292V0.0727734L7.99951 7.00098Z" fill="#796FA4"/>
+                              </svg>
+                            </MenuItem>
+                          </MenuHandler >
+                          <MenuList className="bg-purple-sh-2 border border-purple">
+                            <MenuItem  onClick={() => {ban(1)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">1 Minute</MenuItem>
+                            <MenuItem  onClick={() => {ban(1)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">10 Minute</MenuItem>
+                            <MenuItem  onClick={() => {ban(1)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Forever</MenuItem>
+                          </MenuList>
+                        </Menu>
+
+
+                      )}
                     {
                       (isAdmin && props.authorState !== "banned") &&
                       (props.authorState === "muted" ?
                         <MenuItem onClick={() => { unmute() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">unmute user</MenuItem>
-                        : <MenuItem onClick={() => { mute() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Mute for 10 mins</MenuItem>)
-                    }
+                        : 
 
+                        <Menu placement="right-start" open={openMute} handler={setOpenMute} allowHover offset={15} >
+                          <MenuHandler className="flex items-center justify-between text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">
+                            <MenuItem >
+                              Mute for
+                              <svg xmlns="http://www.w3.org/2000/svg" width="8" height="14" viewBox="0 0 8 14" fill="none">
+                                <path d="M7.99951 7.00098L0.499512 13.9292V0.0727734L7.99951 7.00098Z" fill="#796FA4"/>
+                              </svg>
+                            </MenuItem>
+                          </MenuHandler >
+                          <MenuList className="bg-purple-sh-2 border border-purple">
+                            <MenuItem onClick={() => {mute(1)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">1 Minute</MenuItem>
+                            <MenuItem onClick={() => {mute(2)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">10 Minute</MenuItem>
+                            <MenuItem onClick={() => {mute(3)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Forever</MenuItem>
+                          </MenuList>
+                        </Menu>
+
+
+                        )}
+
+                          {/* <MenuItem onClick={() => { mute() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Mute for 10 mins</MenuItem> */}
 
 
                     {isAdmin && <MenuItem onClick={() => { kickUser() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Kick user</MenuItem>}
