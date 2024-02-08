@@ -138,27 +138,39 @@ function Profile () {
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-100">acheivements:</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <img style={{
-                    width: '60px',
-                    filter: !isNewComer ? 'sepia(100%)': 'none',
-                  }} src={newComerPic} />
-                  {isNewComer && (<h1 style={{fontSize:"35px"}}>New comer</h1>)}
+                <div className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15">
+                  <img src={newComerPic} className="h-20 mx-4"/>
+                  <p className="text-2xl text-purple-tone-2 mx-3" > New Comer</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <img style={{
-                    width: '60px',
-                    filter: !isPlayer ? 'sepia(100%)': 'none',
-                  }} src={playerPic} />
-                  {isPlayer && (<h1 style={{fontSize:"35px"}}>Player</h1>)}
+                <div className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15">
+                  <img src={playerPic} className="h-20 mx-4"/>
+                  <p className="text-2xl text-purple-tone-2 mx-3" > Pro Player</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <img style={{
-                    width: '60px',
-                    filter: !isVeteran ? 'sepia(100%)': 'none',
-                  }} src={veteranPic} />
-                  {isVeteran && (<h1 style={{fontSize:"35px"}}>Veteran</h1>)}
+                <div className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15">
+                  <img src={veteranPic} className="h-20 mr-2 grayscale opacity-60"/>
+                  <p className="text-2xl text-purple-tone-2 mx-3" > Veteran!</p>
                 </div>
+                {/* <div style={{ display: 'flex', alignItems: 'center' }}> */}
+                {/*   <img style={{ */}
+                {/*     width: '60px', */}
+                {/*     filter: !isNewComer ? 'sepia(100%)': 'none', */}
+                {/*   }} src={newComerPic} /> */}
+                {/*   {isNewComer && (<h1 style={{fontSize:"35px"}}>New comer</h1>)} */}
+                {/* </div> */}
+                {/* <div style={{ display: 'flex', alignItems: 'center' }}> */}
+                {/*   <img style={{ */}
+                {/*     width: '60px', */}
+                {/*     filter: !isPlayer ? 'sepia(100%)': 'none', */}
+                {/*   }} src={playerPic} /> */}
+                {/*   {isPlayer && (<h1 style={{fontSize:"35px"}}>Player</h1>)} */}
+                {/* </div> */}
+                {/* <div style={{ display: 'flex', alignItems: 'center' }}> */}
+                {/*   <img style={{ */}
+                {/*     width: '60px', */}
+                {/*     filter: !isVeteran ? 'sepia(100%)': 'none', */}
+                {/*   }} src={veteranPic} /> */}
+                {/*   {isVeteran && (<h1 style={{fontSize:"35px"}}>Veteran</h1>)} */}
+                {/* </div> */}
               </div>
             </div>
           </div>

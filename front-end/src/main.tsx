@@ -24,6 +24,12 @@ axios.interceptors.response.use(
       // console.log("isRefreshRequest :", isRefreshRequest);
       return Promise.reject(error);
     }
+
+    // if (error.response && error.response.status === 403 ) {
+
+    // }
+
+
     // console.log("isRefreshRequest :", isRefreshRequest);
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
