@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   CallHandler,
   HttpException,
+  Logger,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Observable, throwError } from 'rxjs';
@@ -18,7 +19,7 @@ export class ErrorsInterceptor implements NestInterceptor {
         catchError((err) => {
           const request: Request = context.switchToHttp().getRequest();
           
-          console.log('Error interceptor: ', err);
+          Logger.debug(err, 'ErrorsInterceptor');
           return throwError(
             () =>
               new HttpException(
