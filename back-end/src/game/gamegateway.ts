@@ -13,8 +13,6 @@ import { UsersService } from 'src/database/users/users.service';
 import { gameService } from './game.service';
 import { room } from './Room';
 import { MatchDto } from 'src/database/matches/matches.dto';
-import { JwtAuthService } from 'src/auth/jwt/jwt.service';
-import { JwtPayload } from 'src/auth/jwt/JwtPayloadDto/JwtPayloadDto';
 import { eventBus } from 'src/eventBus';
 
 // Managing the sockets
@@ -132,10 +130,12 @@ export class gameServer implements OnModuleInit {
 	{
 		let user = await this.gameService.chatService.getUserFromSocket(client); 
 		if (!user)
-		return; 
-		if (await this.userService.getStatus(invitedUserID) == "busy") {
+			return; 
+		if (await this.userService.getStatus(invitedUserID) == "busy" ||
+			await this.userService.getStatus(user.id) == "busy" ) {
 			return;
 		}
+		this.userService.setBusyStatus(user.id);
 		console.log("Invite player");
 		let room_ = new room();
 		room_.id = this.roomID;
@@ -180,9 +180,14 @@ export class gameServer implements OnModuleInit {
 	}
 	@SubscribeMessage('declinePlayingInvite')
 	async declineMatchInvite(client: Socket, roomID: number) {
+		console.log("Player decline invite ", roomID);
 		// The invited user will decline the invite and the room will be deleted and both users will be disconnected
 		let roomCheck = Array.from(this.roomsList.values())
-			.find(room => room.id === roomID);
+		.find(room => room.id === roomID);
+		let user = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient); 
+		if (!user)
+			return;
+		this.userService.setOnlineStatus(user.id);
 		if (roomCheck) {
 			this.roomsList.delete(roomCheck.id);
 		}
