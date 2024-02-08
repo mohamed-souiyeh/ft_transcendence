@@ -2,7 +2,7 @@ import NavBar from "./components/navbar";
 import SideBar from "./components/sidebar";
 import Popup from "./components/twofa";
 import { Switch, ConfigProvider } from "antd";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import newComerPic from "../assets/newcomer.png";
 import playerPic from "../assets/player.png";
 import veteranPic from "../assets/veteran.png";
@@ -60,15 +60,17 @@ function Profile () {
       })
   }
 
-  axios.get(`http://localhost:1337/users/Public_data/${user.data.username}`,
-    { withCredentials: true } )
-    .then(res => {
-      setHistoty(res.data.allMatches)
-      console.log("eeee: ", res.data.allMatches)
+  useEffect( () => {
+    axios.get(`http://localhost:1337/users/Public_data/${user.data.username}`,
+      { withCredentials: true } )
+      .then(res => {
+        setHistoty(res.data.allMatches)
+        console.log("eeee: ", res.data.allMatches)
       })
-  .catch(()=>{
-      console.log("Error getting matches history!!")
-    })
+      .catch(()=>{
+        console.log("Error getting matches history!!")
+      })
+  }, [])
 
   return(
     <>
@@ -125,7 +127,7 @@ function Profile () {
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-100">Matchs History:</p>
                 </div>
-                {history.length ? history.map((matches) => <History key={matches.id} />) : <p className="text-xl text-purple/50 p-5"> No history made yet </p>}
+                {history.length ? history.map((matches) => <History key={matches.id}  data={matches}/>) : <p className="text-xl text-purple/50 p-5"> No history made yet </p>}
               </div>
             </div>
           </div>

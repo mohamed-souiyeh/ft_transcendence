@@ -1,25 +1,32 @@
-import { useContext } from "react"
-import { UserContext } from "../../App"
-import { useAvatarContext } from "../../contexts/avatar"
+import { useEffect, useState } from "react";
 
-function History() { 
 
-  const {avatar} = useAvatarContext()
-  const {user} = useContext(UserContext)
-  // const id = 1
+function History(obj) { 
+
+  const [loserImg, setLoserImg] = useState('')
+  const [winnerImg, setWinnerImg] = useState('')
+
+  useEffect(() => {
+    setLoserImg(`http://localhost:1337/users/${obj.data.loser.id}/avatar`);
+    setWinnerImg(`http://localhost:1337/users/${obj.data.winner.id}/avatar`);
+  },[])
 
 
   return (
     <>
       <div className='bg-purple/15 my-2 mx-4 rounded-lg p-2 flex place-items-center'>
         <div className="flex basis-1/3 items-center">
-          <img src={avatar} className="rounded-full w-12 h-12 "/>
-          <p className="mx-3"> {user.data.username} </p>
+          <div className="bg-light-green-600 rounded-full w-14 h-14 grid place-items-center">
+            <img src={winnerImg} className="rounded-full w-12 h-12 "/>
+          </div>
+          <p className="mx-3"> {obj.data.winner.username} </p>
         </div>
         <div className="flex basis-1/3 justify-center"> -vs- </div>
         <div className="flex basis-1/3 items-center justify-end"> 
-          <p className="mx-3"> {user.data.username} </p>
-          <img src={avatar} className="rounded-full w-12 h-12 "/>
+          <p className="mx-3"> {obj.data.loser.username} </p>
+          <div className="bg-red-300 rounded-full w-14 h-14 grid place-items-center">
+            <img src={loserImg} className="rounded-full w-12 h-12 "/>
+          </div>
         </div>
       </div>
 
