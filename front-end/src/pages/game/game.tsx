@@ -216,12 +216,12 @@ function Game()
           {
               console.log(user1, user2);
               Promise.all([
-                axios.get(`http://localhost:1337/users/${user1}/avatar`, { withCredentials: true }),
-                axios.get(`http://localhost:1337/users/${user2}/avatar`, { withCredentials: true })
+                axios.get(`${process.env.REACT_URL}:1337/users/${user1}/avatar`, { withCredentials: true }),
+                axios.get(`${process.env.REACT_URL}:1337/users/${user2}/avatar`, { withCredentials: true })
               ])
               .then(([response1, response2]) => {
-                setAvatar1(`http://localhost:1337/users/${user1}/avatar`);
-                setAvatar2(`http://localhost:1337/users/${user2}/avatar`);
+                setAvatar1(`${process.env.REACT_URL}:1337/users/${user1}/avatar`);
+                setAvatar2(`${process.env.REACT_URL}:1337/users/${user2}/avatar`);
               })
               .catch(error => {
                 console.error('Error fetching user data:', error);

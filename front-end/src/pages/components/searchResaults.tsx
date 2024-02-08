@@ -7,7 +7,7 @@ function SearchResaults(friend) {
   const [img, setImg] = useState('')
 
   useEffect( ()=> {
-    setImg(`http://localhost:1337/users/${friend.id}/avatar`);
+    setImg(`${process.env.REACT_URL}:1337/users/${friend.id}/avatar`);
   },[])
 
   return (
