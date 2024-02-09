@@ -10,7 +10,7 @@ import { JwtPayload } from 'src/auth/jwt/JwtPayloadDto/JwtPayloadDto';
 import { eventBus } from 'src/eventBus';
 import { UserDto } from 'src/database/users/User_DTO/User.dto';
 
-const LOGOUT_TIMEOUT = 0.1 * 60 * 1000;
+const LOGOUT_TIMEOUT = 4 * 60 * 1000;
 
 @WebSocketGateway(baseGateWayConfig)
 export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {

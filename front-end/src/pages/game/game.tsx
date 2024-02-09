@@ -311,7 +311,7 @@ function Game()
       socket.connect();
     }
   },
-  [socket]);
+  []);
 
   return (<>
           <div className="w-screen grid justify-center ">
