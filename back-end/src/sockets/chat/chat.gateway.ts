@@ -4,7 +4,7 @@ import { baseGateWayConfig } from '../baseGateWayConfig/baseGateWay.config';
 import { ChatService } from './chat.service';
 import { UsersService } from 'src/database/users/users.service';
 import { JwtAuthService } from 'src/auth/jwt/jwt.service';
-import { ChannelType, Role, UserState} from '@prisma/client';
+import { ChannelType, Role, UserState } from '@prisma/client';
 import { JwtPayload } from 'src/auth/jwt/JwtPayloadDto/JwtPayloadDto';
 import { Server, Socket } from 'socket.io';
 import Joi from 'joi';
@@ -23,6 +23,7 @@ import { ChangeChannelPasswordGuard } from './change-channel-password/change-cha
 import { JoinChannelGuard } from './join-channel/join-channel.guard';
 import { RemoveChannelGuard } from './remove-channel/remove-channel.guard';
 import { eventBus } from 'src/eventBus';
+import { setTimeout } from 'timers';
 // import { eventBus } from 'src/eventBus';
 // import { UserDto } from 'src/database/users/User_DTO/User.dto';
 
@@ -88,7 +89,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     for (const channel of user.channels) {
       // console.log("channel => ", channel);
       client.join(`channel.${channel.id}`);
-    } 
+    }
     await this.checkIfActiveAgain(user);
   }
 
@@ -185,10 +186,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
     const bannedUsers = conv.usersState.filter(userState => userState.state === UserState.banned);
 
-    
+
     const adapter = this.server.adapter as any;
     const room = adapter.rooms.get(`channel.${msg.convId}`);
-    
+
     if (room && room.size > 0) {
       const db_msg = {
         text: msg.message,
@@ -249,7 +250,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
 
 
-    if (await this.replaceOwner(msg.convId, payload.id) === false){
+    if (await this.replaceOwner(msg.convId, payload.id) === false) {
       this.server.to(`channel.${msg.convId}`).emit('update', {
         message: 'the owner left and channel removed',
       });
@@ -292,21 +293,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('banUser')
   async banUser(@MessageBody() msg: any) {
     const until = await this.checkDate(msg.until);
-    
+
+    const now = new Date();
+
+    //NOTE - only launch the timer if the time is less than 5 hours
+    if (until.getTime() - now.getTime() < 5 * (1000 * 60 * 60)) {
+      setTimeout(() => {
+        this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.active);
+        this.server.to(`channel.${msg.convId}`).emit('update', {
+          message: 'a user unbanned',
+        });
+      }, until.getTime() - now.getTime() + (0.5 * 60000));
+    }
+
     await this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.banned, until);
 
     this.server.to(`channel.${msg.convId}`).emit('update', {
       message: 'a user banned',
     });
 
-    return { message: 'a user banned' }; 
+    return { message: 'a user banned' };
   }
 
   @UseGuards(modiratorChatGuard)
   @SubscribeMessage('unbanUser')
   async unbanUser(@MessageBody() msg: any) {
     await this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.active);
-    
+
     this.server.to(`channel.${msg.convId}`).emit('update', {
       message: 'a user unbanned',
     });
@@ -318,20 +331,37 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('muteUser')
   async muteUser(@MessageBody() msg: any) {
     const until = await this.checkDate(msg.until);
+
+
+    const now = new Date();
+
+
+
+    if (until.getTime() - now.getTime() < 5 * (1000 * 60 * 60)) {
+    //NOTE - only launch the timer if the time is less than 5 hours
+    setTimeout(() => {
+      this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.active);
+      this.server.to(`channel.${msg.convId}`).emit('update', {
+        message: 'a user unmuted',
+      });
+    }, until.getTime() - now.getTime() + (0.5 * 60000));
+  }
+
+
     await this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.muted, until);
 
     this.server.to(`channel.${msg.convId}`).emit('update', {
       message: 'a user muted',
     });
 
-    return { message: 'a user muted' }; 
+    return { message: 'a user muted' };
   }
 
   @UseGuards(modiratorChatGuard)
   @SubscribeMessage('unmuteUser')
   async unmuteUser(@MessageBody() msg: any) {
     await this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.active);
-    
+
     this.server.to(`channel.${msg.convId}`).emit('update', {
       message: 'a user unmuted',
     });
@@ -356,11 +386,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('removeAdminRole')
   async removeAdminRole(@MessageBody() msg: any) {
     await this.convService.updateUserRole(msg.convId, msg.targetedUserId, Role.user);
-    
+
     this.server.to(`channel.${msg.convId}`).emit('update', {
       message: 'a user is no longer admin',
     });
-    
+
     return { message: 'a user is no longer admin' };
   }
 
@@ -386,7 +416,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   async changeChanneltype(@MessageBody() msg: any) {
     await this.convService.setChanneltype(msg.convId, msg.newType,
       msg.password === undefined ? null : msg.password);
-    
+
     console.log("channel type changed");
     this.server.to(`channel.${msg.convId}`).emit('update', {
       message: 'channel type changed',
@@ -535,7 +565,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     // console.log("adapter keys => ", Object.keys(this.server.adapter));
     // console.log("adapter values => ", Object.values(this.server.adapter));
     // return ;
-    
+
     const adapter = this.server.adapter as any;
     const room = adapter.rooms.get(`dm.${msg.convId}`);
 
