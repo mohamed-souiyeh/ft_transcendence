@@ -616,9 +616,6 @@ export class UsersService {
   //!SECTION
 
 
-
-
-
   //SECTION - VALIDATION OPERATIONS
 
   async checkIfUsernamUnique(username: string): Promise<any> {
