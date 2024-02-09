@@ -238,7 +238,7 @@ function SetupSockets() {
       chat: chat_socket,
     }));
 
-    console.log("the user context is in setup sockets :", user);
+    // console.log("the user context is in setup sockets :", user);
     return () => {
       ping_socket.disconnect();
       ping_socket.off();
@@ -273,9 +273,9 @@ function App() {
   //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
 
 
-  useEffect(() => {
-    console.log("the user context is in app :", user);
-  }, [user]);
+  // useEffect(() => {
+  //   console.log("the user context is in app :", user);
+  // }, [user]);
 
   // const navigate = useNavigate();
   useEffect(() => {
@@ -284,7 +284,7 @@ function App() {
 
     if (userData) {
       //prevUser => ({...prevUser, data: resp.data})
-      console.log("we are in the app useeffect and we have the user data");
+      // console.log("we are in the app useeffect and we have the user data");
       setUser(prevUser => ({ ...prevUser, data: JSON.parse(userData) }));
     }
 

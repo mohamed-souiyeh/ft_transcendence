@@ -35,7 +35,7 @@ function Loading() {
 
 
   const setAvararFunction = (id : string) => { 
-    axios.get("http://localhost:1337/users/"+ id+ '/avatar',
+    axios.get("http://localhost:1337/users/"+id+'/avatar',
       {
         withCredentials: true,
         responseType: 'arraybuffer'
