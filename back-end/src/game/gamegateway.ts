@@ -13,8 +13,6 @@ import { UsersService } from 'src/database/users/users.service';
 import { gameService } from './game.service';
 import { room } from './Room';
 import { MatchDto } from 'src/database/matches/matches.dto';
-import { JwtAuthService } from 'src/auth/jwt/jwt.service';
-import { JwtPayload } from 'src/auth/jwt/JwtPayloadDto/JwtPayloadDto';
 import { eventBus } from 'src/eventBus';
 
 // Managing the sockets
@@ -28,6 +26,7 @@ import { eventBus } from 'src/eventBus';
 export class gameServer implements OnModuleInit {
 	@WebSocketServer()
 	server: Server;
+	roomID:number = 0;
 
 	roomsList: Map<number, room> = new Map<number, room>();
 
@@ -110,21 +109,20 @@ export class gameServer implements OnModuleInit {
 
 	@SubscribeMessage('botMode')
 	async setGameAsBotMode(client: Socket) {
-		await console.log("BOT MODE !!!!!", client);
 		let user = await this.gameService.chatService.getUserFromSocket(client);
 		if (!user)
 			return;
 		this.userService.setScore(user.id, 0);
-
+	
 		let room_ = await new room();
 		room_.firstClient = client;
 		room_.gameMode = "robot";
 		room_.roomState = "ready";
-		room_.id = this.roomsList.size;
+		room_.id = this.roomID;
+		this.roomID++;
 		this.roomsList.set(room_.id, room_);
 		client.join(`${room_.id}`);
-		console.log("Rooms L ", this.roomsList.size);
-		this.server.to(`${room_.id}`).emit("botGame");
+		console.log(`Socket ${client.id} joined room ${room_.id}`);
 	}
 
 	@SubscribeMessage('invite')
@@ -132,13 +130,16 @@ export class gameServer implements OnModuleInit {
 	{
 		let user = await this.gameService.chatService.getUserFromSocket(client); 
 		if (!user)
-		return; 
-		if (await this.userService.getStatus(invitedUserID) == "busy") {
+			return; 
+		if (await this.userService.getStatus(invitedUserID) == "busy" ||
+			await this.userService.getStatus(user.id) == "busy" ) {
 			return;
 		}
+		this.userService.setBusyStatus(user.id);
 		console.log("Invite player");
 		let room_ = new room();
-		room_.id = this.roomsList.size;
+		room_.id = this.roomID;
+		this.roomID++;
 		room_.firstClient = client;
 		room_.gameMode = "private";
 		room_.roomState = "invite";
@@ -151,7 +152,7 @@ export class gameServer implements OnModuleInit {
 	@SubscribeMessage('acceptPlayingInvite')
 	async acceptMatchInvite(client: Socket, roomID: number) {
 		console.log("Player accept invite ", roomID);
-		let roomCheck = Array.from(this.roomsList.values())
+		let roomCheck = Array.from(this.roomsList.values()) 
 			.find(room => room.id === roomID);
 		if (roomCheck) {
 			client.join(`${roomCheck.id}`);
@@ -168,14 +169,25 @@ export class gameServer implements OnModuleInit {
 			roomCheck.user1ID = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient).then((user) => {
 				return user.id;
 			});
-			console.log("Entered room ", roomCheck.id);
+			if (roomCheck.user1ID && roomCheck.user2ID)
+			{
+				console.log("User IDs ", roomCheck.user1ID, roomCheck.user2ID);
+				this.server.to(`${roomCheck.id}`).emit("userIDs", 
+					roomCheck.user1ID, 
+					roomCheck.user2ID); 
+			}
 		}
 	}
 	@SubscribeMessage('declinePlayingInvite')
 	async declineMatchInvite(client: Socket, roomID: number) {
+		console.log("Player decline invite ", roomID);
 		// The invited user will decline the invite and the room will be deleted and both users will be disconnected
 		let roomCheck = Array.from(this.roomsList.values())
-			.find(room => room.id === roomID);
+		.find(room => room.id === roomID);
+		let user = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient); 
+		if (!user)
+			return;
+		this.userService.setOnlineStatus(user.id);
 		if (roomCheck) {
 			this.roomsList.delete(roomCheck.id);
 		}
@@ -371,6 +383,7 @@ export class gameServer implements OnModuleInit {
 					room.user2ID = user.id;
 					console.log("player " + room.user2ID + "here");
 					this.server.to(`${room.id}`).emit("matchFound", true);
+					this.server.to(`${room.id}`).emit("gameStart");
 					this.server.to(`${room.id}`).emit("userIDs", 
 								room.user1ID, 
 								room.user2ID);
@@ -379,7 +392,8 @@ export class gameServer implements OnModuleInit {
 			}
 		}
 		let room_ = new room();
-		room_.id = this.roomsList.size;
+		room_.id = this.roomID;
+		this.roomID++;
 		client.join(`${room_.id}`);
 		room_.firstClient = client;
 		room_.gameMode = "random";

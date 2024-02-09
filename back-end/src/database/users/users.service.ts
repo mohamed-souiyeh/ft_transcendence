@@ -697,6 +697,8 @@ export class UsersService {
 
 
   async getUserData(username: string): Promise<any> {
+
+  
     const user = await this.prismaService.user.findUnique({
       where: { username },
       select: {
@@ -708,8 +710,42 @@ export class UsersService {
         matchesPlayed: true,
         status: true,
         achievements: true,
-        wonMatches: true ,
-        lostMatches: true
+        wonMatches: {
+          include: {
+          winner: {
+              select: {
+                username: true,
+                id: true,
+
+            },
+          },
+          loser: {
+            select: {
+              username: true,
+              id: true,
+            },
+          },
+          
+        } ,
+      },
+        lostMatches:{
+          include: {
+            winner: {
+              select: {
+                username: true,
+                id: true,
+              },
+            },
+            loser: {
+              select: {
+                username: true,
+                id: true,
+              },
+            },
+
+          },
+
+        },
       },
     });
 

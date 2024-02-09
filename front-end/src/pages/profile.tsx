@@ -1,11 +1,8 @@
 import NavBar from "./components/navbar";
 import SideBar from "./components/sidebar";
 import Popup from "./components/twofa";
-import trophy from "../assets/trophy.png";
-import star from "../assets/star.png";
-import games from "../assets/controller.png"
 import { Switch, ConfigProvider } from "antd";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import newComerPic from "../assets/newcomer.png";
 import playerPic from "../assets/player.png";
 import veteranPic from "../assets/veteran.png";
@@ -13,6 +10,7 @@ import { UserContext } from "../App";
 import { useAvatarContext } from "../contexts/avatar";
 import axios from "axios";
 import Cookies from 'js-cookie';
+import History from "./components/history";
 
 function Profile () {
 
@@ -27,12 +25,11 @@ function Profile () {
   const [name, setName] = useState(user.data.username)
   const [badName, setBadName] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [history, setHistoty] = useState([])
   let formdata = new FormData();
 
   const changeUserName = (e : React.FormEvent) => {
     e.preventDefault()
-    //send req, set err msg if bad username
-    //
 
     if (name.length)
     formdata.set("username", name);
@@ -61,8 +58,19 @@ function Profile () {
         setSuccess(false)
         setBadName(true)
       })
-
   }
+
+  useEffect( () => {
+    axios.get(`http://localhost:1337/users/Public_data/${user.data.username}`,
+      { withCredentials: true } )
+      .then(res => {
+        setHistoty(res.data.allMatches)
+        console.log("eeee: ", res.data.allMatches)
+      })
+      .catch(()=>{
+        console.log("Error getting matches history!!")
+      })
+  }, [])
 
   return(
     <>
@@ -119,8 +127,7 @@ function Profile () {
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-100">Matchs History:</p>
                 </div>
-
-                {/* we need a component for opponents, that will show their name, image, and score from that match*/}
+                {history.length ? history.map((matches) => <History key={matches.id}  data={matches}/>) : <p className="text-xl text-purple/50 p-5"> No history made yet </p>}
               </div>
             </div>
           </div>
@@ -131,27 +138,39 @@ function Profile () {
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-100">acheivements:</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <img style={{
-                    width: '60px',
-                    filter: !isNewComer ? 'sepia(100%)': 'none',
-                  }} src={newComerPic} />
-                  {isNewComer && (<h1 style={{fontSize:"35px"}}>New comer</h1>)}
+                <div className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15">
+                  <img src={newComerPic} className="h-20 mx-4"/>
+                  <p className="text-2xl text-purple-tone-2 mx-3" > New Comer</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <img style={{
-                    width: '60px',
-                    filter: !isPlayer ? 'sepia(100%)': 'none',
-                  }} src={playerPic} />
-                  {isPlayer && (<h1 style={{fontSize:"35px"}}>Player</h1>)}
+                <div className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15">
+                  <img src={playerPic} className="h-20 mx-4"/>
+                  <p className="text-2xl text-purple-tone-2 mx-3" > Pro Player</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <img style={{
-                    width: '60px',
-                    filter: !isVeteran ? 'sepia(100%)': 'none',
-                  }} src={veteranPic} />
-                  {isVeteran && (<h1 style={{fontSize:"35px"}}>Veteran</h1>)}
+                <div className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15">
+                  <img src={veteranPic} className="h-20 mr-2 grayscale opacity-60"/>
+                  <p className="text-2xl text-purple-tone-2 mx-3" > Veteran!</p>
                 </div>
+                {/* <div style={{ display: 'flex', alignItems: 'center' }}> */}
+                {/*   <img style={{ */}
+                {/*     width: '60px', */}
+                {/*     filter: !isNewComer ? 'sepia(100%)': 'none', */}
+                {/*   }} src={newComerPic} /> */}
+                {/*   {isNewComer && (<h1 style={{fontSize:"35px"}}>New comer</h1>)} */}
+                {/* </div> */}
+                {/* <div style={{ display: 'flex', alignItems: 'center' }}> */}
+                {/*   <img style={{ */}
+                {/*     width: '60px', */}
+                {/*     filter: !isPlayer ? 'sepia(100%)': 'none', */}
+                {/*   }} src={playerPic} /> */}
+                {/*   {isPlayer && (<h1 style={{fontSize:"35px"}}>Player</h1>)} */}
+                {/* </div> */}
+                {/* <div style={{ display: 'flex', alignItems: 'center' }}> */}
+                {/*   <img style={{ */}
+                {/*     width: '60px', */}
+                {/*     filter: !isVeteran ? 'sepia(100%)': 'none', */}
+                {/*   }} src={veteranPic} /> */}
+                {/*   {isVeteran && (<h1 style={{fontSize:"35px"}}>Veteran</h1>)} */}
+                {/* </div> */}
               </div>
             </div>
           </div>

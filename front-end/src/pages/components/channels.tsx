@@ -87,7 +87,7 @@ function Channels(props: object) {
     <div className={` ${channel.name === currentChannel.channelName ? 'bg-purple-sh-0' : 'bg-transparent'} flex border border-transparent border-b-purple-sh-0 p-4`} onClick={() => clicked()}>
       <div className='flex basis-2/3 hover:cursor-pointer'>
         <div className="grid px-2">
-          <div className="flex flex-row gap-1 align-bottom justify-center items-baseline">
+          <div className="flex flex-col gap-1 align-bottom justify-center items-baseline">
             <p className="text-xl font-bold text-purple-tone-2"> {currentChannel.channelName} </p>
             <p className="text-sm text-impure-white/40  truncate"> {currentChannel.type} </p>
           </div>

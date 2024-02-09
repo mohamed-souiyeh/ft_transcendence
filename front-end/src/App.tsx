@@ -42,6 +42,22 @@ const game_socket = io(`${process.env.REACT_URL}:1337/game`,
 
 function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any, declineGame?:any})
 {
+  let [acceptedInvite, setInviteState] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!acceptedInvite)
+      {
+        if (declineGame)
+        {
+            declineGame();
+        }
+        console.log("the toast is closing");
+      }
+    }, 6000);
+
+    return () => clearTimeout(timer);
+  }, [acceptedInvite]);
+
   return (
     <div>
       <h3>{msg}</h3>
@@ -55,6 +71,7 @@ function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any
         {
             if (joinGame)
           {
+              setInviteState(true);
               joinGame();
             }
           }}
@@ -67,7 +84,7 @@ function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any
         onClick={() =>
         {
             if (declineGame)
-          {
+            {
               declineGame();
             }
           }}
@@ -192,7 +209,7 @@ function SetupSockets() {
     const setIntervalId = setInterval(() =>
     {
         ping_socket.emit('ping');
-      }, 3 * 60 * 1000);
+      }, 5 * 1);
 
 
     //TODO - this maybe broken it need testing because the notification event is sent from the main gateway not the chat gateway
@@ -345,7 +362,8 @@ function App() {
                         <Route path="/groups" element={<ManageGoups/>} />
                         <Route path="/search" element={<Search/>} />
                         <Route path="/not-found" element={<NotFoundPage />} />
-                        <Route path="/game" element={
+                        <Route path="/game" 
+                        element={
                           <SocketContext.Provider value={game_socket}>
                             <Game />
                           </SocketContext.Provider>

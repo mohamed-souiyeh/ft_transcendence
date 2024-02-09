@@ -14,7 +14,7 @@ function Setup()
 
   //NOTE - from here start the code comunicationg with the back_end
   let inputRef = useRef(null);
-  let [srcImg, setProfilePic] = useState("");
+  let [srcImg, setProfilePic] = useState<File | null>(null);
   // SetStateAction<string>
   let [userName, setName] = useState("");
   let formdata = new FormData();
