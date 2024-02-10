@@ -477,6 +477,8 @@ export class ConversationsService {
 
 
   async createChannel(req: IRequestWithUser, channelFromBody: createChanneldto) {
+    if (channelFromBody.type === ChannelType.dm)
+      throw new BadRequestException('You cannot create a channel of type DM');
     const channelData = new createChanneldto(channelFromBody);
 
     if (channelData.type === ChannelType.protected && !channelData.channelPassword) {

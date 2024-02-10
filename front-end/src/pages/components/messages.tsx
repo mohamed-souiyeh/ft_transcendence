@@ -97,7 +97,7 @@ function Messages() {
       setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
-    setImg(`http://localhost:1337/users/${dm.userId}/avatar`);
+    setImg(`${process.env.REACT_URL}:1337/users/${dm.userId}/avatar`);
     return () => {
       user.chat.off('broadcast');
     }

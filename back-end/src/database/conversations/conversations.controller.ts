@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards, Query, Get , ParseIntPipe, Delete, HttpCode} from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards, Query, Get, ParseIntPipe, Delete, HttpCode, BadRequestException } from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
 import { IRequestWithUser } from 'src/auth/Interfaces/IRequestWithUser';
@@ -62,8 +62,8 @@ export class ConversationsController {
   }
 
 
-  
- 
+
+
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('/join')
@@ -71,16 +71,18 @@ export class ConversationsController {
     @Body('channelId', ParseIntPipe) channelId: number,
     @Body('userId', ParseIntPipe) userId: number,
     @Body('password') password: string,
-  ): Promise<void> {
-    
-    console.log("---------------------");
-    console.log(channelId);
-    console.log(userId);
-    console.log(password);
-    console.log("Je suis ici");
+  ): Promise<any> {
+
+    // console.log("---------------------");
+    // console.log(channelId);
+    // console.log(userId);
+    // console.log(password);
+    // console.log("Je suis ici");
 
 
     await this.conversationService.joinChannel(channelId, userId, password);
+
+    return { message: 'user joined the channel successfully' };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -89,10 +91,13 @@ export class ConversationsController {
   async leaveChannel(
     @Body('channelId', ParseIntPipe) channelId: number,
     @Body('userId', ParseIntPipe) userId: number,
-  ): Promise<void> {
+  ): Promise<any> {
     console.log("Je suis ici");
-    await this.conversationService.removeUserFromChannel(channelId, userId);
+    const state = await this.conversationService.removeUserFromChannel(channelId, userId);
+
+    if (state === null)
+      throw new BadRequestException('user is not in the channel, or channel does not exist');
+
+    return { message: 'user left the channel successfully' };
   }
-
 }
-

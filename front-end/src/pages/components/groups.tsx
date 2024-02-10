@@ -35,7 +35,7 @@ function Groups(props: any) {
   const joinGroup = () => {
     console.log("password: ", protectedRoom.password);
     axios.post(
-      "http://localhost:1337/conv/join",
+      `${process.env.REACT_URL}:1337/conv/join`,
       {
         channelId: props.group.id,
         userId: user.data.id,
@@ -54,7 +54,7 @@ function Groups(props: any) {
         password: undefined,
       })
       setIncorrectPassword("");
-      axios.get("http://localhost:1337/users/allforhome", {
+      axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
         withCredentials: true
       })
         .then((resp) => {
@@ -82,7 +82,7 @@ function Groups(props: any) {
 
   const leaveGroup = () => {
 
-    axios.post('http://localhost:1337/conv/leave',
+    axios.post(`${process.env.REACT_URL}:1337/conv/leave`,
       {
         channelId: props.group.id,
         userId: user.data.id,
@@ -90,7 +90,7 @@ function Groups(props: any) {
       {
         withCredentials: true,
       }).then((response) => {
-        axios.get("http://localhost:1337/users/allforhome", {
+        axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
           withCredentials: true
         })
           .then((resp) => {

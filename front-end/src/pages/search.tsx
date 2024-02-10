@@ -23,7 +23,7 @@ function Search() {
     e.preventDefault()
     if (!val) return setSearchResaults([]);
 
-    axios.get(`http://localhost:1337/users/search/?prefix=${val}`,
+    axios.get(`${process.env.REACT_URL}:1337/users/search/?prefix=${val}`,
       {
         withCredentials: true,
       }

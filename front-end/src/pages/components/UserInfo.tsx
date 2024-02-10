@@ -29,13 +29,13 @@ export default function UserInfo() {
   useEffect(() => {
 
     const fetchUserData = () => {
-      axios.get(`http://localhost:1337/users/Public_data/${username}`,
+      axios.get(`${process.env.REACT_URL}:1337/users/Public_data/${username}`,
         { withCredentials: true }
       ).then((response) => {
         console.log("response: ", response);
         setUserData(response.data);
         const id = response.data['id'];
-        axios.get(`http://localhost:1337/users/check_notification?receiverId=${id}`, {
+        axios.get(`${process.env.REACT_URL}:1337/users/check_notification?receiverId=${id}`, {
           withCredentials: true
         }).then((res) => {
           console.log("res in fetch data : ", res);
@@ -44,14 +44,14 @@ export default function UserInfo() {
         }).catch((err) => {
           console.log("error while checking notification: ", err);
         })
-        setImagePath(`http://localhost:1337/users/${id}/avatar`);
+        setImagePath(`${process.env.REACT_URL}:1337/users/${id}/avatar`);
       }).catch(error => {
         console.error('Error fetching user data:', error);
         navigate("/not-found");
       });
     };
 
-    axios.get(`http://localhost:1337/users/check_blocked?otherUserUsername=${username}`, {
+    axios.get(`${process.env.REACT_URL}:1337/users/check_blocked?otherUserUsername=${username}`, {
       withCredentials: true,
     }).then((res) => {
       console.log("res in check blocked: ", res);
@@ -109,7 +109,7 @@ export default function UserInfo() {
   const handleAddFriend = async () => {
     try {
       const response = await axios.post(
-        'http://localhost:1337/notifications/friend-request',
+        `${process.env.REACT_URL}:1337/notifications/friend-request`,
         { 
           senderId: user.data.id,
           receiverId: userData.id,
@@ -130,7 +130,7 @@ export default function UserInfo() {
   const handleUnfriendUser = async () => {
     try {
       const response = await axios.post(
-        'http://localhost:1337/users/unfriend',
+        `${process.env.REACT_URL}:1337/users/unfriend`,
         { id: userData['id'] },
         { withCredentials: true }
       );
@@ -149,7 +149,7 @@ export default function UserInfo() {
   const handleBlockUser = async () => {
     try {
       await axios.post(
-        'http://localhost:1337/users/block',
+        `${process.env.REACT_URL}:1337/users/block`,
         { id: userData['id'] }, {
         withCredentials: true
       });

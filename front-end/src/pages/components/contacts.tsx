@@ -30,7 +30,7 @@ function Contacts(props) {
   }
 
   useEffect( ()=> {
-    setImg(`http://localhost:1337/users/${user.id}/avatar`);
+    setImg(`${process.env.REACT_URL}:1337/users/${user.id}/avatar`);
   },[])
 
   return (

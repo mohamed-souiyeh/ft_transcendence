@@ -65,7 +65,7 @@ function ManageGoups() {
     if (!val) return setGroupData([]);
 
 
-    axios.get(`http://localhost:1337/conv/search?prefix=${val}`, {
+    axios.get(`${process.env.REACT_URL}:1337/conv/search?prefix=${val}`, {
       withCredentials: true,
     })
       .then(response => {
@@ -85,7 +85,7 @@ function ManageGoups() {
     if (!val) return setGroupData([]);
 
 
-    axios.get(`http://localhost:1337/conv/search?prefix=${val}`, {
+    axios.get(`${process.env.REACT_URL}:1337/conv/search?prefix=${val}`, {
       withCredentials: true,
     })
     .then(response => {
@@ -123,7 +123,7 @@ function ManageGoups() {
       return ;
     }
     // console.log("this is what should be sent:", createdGroup);
-    axios.post("http://localhost:1337/conv/createChannel", {
+    axios.post(`${process.env.REACT_URL}:1337/conv/createChannel`, {
       channelName: createdGroup.name,
       channelDescription: createdGroup.description,
       type: createdGroup.privacy,
@@ -140,7 +140,7 @@ function ManageGoups() {
           description: "",
           members: [],
         })
-        axios.get("http://localhost:1337/users/allforhome", {
+        axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
           withCredentials: true
         })
           .then((resp) => {

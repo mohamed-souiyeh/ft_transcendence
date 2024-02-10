@@ -15,7 +15,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
   useEffect(() => {
 // <<<<<<< HEAD
 //     // if (!codeFetched) {
-//     axios.get("http://localhost:1337/2fa/generate",
+//     axios.get("${process.env.REACT_URL}:1337/2fa/generate",
 // =======
     axios.get(`${process.env.REACT_URL}:1337/2fa/generate`,
 // >>>>>>> master

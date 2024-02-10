@@ -190,7 +190,11 @@ export class UsersService {
         id: userId,
       },
       include: {
-        channels: true,
+        channels: {
+          include: {
+            usersState: true,
+          },
+        },
         dms: true,
       }
     });
@@ -693,6 +697,8 @@ export class UsersService {
 
 
   async getUserData(username: string): Promise<any> {
+
+  
     const user = await this.prismaService.user.findUnique({
       where: { username },
       select: {
@@ -704,8 +710,42 @@ export class UsersService {
         matchesPlayed: true,
         status: true,
         achievements: true,
-        wonMatches: true ,
-        lostMatches: true
+        wonMatches: {
+          include: {
+          winner: {
+              select: {
+                username: true,
+                id: true,
+
+            },
+          },
+          loser: {
+            select: {
+              username: true,
+              id: true,
+            },
+          },
+          
+        } ,
+      },
+        lostMatches:{
+          include: {
+            winner: {
+              select: {
+                username: true,
+                id: true,
+              },
+            },
+            loser: {
+              select: {
+                username: true,
+                id: true,
+              },
+            },
+
+          },
+
+        },
       },
     });
 
@@ -740,6 +780,11 @@ export class UsersService {
       take: 10, 
       orderBy: {
         score: 'desc', 
+      },
+      where: {
+        matchesPlayed: {
+          gt: 0,
+        }
       },
       select: {
         id: true,

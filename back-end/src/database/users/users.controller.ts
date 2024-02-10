@@ -35,6 +35,14 @@ export class UsersController {
   constructor(private userService: UsersService) {}
 
 
+  @Get('friends')
+  @UseGuards(JwtAuthGuard)
+  async getUserFriends(@Req() req: IRequestWithUser) {
+    const userFriends = await this.userService.getUserFriends(req.user.id);
+
+    return userFriends;
+  }
+
   @Get('network')
   @UseGuards(JwtAuthGuard)
   async getUserNetwork(@Req() req: IRequestWithUser) {
@@ -107,7 +115,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('block')
-  async blockUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+  async blockUser(@Req() req: IRequestWithUser, @Body('id', ParseIntPipe) id: number) {
     if (req.user.id === id)
       throw new BadRequestException("what do you think you are doing?!");
     await this.userService.blockUser(req.user.id, id);
@@ -119,7 +127,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('unblock')
-  async unblockUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+  async unblockUser(@Req() req: IRequestWithUser, @Body('id', ParseIntPipe) id: number) {
     if (req.user.id === id)
       throw new BadRequestException("what do you think you are doing?!");
     await this.userService.unblockUser(req.user.id, id);
@@ -130,7 +138,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('unfriend')
-  async unfriendUser(@Req() req: IRequestWithUser, @Body('id') id: number) {
+  async unfriendUser(@Req() req: IRequestWithUser, @Body('id', ParseIntPipe) id: number) {
     if (req.user.id === id)
       throw new BadRequestException("what do you think you are doing?!");
     await this.userService.removeFriendship(req.user.id, id);
@@ -178,7 +186,7 @@ export class UsersController {
 
 
 
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Get('Public_data/:username')
   async getUserByUsername(@Param('username') username: string): Promise<any> { 
     try {

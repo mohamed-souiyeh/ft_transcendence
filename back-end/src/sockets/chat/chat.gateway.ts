@@ -62,6 +62,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     // console.log('chat gateway initialized');
   }
 
+  async checkIfActiveAgain(user: any) {
+    for (const channel of user.channels) {
+      const userState = channel.usersState.find(userState => userState.userId === user.id);
+      if (userState.state === UserState.banned) {
+        if (userState.until < new Date()) {
+          await this.convService.updateUserState(channel.id, user.id, UserState.active);
+        }
+      }
+      else if (userState.state === UserState.muted) {
+        if (userState.until < new Date()) {
+          await this.convService.updateUserState(channel.id, user.id, UserState.active);
+        }
+      }
+    }
+  }
 
   async addToRooms(user: any, client: Socket) {
 
@@ -73,7 +88,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     for (const channel of user.channels) {
       // console.log("channel => ", channel);
       client.join(`channel.${channel.id}`);
-    }
+    } 
+    await this.checkIfActiveAgain(user);
   }
 
 
