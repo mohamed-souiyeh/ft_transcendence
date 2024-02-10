@@ -1,50 +1,157 @@
-import a3 from "../../assets/a3.png";
-import star from "../../assets/star.png";
-import trophy from "../../assets/trophy.png";
-import a4 from "../../assets/a4.png";
-import a2 from "../../assets/a2.png";
-import a7 from "../../assets/a7.png";
+// import newComerPic from "../../assets/newcomer.png";
+// import playerPic from "../../assets/player.png";
+// import veteranPic from "../../assets/veteran.png";
+// import axios from "axios";
+// import React, { useState, useEffect, useContext } from "react";
 
-export default function Acheivements() {
-  return (
-    <div className="flex flex-row overflow-x-scroll p-4 h-56 bg-purple-sh-2 border-[2px] border-purple/20 rounded-3xl">
-      <div className=" flex-shrink-0 bg-purple bg-opacity-30 border-[2px] border-purple/20 rounded-3xl h-44 w-44 my-auto mr-3">
-        <img src={star} className=" size-36 pt-3 mx-auto " />
-        <p className="text-center font-semibold text-xl text-impure-white">
-          Active member
-        </p>
-      </div>
+// const [newComer, setNewComer] = useState(false);
+// const [player, setPlayer] = useState(false);
+// const [veteran, setVeteran] = useState(false);
 
-      <div className=" flex-shrink-0 bg-purple bg-opacity-30 border-[2px] border-purple/20 rounded-3xl h-44 w-44 my-auto mr-3">
-        <img src={trophy} className=" size-36 pt-3 mx-auto " />
-        <p className="text-center font-semibold text-xl text-impure-white">
-          Won Bot
-        </p>
-      </div>
+// export default function Acheivements() {
+//   return (
+//     <div className="h-[100%]  w-[350px] rounded-t-3xl overflow-hidden">
+//       <div className="bg-purple-sh-2 h-[100%]  w-[350px] rounded-t-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1">
+//         <div
+//           title="Played your first game ever"
+//           className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15"
+//         >
+//           <img
+//             src={newComerPic}
+//             className={`h-20 mx-4 ${!newComer && "grayscale-70 opacity-30"} `}
+//           />
+//           <p
+//             className={`text-2xl ${
+//               newComer ? "text-impure-white" : "text-white/30"
+//             } `}
+//           >
+//             {" "}
+//             New Comer
+//           </p>
+//         </div>
+//         <div
+//           title="Played 5 matches"
+//           className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15"
+//         >
+//           <img
+//             src={playerPic}
+//             className={`h-20 mx-4 ${!player && "grayscale-70 opacity-30"} `}
+//           />
+//           <p
+//             className={`text-2xl ${
+//               player ? "text-impure-white" : "text-white/30"
+//             } `}
+//           >
+//             {" "}
+//             Pro Player!
+//           </p>
+//         </div>
+//         <div
+//           title="Played more than 5 and won 5 matches"
+//           className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15"
+//         >
+//           <img
+//             src={veteranPic}
+//             className={`h-20 mx-4 ${!veteran && "grayscale-70 opacity-30"} `}
+//           />
+//           <p
+//             className={`text-2xl ${
+//               veteran ? "text-impure-white" : "text-white/30"
+//             } `}
+//           >
+//             {" "}
+//             Veteran!
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+import React, { useState, useEffect } from "react";
+import newComerPic from "../../assets/newcomer.png";
+import playerPic from "../../assets/player.png";
+import veteranPic from "../../assets/veteran.png";
+import axios from "axios";
+
+
+export default function Achievements() {
+  const [newComer, setNewComer] = useState(false);
+  const [player, setPlayer] = useState(false);
+  const [veteran, setVeteran] = useState(false);
+
+  useEffect(() => {
+ 
+    const checkAchievements = async () => {
      
-      <div className=" flex-shrink-0 bg-purple bg-opacity-30 border-[2px] border-purple/20 rounded-3xl h-44 w-44 my-auto mr-3">
-        <img src={a4} className=" size-36 pt-3 mx-auto " />
-        <p className="text-center font-semibold text-xl text-impure-white">
-          Won Bot
-        </p>
-      </div>
-      <div className=" flex-shrink-0 bg-purple bg-opacity-30 border-[2px] border-purple/20 rounded-3xl h-44 w-44 my-auto mr-3">
-        <img src={a7} className=" size-36 pt-3 mx-auto " />
-        <p className="text-center font-semibold text-xl text-impure-white">
-          Ranked Top 1
-        </p>
-      </div>
-      <div className=" flex-shrink-0 bg-purple bg-opacity-30 border-[2px] border-purple/20 rounded-3xl h-44 w-44 my-auto mr-3">
-        <img src={a2} className=" size-36 pt-3 mx-auto " />
-        <p className="text-center font-semibold text-xl text-impure-white">
-          Active Member
-        </p>
-      </div>
-      <div className=" flex-shrink-0 bg-purple bg-opacity-30 border-[2px] border-purple/20 rounded-3xl h-44 w-44 my-auto mr-3">
-        <img src={a3} className=" size-36 pt-3 mx-auto " />
-        <p className="text-center font-semibold text-xl text-impure-white">
-          Active Member
-        </p>
+      // const response = await axios.get(`${process.env.REACT_URL}:1337/users/Public_data/`);
+      // const achievements = response.data;
+     
+      const achievements = { playedFirstGame: true, playedFiveMatches: true, wonFiveMatches: true }; 
+
+      if (achievements.playedFirstGame) {
+        setNewComer(true);
+      }
+      if (achievements.playedFiveMatches) {
+        setPlayer(true);
+      }
+      if (achievements.playedFiveMatches && achievements.wonFiveMatches) {
+        setVeteran(true);
+      }
+    };
+
+    checkAchievements();
+  }, []); 
+
+  return (
+    <div className="h-[100%] w-[350px] rounded-t-3xl overflow-hidden">
+      <div className="bg-purple-sh-2 h-[100%] w-[350px] rounded-t-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1">
+        <div
+          title="Played your first game ever"
+          className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15"
+        >
+          <img
+            src={newComerPic}
+            className={`h-20 mx-4 ${!newComer && "grayscale-70 opacity-30"}`}
+          />
+          <p
+            className={`text-2xl ${newComer ? "text-impure-white" : "text-white/30"}`}
+          >
+            New Comer
+          </p>
+        </div>
+        <div
+          title="Played 5 matches"
+          className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15"
+        >
+          <img
+            src={playerPic}
+            className={`h-20 mx-4 ${!player && "grayscale-70 opacity-30"}`}
+          />
+          <p
+            className={`text-2xl ${player ? "text-impure-white" : "text-white/30"}`}
+          >
+            Pro Player!
+          </p>
+        </div>
+        <div
+          title="Played more than 5 and won 5 matches"
+          className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15"
+        >
+          <img
+            src={veteranPic}
+            className={`h-20 mx-4 ${!veteran && "grayscale-70 opacity-30"}`}
+          />
+          <p
+            className={`text-2xl ${veteran ? "text-impure-white" : "text-white/30"}`}
+          >
+            Veteran!
+          </p>
+        </div>
       </div>
     </div>
   );
