@@ -350,10 +350,10 @@ export class gameServer implements OnModuleInit {
 		let roomInvitationCheck = 
 			Array.from(this.roomsList.values()).
 			find
-			(room => (room.user1ID === user.id ||
-			room.user2ID === user.id) && room.gameMode === 'private');
+			(room => (room.firstClient === client ||
+			room.secondClient === client));
 
-		if (roomInvitationCheck)
+		if (roomInvitationCheck.gameMode == "private")
 		{
 			console.log('Player reserved ');
 			return ;
