@@ -39,7 +39,6 @@ function Game()
 
   useEffect(() => 
   {
-    console.log("Game page");
     const handleWinner = (v: boolean) => { setWinState(v); };
     const handleLeaveGame = () => { navigate("/home"); };
     const handleAlreadyPlaying = () => { navigate("/home"); };
@@ -50,6 +49,7 @@ function Game()
         socket.emit("gameOver");
       }
     };
+
     if (socket)
     {
       socket.emit("queuing");
@@ -206,53 +206,51 @@ function Game()
       0, 0,-3, 0,
       0, 0, 0, 1
     ];
-    if (foundMatch)
+    if (socket)
+    {
       socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
+      if(!fetchedAvatars)
+      {
+        socket.on('userIDs', (user1:number, user2:number)=>
+        {
+            Promise.all([
+              axios.get(`http://localhost:1337/users/${user1}/avatar`, { withCredentials: true }),
+              axios.get(`http://localhost:1337/users/${user2}/avatar`, { withCredentials: true })
+            ])
+            .then(([response1, response2]) => {
+              setAvatar1(`http://localhost:1337/users/${user1}/avatar`);
+              setAvatar2(`http://localhost:1337/users/${user2}/avatar`);
+            })
+            .catch(error => {
+              console.error('Error fetching user data:', error);
+            });
+          })
+        }
+        fetchedAvatars = true;
+        setFetchState(true);
+    }
+    if (socket)
+    {
+      
+        socket.emit('playing');
+        socket.on('score', (v:number, v1:number) => {
+          score1 = v;
+          score2 = v1;
+          setScore1((score1));
+          setScore2((score2));
+        });
+        socket.on('left', (v:number)=>{first.vector3D.y = v;});
+        socket.on('right', (v:number)=>{second.vector3D.y = v;});
+        socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
+        socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
+        socket.on('balllaunched', (v:boolean)=>{ballLaunched=v;});
+    }
     function renderGame(gl: WebGLRenderingContext | null)
     {
-      if (socket)
-      {
-        if(!fetchedAvatars)
-        {
-          socket.on('userIDs', (user1:number, user2:number)=>
-          {
-              console.log(user1, user2);
-              Promise.all([
-                axios.get(`${process.env.REACT_URL}:1337/users/${user1}/avatar`, { withCredentials: true }),
-                axios.get(`${process.env.REACT_URL}:1337/users/${user2}/avatar`, { withCredentials: true })
-              ])
-              .then(([response1, response2]) => {
-                setAvatar1(`${process.env.REACT_URL}:1337/users/${user1}/avatar`);
-                setAvatar2(`${process.env.REACT_URL}:1337/users/${user2}/avatar`);
-              })
-              .catch(error => {
-                console.error('Error fetching user data:', error);
-              });
-            })
-          }
-          fetchedAvatars = true;
-          setFetchState(true);
-      }
 
     if (foundMatch)
     {
-      socket.on("gameStart", ()=>{gameState = false; setState(false)});
-      setScore1((score1));
-      setScore2((score2));
-      if (socket)
-      {
-        
-          socket.emit('playing');
-          socket.on('score', (v:number, v1:number) => {
-            score1 = v;
-            score2 = v1;
-          });
-          socket.on('left', (v:number)=>{first.vector3D.y = v;});
-          socket.on('right', (v:number)=>{second.vector3D.y = v;});
-          socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
-          socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
-          socket.on('balllaunched', (v:boolean)=>{ballLaunched=v;});
-        }
+        socket.on("gameStart", ()=>{gameState = false; setState(false)});
 
         if (gl)
         {
@@ -302,9 +300,8 @@ function Game()
       }
     };
 
-    // window.addEventListener("resize", handle);
+    window.addEventListener("resize", handle);
     return () => {cancelAnimationFrame(frameRef.current);
-      window.removeEventListener("resize", handle);
       socket.off("winner", handleWinner);
       socket.off("leaveGame", handleLeaveGame);
       socket.off("alreadyPlaying", handleAlreadyPlaying);
@@ -312,13 +309,6 @@ function Game()
       socket.off("gameover", handleGameOver);
       socket.disconnect();
       socket.connect();
-      if (gl)
-      {
-        terrain.cleanUp(gl);
-        first.cleanUp(gl);
-        second.cleanUp(gl);
-        ball.cleanUp(gl);
-      }
     }
   },
   []);
@@ -411,6 +401,7 @@ function Game()
             <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
           </button>
           </div>
+
           </>
           );
 }
