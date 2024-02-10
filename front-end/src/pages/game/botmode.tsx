@@ -168,8 +168,6 @@ function BotMode()
         let secondPlayerHasTheBall:boolean = false;
         let ballLaunched:boolean = false;
 
-        function renderGame(gl: WebGLRenderingContext | null)
-        {
         let ar = w/h;
         let fov = rad2Degree(71.1);
         let n = 0.1;
@@ -195,8 +193,11 @@ function BotMode()
         ];
         if (socket)
         {
-            socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
+            if (!foundMatch)
+                socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
         }
+        function renderGame(gl: WebGLRenderingContext | null)
+        {
 
         if (foundMatch)
         {

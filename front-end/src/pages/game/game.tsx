@@ -206,11 +206,12 @@ function Game()
       0, 0,-3, 0,
       0, 0, 0, 1
     ];
+    if (foundMatch)
+      socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
     function renderGame(gl: WebGLRenderingContext | null)
     {
       if (socket)
       {
-        socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
         if(!fetchedAvatars)
         {
           socket.on('userIDs', (user1:number, user2:number)=>
