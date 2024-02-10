@@ -320,7 +320,7 @@ function Game()
       }
     }
   },
-  [socket]);
+  []);
 
   return (<>
           <div className="w-screen grid justify-center ">

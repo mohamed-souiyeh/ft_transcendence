@@ -27,7 +27,6 @@ import {
 } from './FormDataInterceptorConfig/UploadConfig';
 import { UpdateUsernameDTO, UploadDTO } from './uploadDTO/uploadDTO';
 import { Response } from 'express';
-import { join } from 'path';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)

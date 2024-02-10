@@ -209,7 +209,7 @@ function SetupSockets() {
     const setIntervalId = setInterval(() =>
     {
         ping_socket.emit('ping');
-      }, 5 * 1);
+      }, 3 * 60 * 1000);
 
 
     //TODO - this maybe broken it need testing because the notification event is sent from the main gateway not the chat gateway
