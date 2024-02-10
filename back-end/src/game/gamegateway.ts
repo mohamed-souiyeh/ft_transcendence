@@ -112,7 +112,6 @@ export class gameServer implements OnModuleInit {
 		let user = await this.gameService.chatService.getUserFromSocket(client);
 		if (!user)
 			return;
-		this.userService.setScore(user.id, 0);
 	
 		let room_ = await new room();
 		room_.firstClient = client;
@@ -122,7 +121,6 @@ export class gameServer implements OnModuleInit {
 		this.roomID++;
 		this.roomsList.set(room_.id, room_);
 		client.join(`${room_.id}`);
-		console.log(`Socket ${client.id} joined room ${room_.id}`);
 	}
 
 	@SubscribeMessage('invite')

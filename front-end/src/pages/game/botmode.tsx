@@ -268,6 +268,14 @@ function BotMode()
         window.addEventListener("resize", handle);
         return () => {
             cancelAnimationFrame(frameRef.current);
+            window.removeEventListener("resize", handle);
+            if (gl)
+            {
+                terrain.cleanUp(gl);
+                first.cleanUp(gl);
+                second.cleanUp(gl);
+                ball.cleanUp(gl);
+            }
         }
   }, [socket]);
 

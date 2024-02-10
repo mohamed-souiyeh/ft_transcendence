@@ -39,6 +39,7 @@ function Game()
 
   useEffect(() => 
   {
+    console.log("Game page");
     const handleWinner = (v: boolean) => { setWinState(v); };
     const handleLeaveGame = () => { navigate("/home"); };
     const handleAlreadyPlaying = () => { navigate("/home"); };
@@ -182,31 +183,31 @@ function Game()
     let secondPlayerHasTheBall:boolean = false;
     let ballLaunched:boolean = false;
 
+    let ar = w/h;
+    let fov = rad2Degree(71.1);
+    let n = 0.1;
+    let f = 1000.0;
+    let t = Math.tan(fov/2) * n;
+    let r = t * ar;
+    let len = f-n;
+
+    let projection:number[] = 
+    [
+      2*n/r,  0.0,       0.0,  0.0,
+      0.0, 2*n/t,         0.0,  0.0,
+      0.0,  0.0,  -(f+n)/len, -1,
+      0.0,  0.0, (-2*f*n)/len, 1.0
+    ];
+
+    let viewMatrix:number[] = 
+    [
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0,-3, 0,
+      0, 0, 0, 1
+    ];
     function renderGame(gl: WebGLRenderingContext | null)
     {
-      let ar = w/h;
-      let fov = rad2Degree(71.1);
-      let n = 0.1;
-      let f = 1000.0;
-      let t = Math.tan(fov/2) * n;
-      let r = t * ar;
-      let len = f-n;
-  
-      let projection:number[] = 
-      [
-        2*n/r,  0.0,       0.0,  0.0,
-        0.0, 2*n/t,         0.0,  0.0,
-        0.0,  0.0,  -(f+n)/len, -1,
-        0.0,  0.0, (-2*f*n)/len, 1.0
-      ];
-
-      let viewMatrix:number[] = 
-      [
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0,-3, 0,
-        0, 0, 0, 1
-      ];
       if (socket)
       {
         socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
@@ -300,8 +301,9 @@ function Game()
       }
     };
 
-    window.addEventListener("resize", handle);
+    // window.addEventListener("resize", handle);
     return () => {cancelAnimationFrame(frameRef.current);
+      window.removeEventListener("resize", handle);
       socket.off("winner", handleWinner);
       socket.off("leaveGame", handleLeaveGame);
       socket.off("alreadyPlaying", handleAlreadyPlaying);
@@ -309,6 +311,13 @@ function Game()
       socket.off("gameover", handleGameOver);
       socket.disconnect();
       socket.connect();
+      if (gl)
+      {
+        terrain.cleanUp(gl);
+        first.cleanUp(gl);
+        second.cleanUp(gl);
+        ball.cleanUp(gl);
+      }
     }
   },
   [socket]);
@@ -401,7 +410,6 @@ function Game()
             <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
           </button>
           </div>
-
           </>
           );
 }
