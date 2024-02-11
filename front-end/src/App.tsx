@@ -61,12 +61,12 @@ function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any
   return (
     <div>
       <h3>{msg}</h3>
-      <button style={{
-        backgroundColor:"purple", 
-        marginRight: "10px",
-        cursor:"pointer",
-        pointerEvents:"auto"
-      }}
+      <button className="bg-purple cursor-pointer pointer-events-auto mr-3" 
+        // style={{
+        // backgroundColor:"purple", 
+        // marginRight: "10px",
+        // cursor:"pointer",
+        // pointerEvents:"auto" }}
         onClick={() =>
         {
             if (joinGame)
@@ -78,9 +78,10 @@ function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any
       >
         Accept
       </button>
-      <button style={{backgroundColor:"purple",
-        cursor:"pointer",
-        pointerEvents:"auto"}}
+      <button className="bg-purple-sh-2 cursor-pointer pointer-events-auto" 
+        // style={{backgroundColor:"purple",
+        // cursor:"pointer",
+        // pointerEvents:"auto"}}
         onClick={() =>
         {
             if (declineGame)
