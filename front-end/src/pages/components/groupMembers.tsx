@@ -32,14 +32,16 @@ const mokChannel = {
 type channelType = typeof mokChannel;
 
 
-function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refreshMembers, setRefreshMembers }: 
-  { refreshMembers: any, 
-    setRefreshMembers: any, 
-    isChannel: boolean, 
-    createdGroup: { name: "", privacy:"", password:"", description: "", members: [], } , 
-    setCreatedGroup: Dispatch<SetStateAction<Object>>} ) {
+function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refreshMembers, setRefreshMembers }:
+  {
+    refreshMembers: any,
+    setRefreshMembers: any,
+    isChannel: boolean,
+    createdGroup: { name: "", privacy: "", password: "", description: "", members: [], },
+    setCreatedGroup: Dispatch<SetStateAction<Object>>
+  }) {
 
-  const [ data, setData ] = useState<{
+  const [data, setData] = useState<{
     id: number,
     username: string,
     added: boolean,
@@ -54,7 +56,7 @@ function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refres
 
   useEffect(() => {
     if (refreshMembers && !isChannel) {
-      setData(prevData => prevData.map((friend) => ({...friend, added: false})));
+      setData(prevData => prevData.map((friend) => ({ ...friend, added: false })));
       setRefreshMembers(false);
     }
   }, [refreshMembers]);
@@ -62,8 +64,7 @@ function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refres
   useEffect(() => {
     console.log("useEffect data: ", data);
     setData([]);
-    axios.get('http://localhost:1337/users/friends',
-    // axios.get('http://localhost:1337/users/network',
+    axios.get(`${process.env.REACT_URL}:1337/users/friends`,
       {
         withCredentials: true,
       }).then((res) => {
@@ -73,7 +74,7 @@ function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refres
           id: number,
           username: string,
           added: boolean,
-        }[] = res.data.friends.map((friend) => ({...friend, added: false}));
+        }[] = res.data.friends.map((friend) => ({ ...friend, added: false }));
 
         if (isChannel) {
           const tmp_channel = channel as channelType;
@@ -89,12 +90,12 @@ function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refres
 
   const addMember = (friend) => {
     friend.added = !friend.added
-    setCreatedGroup({...createdGroup, members : [...createdGroup.members, friend] } )
+    setCreatedGroup({ ...createdGroup, members: [...createdGroup.members, friend] })
   }
 
   const removeMember = (friend) => {
     friend.added = !friend.added
-    setCreatedGroup({...createdGroup, members: createdGroup.members.filter((elem) => elem != friend)} )
+    setCreatedGroup({ ...createdGroup, members: createdGroup.members.filter((elem) => elem != friend) })
   }
 
 
@@ -106,14 +107,14 @@ function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refres
             <p className='text-xl pl-3 pt-2'> {friend.username} </p>
           </div>
           <div className='flex flex-row-reverse m-3 basis-1/3 items-center'>
-            { friend.added ?
-              <button type="button" onClick={() => removeMember(friend)} className="rounded-lg bg-purple-sh-2 h-10 w-28"> added </button> : 
+            {friend.added ?
+              <button type="button" onClick={() => removeMember(friend)} className="rounded-lg bg-purple-sh-2 h-10 w-28"> added </button> :
               <button type="button" onClick={() => addMember(friend)} className="rounded-lg bg-purple h-10 w-28"> add </button>
             }
           </div>
         </div>
       ))
-        :  <p className="text-xl text-purple/50 p-5"> You have no friends </p> 
+        : <p className="text-xl text-purple/50 p-5"> You have no friends </p>
       }
     </>
   )

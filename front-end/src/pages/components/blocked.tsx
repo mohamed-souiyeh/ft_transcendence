@@ -9,9 +9,9 @@ function Blocked(props) {
 
   const [img, setImg] = useState('')
 
-  useEffect( ()=> {
-    setImg(`http://localhost:1337/users/${props.id}/avatar`);
-  },[])
+  useEffect(() => {
+    setImg(`${process.env.REACT_URL}:1337/users/${props.id}/avatar`);
+  }, [])
 
   const UnblockUser = () => {
     axios.post(`${process.env.REACT_URL}:1337/users/unblock`, blocked, {
@@ -32,8 +32,8 @@ function Blocked(props) {
         <p className='text-lg px-7' > {blocked.status} </p>
       </div>
       <div className='flex flex-row-reverse  place-items-center basis-1/2' >
-         
-            <button className="rounded-lg bg-purple-sh-0 focus:outline-none border-none hover:bg-purple text-sm" onClick={UnblockUser}>Unblock</button>
+
+        <button className="rounded-lg bg-purple-sh-0 focus:outline-none border-none hover:bg-purple text-sm" onClick={UnblockUser}>Unblock</button>
       </div>
     </div>
   )

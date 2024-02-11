@@ -12,11 +12,11 @@ import axios from "axios";
 import Cookies from 'js-cookie';
 import History from "./components/history";
 
-function Profile () {
+function Profile() {
 
 
-  const {avatar} = useAvatarContext()
-  const {user, setUser} = useContext(UserContext)
+  const { avatar } = useAvatarContext()
+  const { user, setUser } = useContext(UserContext)
   const [switchValue, setSwitchValue] = useState(user.data.TFAisEnabled);
   const [prompt, setPrompt] = useState(false);
   const [name, setName] = useState(user.data.username)
@@ -34,16 +34,16 @@ function Profile () {
 
   let formdata = new FormData();
 
-  const changeUserName = (e : React.FormEvent) => {
+  const changeUserName = (e: React.FormEvent) => {
     e.preventDefault()
 
     if (name.length)
-    formdata.set("username", name);
+      formdata.set("username", name);
 
     axios.post(`${process.env.REACT_URL}:1337/users/update/username`, formdata, {
       withCredentials: true
     })
-      .then( (res)=> {
+      .then((res) => {
         if (res.status == 200) {
           setBadName(false)
           setSuccess(true)
@@ -55,7 +55,7 @@ function Profile () {
               Cookies.remove('user')
               Cookies.set('user', JSON.stringify(resp.data));
             })
-            .catch((err)=> {
+            .catch((err) => {
               console.log("My sad potato we have an error in updating user cookie in profile smh:", err);
             })
         }
@@ -66,15 +66,15 @@ function Profile () {
       })
   }
 
-  useEffect( () => {
+  useEffect(() => {
     axios.get(`${process.env.REACT_URL}:1337/users/Public_data/${user.data.username}`,
-      { withCredentials: true } )
+      { withCredentials: true })
       .then(res => {
         setHistoty(res.data.allMatches)
         setAchievs(res.data.achievements)
         console.log("eeee: ", res.data.achievements)
       })
-      .catch(()=>{
+      .catch(() => {
         console.log("Error getting matches history!!")
       })
   }, [])
@@ -169,10 +169,10 @@ function Profile () {
   return(
     <>
       <div className="grid justify-center w-screen h-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple ">
-        <SideBar/>
-        <NavBar/>
+        <SideBar />
+        <NavBar />
 
-        {prompt && <Popup switchValue={switchValue} setSwitchValue={setSwitchValue} prompt={prompt} 
+        {prompt && <Popup switchValue={switchValue} setSwitchValue={setSwitchValue} prompt={prompt}
           setPrompt={setPrompt}
         />}
         <div className="bg-purple bg-opacity-10 backdrop-blur-lg border-[1px] border-purple/20 h-64 mt-20 mb-16 rounded-3xl flex">
@@ -196,18 +196,18 @@ function Profile () {
           <div className=" m-6 grid place-content-center">
             <form className="flex w-[100%]" onSubmit={changeUserName}>
               <p className="text-2xl m-2">:</p>
-              <input title="Click To edit" className="w-[40%] bg-transparent border-none focus:outline-none focus:border-none text-2xl" type="text" value={name} onChange={(e) => setName(e.target.value)}/>
-              {badName &&  <p className="font-bold text-red-500 text-lg m-3"> bad Name! </p>}
-              {success &&  <p className="font-bold text-light-green-500 text-lg m-3"> Updated! </p>}
-              <button className="rounded-lg bg-purple-sh-2 hover:border hover:border-purple-sh-2 hover:bg-purple-sh-1 h-8 my-0 py-0 text-sm self-center" type="submit"> save </button>
+              <input title="Click To edit" className="w-[40%] bg-transparent border-none focus:outline-none focus:border-none text-2xl" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+              {badName && <p className="font-bold text-red-500 text-lg m-3"> bad Name! </p>}
+              {success && <p className="font-bold text-light-green-500 text-lg m-3"> Updated! </p>}
+              <button className="rounded-lg bg-purple-sh-2 hover:border hover:border-purple-sh-2 hover:bg-purple-sh-1 h-11" type="submit"> change </button>
             </form>
             <p className="text-2xl m-2">:  {user.data.score}</p>
             <p className="text-2xl m-2">:  {user.data.matchesPlayed}</p>
             <div className="flex ">
               <p className="text-2xl m-2">:  </p>
               <div className="pt-3">
-                <ConfigProvider theme={{ token: { colorPrimary: '#8176AF',  }, }} >
-                  <Switch className="bg-purple-sh-1" checkedChildren="On" unCheckedChildren='Off' 
+                <ConfigProvider theme={{ token: { colorPrimary: '#8176AF', }, }} >
+                  <Switch className="bg-purple-sh-1" checkedChildren="On" unCheckedChildren='Off'
                     defaultChecked={false} //default here should be based on what's on the database.
                     checked={switchValue}
                     onChange={() => setPrompt(true)}
@@ -228,7 +228,7 @@ function Profile () {
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-100">Matchs History:</p>
                 </div>
-                {history.length ? history.map((matches) => <History key={matches.id}  data={matches}/>) : <p className="text-xl text-purple/50 p-5"> No history made yet </p>}
+                {history.length ? history.map((matches) => <History key={matches.id} data={matches} />) : <p className="text-xl text-purple/50 p-5"> No history made yet </p>}
               </div>
             </div>
           </div>

@@ -22,50 +22,50 @@ export default function UserInfo() {
 
 
   useEffect(() => {
-    console.log("isFriendAdded: ", isFriendAdded);  
+    console.log("isFriendAdded: ", isFriendAdded);
     console.log("isFriendPending: ", isFriendPending);
   }, [isFriendAdded, isFriendPending]);
 
   useEffect(() => {
 
     const fetchUserData = () => {
-      axios.get(`http://localhost:1337/users/Public_data/${username}`,
+      axios.get(`${ process.env.REACT_URL }: 1337 / users / Public_data / ${ username }`,
         { withCredentials: true }
       ).then((response) => {
         console.log("response: ", response);
         setUserData(response.data);
         const id = response.data['id'];
-        axios.get(`http://localhost:1337/users/check_notification?receiverId=${id}`, {
-          withCredentials: true
-        }).then((res) => {
-          console.log("res in fetch data : ", res);
-          setIsFriendPending(res.data.isPending);
-          setIsFriendAdded(res.data.isFriend);
-        }).catch((err) => {
-          console.log("error while checking notification: ", err);
-        })
-        setImagePath(`http://localhost:1337/users/${id}/avatar`);
+        axios.get(`${process.env.REACT_URL}:1337/users/check_notification?receiverId=${id}`, {
+        withCredentials: true
+      }).then((res) => {
+        console.log("res in fetch data : ", res);
+        setIsFriendPending(res.data.isPending);
+        setIsFriendAdded(res.data.isFriend);
+      }).catch((err) => {
+        console.log("error while checking notification: ", err);
+      })
+      setImagePath(`${process.env.REACT_URL}:1337/users/${id}/avatar`);
       }).catch(error => {
         console.error('Error fetching user data:', error);
         navigate("/not-found");
       });
     };
 
-    axios.get(`http://localhost:1337/users/check_blocked?otherUserUsername=${username}`, {
-      withCredentials: true,
-    }).then((res) => {
-      console.log("res in check blocked: ", res);
-      if (res.data.isBlocked) {
+    axios.get(`${process.env.REACT_URL}:1337/users/check_blocked?otherUserUsername=${username}`, {
+        withCredentials: true,
+      }).then((res) => {
+        console.log("res in check blocked: ", res);
+        if (res.data.isBlocked) {
+          navigate("/not-found");
+          return;
+        }
+        fetchUserData();
+      }).catch((err) => {
+        console.log("error while checking blocked: ", err);
         navigate("/not-found");
-        return ;
-      }
-      fetchUserData();
-    }).catch((err) => {
-      console.log("error while checking blocked: ", err);
-      navigate("/not-found");
-    });
+      });
 
-  }, [username, navigate]);
+    }, [username, navigate]);
 
 
   const alert = (title: string, text: string, icon: string) => {
@@ -80,24 +80,24 @@ export default function UserInfo() {
     });
   };
 
-  const alert2 =()=>{
+  const alert2 = () => {
     Swal.fire({
       title: "Are you sure?",
       showDenyButton: true,
       showCancelButton: false,
       confirmButtonText: "yes",
       denyButtonText: `No`,
-      iconColor: 'purple', 
+      iconColor: 'purple',
       customClass: {
         popup: 'w-96 h-auto ',
         confirmButton: 'w-32 h-12',
         denyButtonText: 'w-32 h-12',
-        
+
       }
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire("Unfriend successfully!", "", "success");
-      } else if (result.isDenied ) {
+      } else if (result.isDenied) {
         Swal.fire("Good, be more social bro", "", "success");
         setIsFriendAdded(true);
       }
@@ -109,8 +109,8 @@ export default function UserInfo() {
   const handleAddFriend = async () => {
     try {
       const response = await axios.post(
-        'http://localhost:1337/notifications/friend-request',
-        { 
+        `${process.env.REACT_URL}:1337/notifications/friend-request`,
+        {
           senderId: user.data.id,
           receiverId: userData.id,
         },
@@ -130,7 +130,7 @@ export default function UserInfo() {
   const handleUnfriendUser = async () => {
     try {
       const response = await axios.post(
-        'http://localhost:1337/users/unfriend',
+        `${process.env.REACT_URL}:1337/users/unfriend`,
         { id: userData['id'] },
         { withCredentials: true }
       );
@@ -149,7 +149,7 @@ export default function UserInfo() {
   const handleBlockUser = async () => {
     try {
       await axios.post(
-        'http://localhost:1337/users/block',
+        `${process.env.REACT_URL}:1337/users/block`,
         { id: userData['id'] }, {
         withCredentials: true
       });
