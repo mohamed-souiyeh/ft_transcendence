@@ -34,7 +34,7 @@ function Contacts(props) {
   }, [])
 
   return (
-    <div className={` ${dm.id === dmInfo.id ? 'bg-purple-sh-0' : 'bg-transparent'} flex border border - transparent border - b - purple - sh - 0 p - 4`} onClick={() => clicked()}>
+    <div className={` ${dm.id === dmInfo.id ? 'bg-purple-sh-0' : 'bg-transparent'} flex border border-transparent border-b-purple-sh-0 p-4`} onClick={() => clicked()}>
       <div className='flex basis-11/12 hover:cursor-pointer' >
         <img src={img} className="rounded-full h-12 w-12" />
         <div className="grid px-2">

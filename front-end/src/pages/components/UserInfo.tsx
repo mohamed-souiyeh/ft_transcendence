@@ -44,7 +44,7 @@ export default function UserInfo() {
       }).catch((err) => {
         console.log("error while checking notification: ", err);
       })
-      setImagePath(`${ process.env.REACT_URL }: 1337 / users / ${ id } / avatar`);
+      setImagePath(`${process.env.REACT_URL}:1337/users/${id}/avatar`);
       }).catch(error => {
         console.error('Error fetching user data:', error);
         navigate("/not-found");

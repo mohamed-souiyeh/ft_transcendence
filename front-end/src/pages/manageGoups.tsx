@@ -65,7 +65,7 @@ function ManageGoups() {
     if (!val) return setGroupData([]);
 
 
-    axios.get(`${ process.env.REACT_URL }: 1337 / conv / search ? prefix = ${ val }`, {
+    axios.get(`${process.env.REACT_URL}:1337/conv/search?prefix=${val}`, {
       withCredentials: true,
     })
       .then(response => {

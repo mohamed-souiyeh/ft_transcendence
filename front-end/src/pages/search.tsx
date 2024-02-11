@@ -52,7 +52,7 @@ function Search() {
               <input onChange={(e) => setVal(e.target.value)} type='text' placeholder="search for a friend" className='h-12 p-3 bg-transparent cursor-text border-transparent outline-none placeholder:italic placeholder:text-purple/60' />
             </form>
           </div>
-          <div className={`grid w - [100 %] ${!searchResaults.length && 'place-content-center'}`}>
+          <div className={`grid w-[100%] ${!searchResaults.length && 'place-content-center'}`}>
             {searchResaults.length ? searchResaults.map((grp) => <SearchResaults name={grp.username} state={grp.status} id={grp.id} key={grp.id} />) :
               <p className="text-xl text-purple/50 p-5"> Enter a Valid name to search for a friend </p>
             }
