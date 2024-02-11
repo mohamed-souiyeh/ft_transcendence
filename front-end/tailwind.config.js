@@ -38,7 +38,6 @@ module.exports = withMT({
         'purple-end': '#7b1fa2',
         'team':'8785A2'
       },
-      
       height: {
         'l-card-h': '26rem',
         '13': '13px'
@@ -55,6 +54,10 @@ module.exports = withMT({
       },
       animation:{
           'trans-right':'trans-right 0.8s ease-in-out infinite'
+      },
+      grayscale: {
+        50: '50%',
+        70: '70%',
       },
     },
   },
