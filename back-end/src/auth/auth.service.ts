@@ -33,7 +33,7 @@ export class AuthService {
   async addTokenToCookie(res: Response, Token: string, key: string) {
     res.cookie(key, Token, {
       httpOnly: true,
-      sameSite: 'strict',
+      // sameSite: 'strict',
       // secure: true,
     });
   }
