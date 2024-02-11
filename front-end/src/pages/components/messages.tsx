@@ -16,7 +16,7 @@ const dumy_msg = {
 };
 
 type msgType = typeof dumy_msg;
-function Messages() {
+function Messages(props: any) {
 
   const { dm, setDm } = useDmContext();
   const [val, setVal] = useState('');
@@ -33,6 +33,7 @@ function Messages() {
   const maxLength = 42;
 
   const { user } = useContext(UserContext);
+  const { setRefreshDms } = props;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -43,28 +44,28 @@ function Messages() {
     }
   }, [msgs]);
 
-  useEffect(() => {
-    const setIntervalId: NodeJS.Timeout = setInterval(() => {
-      // console.log("dm is: ", dm);
-      user.chat.timeout(1000).emit('checkDmpls', {
-        convId: dm.id,
-        convType: dm.type,
-      }, (err, res) => {
-        if (err) {
-          console.log("error in checking if the user is blocked: ", err)
-          // console.log("the res is: ", res);
-          return;
-        }
-        // console.log("isBlocked is: ", res);
-        if (res.isBlocked !== isBlockedRef.current)
-          setIsBlocked(res.isBlocked);
-      });
-    }, 1000);
+  // useEffect(() => {
+  //   const setIntervalId: NodeJS.Timeout = setInterval(() => {
+  //     // console.log("dm is: ", dm);
+  //     user.chat.timeout(1000).emit('checkDmpls', {
+  //       convId: dm.id,
+  //       convType: dm.type,
+  //     }, (err, res) => {
+  //       if (err) {
+  //         console.log("error in checking if the user is blocked: ", err)
+  //         // console.log("the res is: ", res);
+  //         return;
+  //       }
+  //       // console.log("isBlocked is: ", res);
+  //       if (res.isBlocked !== isBlockedRef.current)
+  //         setIsBlocked(res.isBlocked);
+  //     });
+  //   }, 1000);
 
-    return () => {
-      clearInterval(setIntervalId);
-    }
-  }, [dm]);
+  //   return () => {
+  //     clearInterval(setIntervalId);
+  //   }
+  // }, [dm]);
 
 
   useEffect(() => {
@@ -93,9 +94,15 @@ function Messages() {
     // console.log("user: ", user);
 
     user.chat.on('broadcast', (msg) => {
+      console.log("msg is: ", msg);
       setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
+    user.chat.on('update', () => {
+      setRefreshDms(true);
+    });
+
+    console.log("dm is: ", dm);
     setImg(`${process.env.REACT_URL}:1337/users/${dm.userId}/avatar`);
     return () => {
       user.chat.off('broadcast');

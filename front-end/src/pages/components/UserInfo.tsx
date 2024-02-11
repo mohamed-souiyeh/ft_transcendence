@@ -29,7 +29,7 @@ export default function UserInfo() {
   useEffect(() => {
 
     const fetchUserData = () => {
-      axios.get(`${ process.env.REACT_URL }: 1337 / users / Public_data / ${ username }`,
+      axios.get(`${process.env.REACT_URL}:1337/users/Public_data/${username}`,
         { withCredentials: true }
       ).then((response) => {
         console.log("response: ", response);
