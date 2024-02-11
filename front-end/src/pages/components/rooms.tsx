@@ -144,6 +144,8 @@ function Rooms(props: object) {
                   if (isBaned)
                     message = "you are banned from this channel";
 
+                  console.log("the message is: ", msgs);
+
                   return <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={message} key={msg.id} isBanned={(isBaned || isMuted)}
                     authorState={channel.usersState.find((userState) => userState.userId === msg.authorInfo.id)?.state}
                     authorInfo={msg.authorInfo}

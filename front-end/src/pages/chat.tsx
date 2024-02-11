@@ -243,7 +243,7 @@ function Chat() {
           </div>
         </div>
         <div className='relative basis-2/3 m-5 '>
-          {selected === subpages.NETWORK ? <Network refreshDms={setRefreshDms} /> : (selected === subpages.CHAT ? <Messages /> : <Rooms setRefreshChannels={setRefreshChannels} />)}
+          {selected === subpages.NETWORK ? <Network refreshDms={setRefreshDms} /> : (selected === subpages.CHAT ? <Messages setRefreshDms={setRefreshDms}/> : <Rooms setRefreshChannels={setRefreshChannels} />)}
         </div>
 
       </div>
