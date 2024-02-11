@@ -24,16 +24,17 @@ const interceptorData: {
 
 axios.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const originalRequest = error.config;
 
 
-    console.log("response interceptor :", error.response);
-    console.log("original config :", error.config);
+    // console.log("response interceptor :", error.response);
+    // console.log("original config :", error.config);
     const isRefreshRequest = error.request.responseURL === `${process.env.REACT_URL}:1337/auth/refresh`;
 
     if (isRefreshRequest) {
       // console.log("isRefreshRequest :", isRefreshRequest);
+      console.log("first reject");
       return Promise.reject(error);
     }
 
@@ -46,31 +47,37 @@ axios.interceptors.response.use(
     if (error.response && error.response.status === 401 && !originalRequest._retry ) {
       originalRequest._retry = true;
 
-      // interceptorData.tobeRefreshed.push(originalRequest);
+      interceptorData.tobeRefreshed.push(originalRequest);
       
-      if (interceptorData.isRefreshing)
-        return interceptorData.refreshPromise?.then( () => axios(originalRequest)).catch((err) => { console.log("some nasty shit happened");})
+      if (interceptorData.isRefreshing){
+        console.log("isRefreshing, pushing to failedRequests");
+        console.log("interceptorData :", interceptorData);
+        return interceptorData.refreshPromise!.then(() => {
+          return axios(originalRequest);
+        });
+      }
 
       
-      console.log("401 error, original request is: ", originalRequest);
-
-      interceptorData.isRefreshing = true;
       // Trying to refresh the Token:
       console.log("Trying to refresh Token..")
       interceptorData.refreshPromise = axios.get(`${process.env.REACT_URL}:1337/auth/refresh`, {
         withCredentials: true
       }).then(() => {
-          console.log("Token refreshed ma nigga!")
-          //FIXME - this bastard is mostlikly is the root of the problem
-          return axios(originalRequest);
-        }).catch((err) => {
-          console.log("my sad shit, an err occured, it's :", err);
-
-          eventBus.emit('unauthorized');
-          return Promise.reject(error);
-        });
+        console.log("Token refreshed ma nigga!")
+        interceptorData.isRefreshing = false;
+        //FIXME - this bastard is mostlikly is the root of the problem
+        return axios(originalRequest);
+      }).catch((err) => {
+        console.log("my sad shit, an err occured, it's :", err);
+        
+        eventBus.emit('unauthorized');
+        return Promise.reject(error);
+      });
+      interceptorData.isRefreshing = true;
       return interceptorData.refreshPromise;
     }
+
+    console.log("last reject");
     return Promise.reject(error);
   }
 );

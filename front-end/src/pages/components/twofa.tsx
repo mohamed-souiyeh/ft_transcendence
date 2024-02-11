@@ -3,8 +3,8 @@ import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react
 import { UserContext } from "../../App";
 import Cookies from 'js-cookie'
 
-function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: boolean, prompt:boolean, setSwitchValue: Dispatch<SetStateAction<boolean>>, setPrompt: Dispatch<SetStateAction<boolean>>}) {
-  const  {user} = useContext(UserContext)
+function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue: boolean, prompt: boolean, setSwitchValue: Dispatch<SetStateAction<boolean>>, setPrompt: Dispatch<SetStateAction<boolean>> }) {
+  const { user } = useContext(UserContext)
   const [enable, setEnable] = useState(false);
   const [qrCode, setCode] = useState('');
   const [codeFetched, setStatus] = useState(false);
@@ -13,12 +13,12 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
 
 
   useEffect(() => {
-// <<<<<<< HEAD
-//     // if (!codeFetched) {
-//     axios.get("http://localhost:1337/2fa/generate",
-// =======
+    // <<<<<<< HEAD
+    //     // if (!codeFetched) {
+    //     axios.get("`${process.env.REACT_URL}:1337/2fa/generate",
+    // =======
     axios.get(`${process.env.REACT_URL}:1337/2fa/generate`,
-// >>>>>>> master
+      // >>>>>>> master
       {
         withCredentials: true,
         responseType: 'arraybuffer'
@@ -46,17 +46,17 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
       withCredentials: true
     })
       .then((resp) => {
-        if (resp.status == 200){
+        if (resp.status == 200) {
           // console.log("2fa is off")
 
           setSwitchValue(!switchValue);
           setPrompt(!prompt)
           user.data.TFAisEnabled = false
           Cookies.remove('user')
-          Cookies.set('user',JSON.stringify(user.data));
+          Cookies.set('user', JSON.stringify(user.data));
         }
       })
-      .catch( (err) => {
+      .catch((err) => {
         // console.log("dang an error: ", err)
       })
   }
@@ -68,13 +68,13 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
 
   const verifyCode = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const Code = e.target.verfCode.value; 
+    const Code = e.target.verfCode.value;
     formdata.set("code", Code);
 
-    axios.post(`${process.env.REACT_URL}:1337/2fa/activate`, formdata ,{
-      withCredentials: true, 
-      headers:{
-        'Content-Type' : 'multipart/formdata'
+    axios.post(`${process.env.REACT_URL}:1337/2fa/activate`, formdata, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'multipart/formdata'
       }
     })
       .then((res) => {
@@ -86,7 +86,7 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
           // console.log(JSON.stringify(user.data))
 
           Cookies.remove('user')
-          Cookies.set('user',JSON.stringify(user.data));
+          Cookies.set('user', JSON.stringify(user.data));
         }
         else {
           // console.log('code is rong', res.status)
@@ -124,14 +124,14 @@ function Popup({switchValue, setSwitchValue, prompt, setPrompt} : {switchValue: 
               <p className="text-cente place-self-center">Please Use this
                 <a className="m-1 text-purple-sh-2 hover:text-purple-sh-1" href="https://play.google.com/store/apps/details?id=two.factor.authenticator.generator.code" target="_blank">App</a>
                 to enable 2fa </p>
-              <img src={qrCode} className="w-40 h-40 my-4 place-self-center"/>
+              <img src={qrCode} className="w-40 h-40 my-4 place-self-center" />
               <form onSubmit={verifyCode} action='' className=" grid place-self-center ">
                 <input type='text' name="verfCode" placeholder="Enter verification code" className='w-48 h-12 bg-purple-sh-2 outline-none rounded-lg text-impure-white px-2 place-self-center' />
                 <div className="grid h-7">
-                  { !confirmed && <p className="ml-12 text-sm text-[#D9534F] font-extrabold"> Error! Please Try again. </p> }
+                  {!confirmed && <p className="ml-12 text-sm text-[#D9534F] font-extrabold"> Error! Please Try again. </p>}
                 </div>
                 <div className="flex place-content-center gap-3 pt-1">
-                  <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2"  type="submit" value="Send" > Confirm </button>
+                  <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2" type="submit" value="Send" > Confirm </button>
                   <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2" onClick={() => setPrompt(!prompt)}> Cancel </button>
                 </div>
               </form>
