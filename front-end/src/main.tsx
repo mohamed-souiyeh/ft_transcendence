@@ -9,10 +9,22 @@ import { AvatarProvider } from './contexts/avatar.tsx'
 import { NotificationProvider } from './contexts/notificationContext.tsx'
 
 
+const interceptorData: {
+  tobeRefreshed: any[],
+  failedRequests: any[],
+  refreshPromise: null | Promise<any>,
+  isRefreshing: boolean,
+} = {
+  tobeRefreshed: [],
+  failedRequests: [],
+  refreshPromise: null,
+  isRefreshing: false,
+}
+
 
 axios.interceptors.response.use(
   (response) => response,
-  async (error) => {
+  (error) => {
     const originalRequest = error.config;
 
 
@@ -31,12 +43,21 @@ axios.interceptors.response.use(
 
 
     // console.log("isRefreshRequest :", isRefreshRequest);
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (error.response && error.response.status === 401 && !originalRequest._retry ) {
       originalRequest._retry = true;
 
+      // interceptorData.tobeRefreshed.push(originalRequest);
+      
+      if (interceptorData.isRefreshing)
+        return interceptorData.refreshPromise?.then( () => axios(originalRequest)).catch((err) => { console.log("some nasty shit happened");})
+
+      
+      console.log("401 error, original request is: ", originalRequest);
+
+      interceptorData.isRefreshing = true;
       // Trying to refresh the Token:
       console.log("Trying to refresh Token..")
-      return axios.get(`${process.env.REACT_URL}:1337/auth/refresh`, {
+      interceptorData.refreshPromise = axios.get(`${process.env.REACT_URL}:1337/auth/refresh`, {
         withCredentials: true
       }).then(() => {
           console.log("Token refreshed ma nigga!")
@@ -47,7 +68,8 @@ axios.interceptors.response.use(
 
           eventBus.emit('unauthorized');
           return Promise.reject(error);
-        })
+        });
+      return interceptorData.refreshPromise;
     }
     return Promise.reject(error);
   }
