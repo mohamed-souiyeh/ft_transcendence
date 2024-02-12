@@ -1,4 +1,4 @@
-import { useState , useContext} from "react";
+import { useState, useContext } from "react";
 import Navbar from "./components/navbar";
 import SearchResaults from "./components/searchResaults";
 import SideBar from "./components/sidebar";

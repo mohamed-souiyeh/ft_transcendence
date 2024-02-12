@@ -78,7 +78,8 @@ function Channels(props: object) {
   // }, [channel]);
 
   const clicked = () => {
-    console.log("channel clicked")
+    console.log("channel clicked");
+    console.log("currentChannel is: ", currentChannel);
     // console.log("contact is: ", contact)
     setChannel(currentChannel)
   }

@@ -1,10 +1,10 @@
 import Icons from "./icons"
-import {useDmContext} from "../../contexts/chatContext.tsx"
+import { useDmContext } from "../../contexts/chatContext.tsx"
 import { useEffect, useState } from "react";
 
 function Contacts(props) {
 
-  const {dm, setDm} = useDmContext();
+  const { dm, setDm } = useDmContext();
   const [status, setStatus] = useState("online");
 
   const { user, dmInfo } = props;
@@ -29,9 +29,9 @@ function Contacts(props) {
     // console.log("the dm is: ", dm);
   }
 
-  useEffect( ()=> {
+  useEffect(() => {
     setImg(`${process.env.REACT_URL}:1337/users/${user.id}/avatar`);
-  },[])
+  }, [])
 
   return (
     <div className={` ${dm.id === dmInfo.id ? 'bg-purple-sh-0' : 'bg-transparent'} flex border border-transparent border-b-purple-sh-0 p-4`} onClick={() => clicked()}>
@@ -43,7 +43,7 @@ function Contacts(props) {
         </div>
       </div>
       <div className='flex flex-row-reverse basis-1/12 self-center'>
-        <Icons user={user}/>
+        <Icons user={user} />
       </div>
     </div>
   )

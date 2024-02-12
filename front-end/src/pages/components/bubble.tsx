@@ -123,7 +123,7 @@ function Bubble(props) {
           <div className="grid max-w-[70%]">
             <div className="flex p-3 pb-0" >
               {/* make username clickable */}
-              {Object.keys(channel).length && props.authorInfo.role !== "kicked" ?
+              {Object.keys(channel).length && props.authorInfo?.role !== "kicked" ?
 
                 <Menu>
                   <MenuHandler >

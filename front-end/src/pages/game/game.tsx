@@ -1,21 +1,19 @@
-import {useRef, useEffect, useState, useContext} from 'react';
+import { useRef, useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import Profile from "../components/userProfileIcone";
-import {Cube} from './cube';
+import { Cube } from './cube';
 import quitButton from './exitGame.png';
 import './spinner.css';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from '../../clientSocket';
 
-function rad2Degree(angle:number) : number
-{
-	return angle * 180/Math.PI;
+function rad2Degree(angle: number): number {
+  return angle * 180 / Math.PI;
 }
 
-let gl:WebGLRenderingContext | null;
+let gl: WebGLRenderingContext | null;
 
-function Game() 
-{
+function Game() {
   //================================================================
   const canvasRef = useRef<HTMLCanvasElement>(null);
   let [avatar1, setAvatar1] = useState('');
@@ -37,8 +35,7 @@ function Game()
     navigate("/home");
   }
 
-  useEffect(() => 
-  {
+  useEffect(() => {
     const handleWinner = (v: boolean) => { setWinState(v); };
     const handleLeaveGame = () => { navigate("/home"); };
     const handleAlreadyPlaying = () => { navigate("/home"); };
@@ -53,11 +50,11 @@ function Game()
     if (socket)
     {
       socket.emit("queuing");
-      socket.on("inviteAccepted", ()=>{
+      socket.on("inviteAccepted", () => {
         console.log("inviteAccepted");
         console.log("Game state ", gameState);
-        setState(false); 
-        }
+        setState(false);
+      }
       );
       socket.on("winner", handleWinner);
       socket.on("leaveGame", handleLeaveGame);
@@ -65,95 +62,82 @@ function Game()
       socket.on("alreadyQueuing", handleAlreadyQueuing);
       socket.on("gameover", handleGameOver);
     }
-    if (canvasRef.current) 
-    {
+    if (canvasRef.current) {
       gl = canvasRef.current.getContext("webgl");
 
-      if (gl) 
-      {
+      if (gl) {
         gl.canvas.width = 900;
         gl.canvas.height = 600;
-        frameRef.current = 
-        requestAnimationFrame(() => renderGame(gl));
+        frameRef.current =
+          requestAnimationFrame(() => renderGame(gl));
       }
     }
-    if (!gl)
-    {
+    if (!gl) {
       return;
     }
     let w = 0, h = 0;
-    if (gl)
-    {
-        w = gl.canvas.width;
-        h = gl.canvas.height;
+    if (gl) {
+      w = gl.canvas.width;
+      h = gl.canvas.height;
     }
 
-    let terrain:Cube = new Cube(gl, 9.8, 7, 1);
-    let first:Cube = new Cube(gl, 0.18, 1, 0.3);
-    let second:Cube = new Cube(gl, 0.18, 1, 0.3);
-    let ball:Cube = new Cube(gl, 0.2, 0.2, 0.5);
-    
+    let terrain: Cube = new Cube(gl, 9.8, 7, 1);
+    let first: Cube = new Cube(gl, 0.18, 1, 0.3);
+    let second: Cube = new Cube(gl, 0.18, 1, 0.3);
+    let ball: Cube = new Cube(gl, 0.2, 0.2, 0.5);
+
     first.vector3D.x = 0.97;
-    first.vector3D.y =  0.0;
-    first.vector3D.z =  -0.02;
-    first.velocityy =  0.0;
-    first.speed =  0.01;
+    first.vector3D.y = 0.0;
+    first.vector3D.z = -0.02;
+    first.velocityy = 0.0;
+    first.speed = 0.01;
 
     second.vector3D.x = -0.97;
     second.vector3D.y = 0.0;
     second.vector3D.z = -0.02;
     second.velocityy = 0.0;
-    second.speed =  0.01;
+    second.speed = 0.01;
 
-    ball.vector3D.x =  first.vector3D.x - 0.05;
-    ball.vector3D.y =  first.vector3D.y;
-    ball.vector3D.z =  -0.02;
+    ball.vector3D.x = first.vector3D.x - 0.05;
+    ball.vector3D.y = first.vector3D.y;
+    ball.vector3D.z = -0.02;
     ball.speed = 0.009;
     ball.prevPositions.x = first.vector3D.x + 0.5;
     ball.prevPositions.y = first.vector3D.y + 0.5;
     ball.prevPositions.z = -0.01;
 
-    document.addEventListener('keydown', (e) => 
-    {
-      if (e.code == 'Space')
-      {
-        if (!ballLaunched)
-        {
-              second.speed = 0.01;
-              first.speed = 0.01;
-              if (firstPlayerHasTheBall)
-              {
-                  ball.prevPositions.x = first.vector3D.x + 0.5;
-                  ball.prevPositions.y = first.vector3D.y + 0.5;
-              }
-              if (secondPlayerHasTheBall)
-              {
-                  ball.prevPositions.x = second.vector3D.x - 0.5;
-                  ball.prevPositions.y = second.vector3D.y - 0.5;
-              }
-              ball.velocityx =  ball.vector3D.x - ball.prevPositions.x;
-              ball.velocityy =  ball.vector3D.y - ball.prevPositions.y;
-              ball.prevPositions.x = ball.vector3D.x + 0.5;
-              ball.prevPositions.y = ball.vector3D.y + 0.5;
-              ballLaunched = true;
-              ball.speed = 0.009;
-            }
-            if (socket)
-            socket.emit('balllaunch', ballLaunched);
+    document.addEventListener('keydown', (e) => {
+      if (e.code == 'Space') {
+        if (!ballLaunched) {
+          second.speed = 0.01;
+          first.speed = 0.01;
+          if (firstPlayerHasTheBall) {
+            ball.prevPositions.x = first.vector3D.x + 0.5;
+            ball.prevPositions.y = first.vector3D.y + 0.5;
+          }
+          if (secondPlayerHasTheBall) {
+            ball.prevPositions.x = second.vector3D.x - 0.5;
+            ball.prevPositions.y = second.vector3D.y - 0.5;
+          }
+          ball.velocityx = ball.vector3D.x - ball.prevPositions.x;
+          ball.velocityy = ball.vector3D.y - ball.prevPositions.y;
+          ball.prevPositions.x = ball.vector3D.x + 0.5;
+          ball.prevPositions.y = ball.vector3D.y + 0.5;
+          ballLaunched = true;
+          ball.speed = 0.009;
         }
-      if (e.code == 'KeyW')
-      {
         if (socket)
-        {
+          socket.emit('balllaunch', ballLaunched);
+      }
+      if (e.code == 'KeyW') {
+        if (socket) {
           socket.emit('right', 1);
           socket.emit('left', 1);
 
         }
       }
-      if (e.code == 'KeyS')
-      {
-        if (socket)
-        {
+      if (e.code == 'KeyS') {
+        if (socket) {
           socket.emit('right', -1);
           socket.emit('left', -1);
         }
@@ -161,27 +145,23 @@ function Game()
     })
 
     document.addEventListener('keyup', (e) => {
-      if (e.code == 'KeyW')
-      {
-        if (socket)
-        {
+      if (e.code == 'KeyW') {
+        if (socket) {
           socket.emit('right', 0);
           socket.emit('left', 0);
         }
       }
-      if (e.code == 'KeyS')
-      {
-        if (socket)
-        {
+      if (e.code == 'KeyS') {
+        if (socket) {
           socket.emit('right', 0);
           socket.emit('left', 0);
         }
       }
     })
 
-    let firstPlayerHasTheBall:boolean = true;
-    let secondPlayerHasTheBall:boolean = false;
-    let ballLaunched:boolean = false;
+    let firstPlayerHasTheBall: boolean = true;
+    let secondPlayerHasTheBall: boolean = false;
+    let ballLaunched: boolean = false;
 
     let ar = w/h;
     let fov = rad2Degree(71.1);
@@ -252,14 +232,13 @@ function Game()
     {
         socket.on("gameStart", ()=>{gameState = false; setState(false)});
 
-        if (gl)
-        {
+        if (gl) {
           gl.clearColor(0.282, 0.17, 0.37, 1.0);
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           gl.enable(gl.DEPTH_TEST);
 
           terrain.renderEntity(gl, 36);
-          terrain.setColor(gl, [0.41, 0.26,0.5]);
+          terrain.setColor(gl, [0.41, 0.26, 0.5]);
           terrain.rotateX(gl, rad2Degree(0.004));
           terrain.rotateY(gl, rad2Degree(0.0));
           terrain.setLightSource(gl, [0.0, 0.0, -0.6], [1.0, 1.0, 1.0]);
@@ -278,7 +257,7 @@ function Game()
           second.setColor(gl, [0.7, 0.6, 1.8]);
           second.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
           second.set3DMatrices(gl, projection, viewMatrix);
-  
+
           ball.renderEntity(gl, 36);
           ball.rotateX(gl, rad2Degree(0.004));
           ball.rotateY(gl, rad2Degree(0.0));
@@ -287,21 +266,20 @@ function Game()
           ball.set3DMatrices(gl, projection, viewMatrix);
         }
       }
-    
+
       frameRef.current = requestAnimationFrame(() => renderGame(gl));
     }
 
-    const handle = () =>
-    {
-      if (gl)
-      {
+    const handle = () => {
+      if (gl) {
         gl.canvas.width = 900;
         gl.canvas.height = 600;
       }
     };
 
     window.addEventListener("resize", handle);
-    return () => {cancelAnimationFrame(frameRef.current);
+    return () => {
+      cancelAnimationFrame(frameRef.current);
       socket.off("winner", handleWinner);
       socket.off("leaveGame", handleLeaveGame);
       socket.off("alreadyPlaying", handleAlreadyPlaying);
@@ -311,99 +289,110 @@ function Game()
       socket.connect();
     }
   },
-  []);
+    []);
 
   return (<>
-          <div className="w-screen grid justify-center ">
+    <div className="w-screen grid justify-center ">
 
-          <div style={{textAlign:"center",
-                      font:"status-bar",
-                      height: "100%"}}>
-          {<Profile score = {score1}
-                    score2= {score2}
-                    pic1={avatar1}
-                    pic2={avatar2}
+      <div style={{
+        textAlign: "center",
+        font: "status-bar",
+        height: "100%"
+      }}>
+        {<Profile score={score1}
+          score2={score2}
+          pic1={avatar1}
+          pic2={avatar2}
         />}
-          <canvas style={{right:"300px",
-                          width: "100%",
-                          height: "100%"}} 
-            ref={canvasRef}
-          /></div>
-          <div style={{ position: "absolute", 
-              top: 0, 
-              left: 0, 
-              width: "100%", 
-              height: "100%", 
-              display: "flex", 
-              justifyContent: "center", 
-              alignItems: "center",
-              pointerEvents: "none" }}>
-            {/* <h1>GO !</h1> */}
-          </div>
-          </div>
-          {!foundMatch && (
-            <div className="spinner">
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-            </div>
-          )} 
-          {gameState &&
-            (<div style={{ 
-              position: "absolute", 
-              top: "47%", 
-              left: "50%", 
-              width: "600px", 
-              height: "400px", 
-              backgroundColor: "rgba(128, 0, 129, 0.5)", 
-              transform: "translate(-50%, -50%)",
-              pointerEvents: "none",
-              borderRadius: "20px",
-              borderWidth: "5px",
-              borderColor: "rgba(255, 0, 255, 0.5)",
-            }}>
+        <canvas style={{
+          right: "300px",
+          width: "100%",
+          height: "100%"
+        }}
+          ref={canvasRef}
+        /></div>
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        pointerEvents: "none"
+      }}>
+        {/* <h1>GO !</h1> */}
+      </div>
+    </div>
+    {!foundMatch && (
+      <div className="spinner">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    )}
+    {gameState &&
+      (<div style={{
+        position: "absolute",
+        top: "47%",
+        left: "50%",
+        width: "600px",
+        height: "400px",
+        backgroundColor: "rgba(128, 0, 129, 0.5)",
+        transform: "translate(-50%, -50%)",
+        pointerEvents: "none",
+        borderRadius: "20px",
+        borderWidth: "5px",
+        borderColor: "rgba(255, 0, 255, 0.5)",
+      }}>
 
-              <div className="lds-dual-ring"></div>
-              <h1 style={{ 
-              position: "absolute",
-              left:"28%"}}>GAME OVER</h1>
+        <div className="lds-dual-ring"></div>
+        <h1 style={{
+          position: "absolute",
+          left: "28%"
+        }}>GAME OVER</h1>
 
-              {win && (<h1 style={{ 
-              position: "absolute",
-              top:"20%",
-              left:"43%",
-              fontSize:"25px"}}>YOU WIN</h1>)}
+        {win && (<h1 style={{
+          position: "absolute",
+          top: "20%",
+          left: "43%",
+          fontSize: "25px"
+        }}>YOU WIN</h1>)}
 
-              {!win && (<h1 style={{ 
-              position: "absolute",
-              top:"20%",
-              left:"42%",
-              fontSize:"25px"}}>YOU LOSE</h1>)}
+        {!win && (<h1 style={{
+          position: "absolute",
+          top: "20%",
+          left: "42%",
+          fontSize: "25px"
+        }}>YOU LOSE</h1>)}
 
-              <h1 style={{ 
-              position: "absolute",
-              top:"40%",
-              left:"30%",
-              fontSize:"90px"}}>{score1}</h1>
-              <h1 style={{ 
-              position: "absolute",
-              top:"40%",
-              left:"64%",
-              fontSize:"90px"}}>{score2}</h1>
-            </div>)
-          }
-          <div style={{ textAlign: "center", marginTop: "120px" }}>
-          <button 
-              onClick={leaveGame}
-              style={{ color: "white", background: "#DFA7FC", width: 60, height: 60, border: "none", padding: 0}}>
-            <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
-          </button>
-          </div>
+        <h1 style={{
+          position: "absolute",
+          top: "40%",
+          left: "30%",
+          fontSize: "90px"
+        }}>{score1}</h1>
+        <h1 style={{
+          position: "absolute",
+          top: "40%",
+          left: "64%",
+          fontSize: "90px"
+        }}>{score2}</h1>
+      </div>)
+    }
+    <div style={{ textAlign: "center", marginTop: "120px" }}>
+      <button
+        onClick={leaveGame}
+        style={{ color: "white", background: "#DFA7FC", width: 60, height: 60, border: "none", padding: 0 }}>
+        <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
+      </button>
+    </div>
 
-          </>
-          );
+  </>
+  );
 }
 
 export default Game;

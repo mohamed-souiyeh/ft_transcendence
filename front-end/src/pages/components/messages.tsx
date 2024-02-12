@@ -16,7 +16,7 @@ const dumy_msg = {
 };
 
 type msgType = typeof dumy_msg;
-function Messages() {
+function Messages(props: any) {
 
   const { dm, setDm } = useDmContext();
   const [val, setVal] = useState('');
@@ -33,6 +33,7 @@ function Messages() {
   const maxLength = 42;
 
   const { user } = useContext(UserContext);
+  const { setRefreshDms } = props;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -43,28 +44,28 @@ function Messages() {
     }
   }, [msgs]);
 
-  useEffect(() => {
-    const setIntervalId: NodeJS.Timeout = setInterval(() => {
-      // console.log("dm is: ", dm);
-      user.chat.timeout(1000).emit('checkDmpls', {
-        convId: dm.id,
-        convType: dm.type,
-      }, (err, res) => {
-          if (err) {
-            console.log("error in checking if the user is blocked: ", err)
-            // console.log("the res is: ", res);
-            return;
-          }
-          // console.log("isBlocked is: ", res);
-          if (res.isBlocked !== isBlockedRef.current)
-          setIsBlocked(res.isBlocked);
-        });
-    }, 1000);
+  // useEffect(() => {
+  //   const setIntervalId: NodeJS.Timeout = setInterval(() => {
+  //     // console.log("dm is: ", dm);
+  //     user.chat.timeout(1000).emit('checkDmpls', {
+  //       convId: dm.id,
+  //       convType: dm.type,
+  //     }, (err, res) => {
+  //       if (err) {
+  //         console.log("error in checking if the user is blocked: ", err)
+  //         // console.log("the res is: ", res);
+  //         return;
+  //       }
+  //       // console.log("isBlocked is: ", res);
+  //       if (res.isBlocked !== isBlockedRef.current)
+  //         setIsBlocked(res.isBlocked);
+  //     });
+  //   }, 1000);
 
-    return () => {
-      clearInterval(setIntervalId);
-    }
-  }, [dm]);
+  //   return () => {
+  //     clearInterval(setIntervalId);
+  //   }
+  // }, [dm]);
 
 
   useEffect(() => {
@@ -74,29 +75,34 @@ function Messages() {
       convId: dm.id,
       convType: dm.type,
     }, (err, res) => {
-        if (err) return console.log("error in checking if the user is blocked: ", err);
-        console.log("isBlocked is: ", res);
-        setIsBlocked(res.isBlocked);
-        if (res.isBlocked === false)
-        {
+      if (err) return console.log("error in checking if the user is blocked: ", err);
+      console.log("isBlocked is: ", res);
+      setIsBlocked(res.isBlocked);
+      if (res.isBlocked === false) {
         //NOTE - fetch the messages of the dm using the dm.id and dm.type from the chatGatway
         user.chat.timeout(5000).emit('getAllMessages', {
           convId: dm.id,
           convType: dm.type,
         }, (err, messages) => {
-            if (err) return console.log("error in getting all messages: ", err);
-            console.log("messages are: ", messages);
-            setMsgs(messages);
-          })
-        }
-      })
+          if (err) return console.log("error in getting all messages: ", err);
+          console.log("messages are: ", messages);
+          setMsgs(messages);
+        })
+      }
+    })
 
     // console.log("user: ", user);
 
     user.chat.on('broadcast', (msg) => {
+      console.log("msg is: ", msg);
       setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
+    user.chat.on('update', () => {
+      setRefreshDms(true);
+    });
+
+    console.log("dm is: ", dm);
     setImg(`${process.env.REACT_URL}:1337/users/${dm.userId}/avatar`);
     return () => {
       user.chat.off('broadcast');
@@ -140,7 +146,7 @@ function Messages() {
       <div className="h-[87%] overflow-scroll scrollbar-thin scrollbar-thumb-purple-sh-0" ref={messagesEndRef}>
         {
           isBlocked ? <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> One of you blocked the other</p> :
-        (msgs.length ? msgs.map((msg) => <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={msg.message} key={msg.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p>)}
+            (msgs.length ? msgs.map((msg) => <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={msg.message} key={msg.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p>)}
       </div>
       <div className="fixed bottom-5 bg-purple-sh-0 w-[66%] h-12 m-2 rounded-lg px-2">
         {!isBlocked ? <form onSubmit={sendMsg} className="flex items-center">
