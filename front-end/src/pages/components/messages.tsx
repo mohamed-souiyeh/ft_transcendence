@@ -143,7 +143,7 @@ function Messages(props: any) {
         </div>
       </div>
 
-      <div className="h-[87%] overflow-scroll scrollbar-thin scrollbar-thumb-purple-sh-0" ref={messagesEndRef}>
+      <div className="h-[87%] overflow-y-scroll scrollbar-thin scrollbar-thumb-purple-sh-0" ref={messagesEndRef}>
         {
           isBlocked ? <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> One of you blocked the other</p> :
             (msgs.length ? msgs.map((msg) => <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={msg.message} key={msg.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No messages yet :(</p>)}

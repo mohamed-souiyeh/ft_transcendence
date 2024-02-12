@@ -147,7 +147,7 @@ function ManageGoups() {
           .then((resp) => {
             console.log("refreshed the user data: ", resp);
             setUser(prevUser => ({ ...prevUser, data: resp.data }))
-            Cookies.set('user', JSON.stringify(resp.data));
+            Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' , secure: true });
             setRefreshGroups(true)
           })
           .catch((err) => {
