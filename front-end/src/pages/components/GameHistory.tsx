@@ -22,8 +22,8 @@ export default function GameHistory() {
   }, []);
   return (
     <>
-    
-      <div className="flex w-scree overflow-hidden">
+        
+      <div className="ml-14 flex overflow-hidden">
         <div className="grid justify-center mx-5 ">
           <div className="h-[100%]  w-[500px] rounded-t-3xl overflow-hidden">
             <div className="bg-purple-sh-2 h-[100%]  w-[500px] rounded-t-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1 ">
