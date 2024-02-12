@@ -1,11 +1,10 @@
-import souiyeh from "../../assets/souiyeh.jpeg";
 import { useNavigate } from 'react-router-dom';
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { UserContext } from "../../App";
-
+import ProgressCercle from "../../pages/components/ProgressCercle";
 
 export default function UserInfo() {
 
@@ -160,11 +159,15 @@ export default function UserInfo() {
       console.error('Error blocking user:', error);
     }
   };
+  useEffect(() => {
 
-
+    if (userData.username === user.data.username) {
+      navigate('/profile'); 
+    }
+  }, [userData, navigate]); 
 
   return (
-    <div className="flex bg-purple bg-opacity-30  border-[2px] border-purple/20 rounded-3xl ">
+    <div className="flex bg-purple bg-opacity-30  border-[2px] border-purple/20 rounded-3xl">
       <div className=" bg-purple-sh-2 rounded-full h-48 w-48 grid place-content-center ml-6 mt-6 ">
         <div className="relative inline-block">
           <img className="rounded-full h-44 w-44  " src={imagePath} alt="Profile" />
@@ -172,7 +175,9 @@ export default function UserInfo() {
             <span className="w-8 h-8 rounded-full bg-green absolute bottom-0.5 right-0.5"></span>
           )}
         </div>
+       
       </div>
+    
       <div className="grid place-content-center ">
         <p className="text-white font-bold text-xl ml-10">{userData ? userData.username.toUpperCase() + (userData.username === user.data.username ? "(aka you)" : "") : "Undefined User"}</p>
 
@@ -181,7 +186,7 @@ export default function UserInfo() {
 
           <button
             onClick={isFriendAdded ? handleUnfriendUser : handleAddFriend}
-            className="text-white bg-purple ring-2 ring-purple hover:bg-gradient-to-l focus:ring-4 focus:ring-purple-sh-1 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            className=" h-10 w-52 text-white bg-purple ring-2 ring-purple hover:bg-gradient-to-l focus:ring-4 focus:ring-purple-sh-1 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
             disabled={isFriendPending}
           >
             {isFriendPending ? "pending request" : isFriendAdded ? 'Unfriend' : 'Add Friend'}
@@ -189,15 +194,17 @@ export default function UserInfo() {
 
           <button
             onClick={handleBlockUser}
-            className="text-white bg-purple ring-2 ring-purple hover:bg-gradient-to-l focus:ring-4 focus:ring-purple-sh-1 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 ml-8"
+            className="h-10 w-40 text-white bg-purple ring-2 ring-purple hover:bg-gradient-to-l focus:ring-4 focus:ring-purple-sh-1 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 ml-8"
           >
             Block User
           </button>
         </div>}
       </div>
+        <div className="">
+          {<ProgressCercle />}
+        </div>
+    
+    
     </div>
   );
 }
-
-
-
