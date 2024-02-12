@@ -13,17 +13,17 @@ function ManageGoups() {
   const [badInput, setBadInput] = useState({
     badName: false,
     badPwd: false,
-    badPrv:false,
-    badMembers:false,
+    badPrv: false,
+    badMembers: false,
   })
-  const {protectedRoom } = useProtectedRoomContext()
+  const { protectedRoom } = useProtectedRoomContext()
   const [val, setVal] = useState("")
   const [state, setState] = useState(false)
   const menuRef = useRef(null);
   const [confirmationPwd, setConfirmationPwd] = useState("")
   const [createdGroup, setCreatedGroup] = useState({
     name: "",
-    privacy:"",
+    privacy: "",
     password: undefined,
     description: "",
     members: [],
@@ -52,8 +52,8 @@ function ManageGoups() {
     document.addEventListener("mousedown", handleClickOutside);
   }, [menuRef]);
 
-  const setPrivacy = (prv : string) => {
-    setCreatedGroup({...createdGroup, privacy: prv} )
+  const setPrivacy = (prv: string) => {
+    setCreatedGroup({ ...createdGroup, privacy: prv })
     setState(false)
 
   }
@@ -65,7 +65,7 @@ function ManageGoups() {
     if (!val) return setGroupData([]);
 
 
-    axios.get(`http://localhost:1337/conv/search?prefix=${val}`, {
+    axios.get(`${process.env.REACT_URL}:1337/conv/search?prefix=${val}`, {
       withCredentials: true,
     })
       .then(response => {
@@ -85,15 +85,16 @@ function ManageGoups() {
     if (!val) return setGroupData([]);
 
 
-    axios.get(`http://localhost:1337/conv/search?prefix=${val}`, {
+    axios.get(`${process.env.REACT_URL}:1337/conv/search?prefix=${val}`, {
       withCredentials: true,
     })
-    .then(response => {
-      setGroupData(response.data);
-  console.log("response from channel is here :D" , response.data)    })
-    .catch(error => {
-      console.error('There was an error!', error);
-    });
+      .then(response => {
+        setGroupData(response.data);
+        console.log("response from channel is here :D", response.data)
+      })
+      .catch(error => {
+        console.error('There was an error!', error);
+      });
   }
 
 
@@ -101,29 +102,29 @@ function ManageGoups() {
     setState(!state)
   }
 
-  const handleSubmit = (e : React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // console.log("submitting some data..")
     // console.log("_name:",createdGroup.name,'privacy:', createdGroup.privacy,'desc:', createdGroup.description)
     // console.log("pwd:",createdGroup.password, 'conf pwd:', confirmationPwd, 'members:', createdGroup.members)
-    if(!Object.keys(createdGroup.members).length){
-      setBadInput({...badInput, badMembers: true})
-      return ;
+    if (!Object.keys(createdGroup.members).length) {
+      setBadInput({ ...badInput, badMembers: true })
+      return;
     }
-    if(createdGroup.privacy === "protected" && (createdGroup.password != confirmationPwd || !createdGroup.password)) {
-      setBadInput({...badInput, badPwd: true})
-      return ;
+    if (createdGroup.privacy === "protected" && (createdGroup.password != confirmationPwd || !createdGroup.password)) {
+      setBadInput({ ...badInput, badPwd: true })
+      return;
     }
-    if(!createdGroup.privacy) {
-      setBadInput({...badInput, badPrv: true})
-      return ;
+    if (!createdGroup.privacy) {
+      setBadInput({ ...badInput, badPrv: true })
+      return;
     }
-    if(!createdGroup.name) {
-      setBadInput({...badInput, badName: true})
-      return ;
+    if (!createdGroup.name) {
+      setBadInput({ ...badInput, badName: true })
+      return;
     }
     // console.log("this is what should be sent:", createdGroup);
-    axios.post("http://localhost:1337/conv/createChannel", {
+    axios.post(`${process.env.REACT_URL}:1337/conv/createChannel`, {
       channelName: createdGroup.name,
       channelDescription: createdGroup.description,
       type: createdGroup.privacy,
@@ -135,12 +136,12 @@ function ManageGoups() {
       .then(response => {
         setCreatedGroup({
           name: "",
-          privacy:"",
+          privacy: "",
           password: undefined,
           description: "",
           members: [],
         })
-        axios.get("http://localhost:1337/users/allforhome", {
+        axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
           withCredentials: true
         })
           .then((resp) => {
@@ -163,25 +164,25 @@ function ManageGoups() {
 
   return (
     <>
-      <SideBar/>
-      { protectedRoom.state  && <ProtectedRoomPopup />}
+      <SideBar />
+      {protectedRoom.state && <ProtectedRoomPopup />}
       {/* --------------------------------{ JOIN  a Group }----------------------------------- */}
       <div className="h-screen w-screen bg-gradient-to-br from-purple-sh-2 from-10% via-purple-sh-1 via-30% to-purple flex gap-10 justify-center items-center">
         <div className="basis-1/4 h-[80%] ">
           <p className="text-impure-white text-5xl pb-3"> Join a Group </p>
           <div className="bg-purple-sh-2 rounded-lg h-[90%] w-full overflow-y-scroll scrollbar-thin scrollbar-thumb-purple-sh-1 p-4">
 
-              <div className="flex flex-row-reverse py-2" >
-                <form onSubmit={getGroups} className="flex bg-purple-sh-0 rounded-lg items-center m-3">
-                  <svg className="w-10 h-10 stroke-purple stroke-2 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                  </svg>
-                  <input onChange={(e) => setVal(e.target.value)} type='text' placeholder="search for a group" className='h-12 p-3 bg-transparent cursor-text border-transparent outline-none placeholder:italic placeholder:text-purple/60'/>
-                </form>
-              </div>
+            <div className="flex flex-row-reverse py-2" >
+              <form onSubmit={getGroups} className="flex bg-purple-sh-0 rounded-lg items-center m-3">
+                <svg className="w-10 h-10 stroke-purple stroke-2 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                <input onChange={(e) => setVal(e.target.value)} type='text' placeholder="search for a group" className='h-12 p-3 bg-transparent cursor-text border-transparent outline-none placeholder:italic placeholder:text-purple/60' />
+              </form>
+            </div>
 
-            <div className={`grid w-[100%] ${ !groupData.length && 'place-content-center'}`}>
-              
+            <div className={`grid w-[100%] ${!groupData.length && 'place-content-center'}`}>
+
               {groupData.length ? groupData.map((grp) => <Groups group={grp} refreshGroups={setRefreshGroups} key={grp.id} />) : <p className="text-xl text-purple/50 p-5"> search for a group </p>}
             </div>
 
@@ -197,46 +198,46 @@ function ManageGoups() {
 
               <div className="flex-col h-full p-4 basis-1/2 " >
                 <p className="text-2xl" > Group Name: </p>
-                <input type="text" name="name" value={createdGroup.name} onChange={handleInputChange} placeholder="group name" className="bg-purple-sh-0 rounded-lg w-72 placeholder:text-impure-white/30 focus:outline-none p-2" /> 
-                { badInput.badName && <p className="text-[#D9534F] font-bold text-sm" > Please Enter a valid name</p> }
+                <input type="text" name="name" value={createdGroup.name} onChange={handleInputChange} placeholder="group name" className="bg-purple-sh-0 rounded-lg w-72 placeholder:text-impure-white/30 focus:outline-none p-2" />
+                {badInput.badName && <p className="text-[#D9534F] font-bold text-sm" > Please Enter a valid name</p>}
 
                 <p className="text-2xl pt-3" > privacy: </p>
-                <div ref={menuRef} onClick={() => {openOptions()}} className=" bg-purple-sh-0 flex items-center rounded-lg p-2 hover:cursor-pointer w-72">
+                <div ref={menuRef} onClick={() => { openOptions() }} className=" bg-purple-sh-0 flex items-center rounded-lg p-2 hover:cursor-pointer w-72">
                   <div className="basis-11/12">
-                    {createdGroup.privacy ?  <p className="text-impure-white text-lg"> {createdGroup.privacy } </p> : <p className="text-impure-white/30 text-md"> click to select</p>}
+                    {createdGroup.privacy ? <p className="text-impure-white text-lg"> {createdGroup.privacy} </p> : <p className="text-impure-white/30 text-md"> click to select</p>}
                   </div>
                   <div className="basis-1/12">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="8" viewBox="0 0 14 8" fill="none">
-                      <path d="M7 8L0.0717964 0.5L13.9282 0.5L7 8Z" fill="#201E2D"/>
+                      <path d="M7 8L0.0717964 0.5L13.9282 0.5L7 8Z" fill="#201E2D" />
                     </svg>
                   </div>
                 </div>
-                { badInput.badPrv && <p className="text-[#D9534F] font-bold text-sm" > Please choose privacy </p> }
-                { state && 
+                {badInput.badPrv && <p className="text-[#D9534F] font-bold text-sm" > Please choose privacy </p>}
+                {state &&
                   <div ref={menuRef} className="border border-purple  shadow-xl shadow-purple-sh-2 bg-purple-sh-0 rounded-lg mt-1 absolute w-72">
-                    <div onClick={() => {setPrivacy("public")}} className="hover:bg-purple-sh-1 hover:cursor-pointer rounded-lg p-2">
+                    <div onClick={() => { setPrivacy("public") }} className="hover:bg-purple-sh-1 hover:cursor-pointer rounded-lg p-2">
                       Public
                     </div>
-                    <div onClick={() => {setPrivacy("protected")}} className="hover:bg-purple-sh-1  hover:cursor-pointer rounded-lg p-2">
+                    <div onClick={() => { setPrivacy("protected") }} className="hover:bg-purple-sh-1  hover:cursor-pointer rounded-lg p-2">
                       Protected
                     </div>
-                    <div onClick={() => {setPrivacy("private")}} className="hover:bg-purple-sh-1 rounded-lg p-2 hover:cursor-pointer ">
+                    <div onClick={() => { setPrivacy("private") }} className="hover:bg-purple-sh-1 rounded-lg p-2 hover:cursor-pointer ">
                       Private
                     </div>
                   </div>
                 }
 
-                { createdGroup.privacy === "protected" &&                 
+                {createdGroup.privacy === "protected" &&
                   <div >
                     <p className="text-2xl pt-3" > Password: </p>
                     <input type="password" name="password" placeholder="enter password" onChange={handleInputChange} className="bg-purple-sh-0 rounded-lg w-72 h-12 focus:outline-none p-2 placeholder:text-impure-white/30 " />
                     <p className="text-2xl pt-3" > confirm Password: </p>
-                    <input type="password" name="confirmedPassword" placeholder="re-enter password" onChange={(e) => {setConfirmationPwd(e.target.value)}} className="bg-purple-sh-0 rounded-lg w-72 h-12 focus:outline-none p-2 placeholder:text-impure-white/30 " />
-                    { badInput.badPwd && <p className="text-[#D9534F] font-bold text-sm" > Bad Password</p> }
+                    <input type="password" name="confirmedPassword" placeholder="re-enter password" onChange={(e) => { setConfirmationPwd(e.target.value) }} className="bg-purple-sh-0 rounded-lg w-72 h-12 focus:outline-none p-2 placeholder:text-impure-white/30 " />
+                    {badInput.badPwd && <p className="text-[#D9534F] font-bold text-sm" > Bad Password</p>}
                   </div>
                 }
                 <p className="text-2xl pt-3" > description: </p>
-                <textarea name="description" value={createdGroup.description}  onChange={handleInputChange} className="bg-purple-sh-0 rounded-lg  focus:outline-none p-2" cols={35} rows={4} />
+                <textarea name="description" value={createdGroup.description} onChange={handleInputChange} className="bg-purple-sh-0 rounded-lg  focus:outline-none p-2" cols={35} rows={4} />
                 <div className="flex w-full place-content-center pt-3">
                   <button type="submit" className="bg-purple-sh-1 hover:bg-purple-sh-0 rounded-lg object-center w-[60%]"> Create Group </button>
                 </div>
@@ -246,11 +247,11 @@ function ManageGoups() {
                 <p className="text-2xl" > Add Members: </p>
                 <div className="border-4 rounded-lg border-purple-sh-1 h-[80%] overflow-y-scroll scrollbar-thin scrollbar-thumb-purple-sh-0 p-4">
                   {/* <div className={`grid w-[100%] ${ !FakeData.length && 'place-content-center'}  `}> */}
-                    {/* {FakeData.length ? FakeData.map((grp) => <GroupMembers userName={grp.groupName} added={grp.joined} key={grp.id}/>) : <p className="text-xl text-purple/50 p-5"> You have no friends </p>} */}
-                  <GroupMembers refreshMembers={refreshMembers} setRefreshMembers={setRefreshMembers} createdGroup={createdGroup} setCreatedGroup={setCreatedGroup}/>
+                  {/* {FakeData.length ? FakeData.map((grp) => <GroupMembers userName={grp.groupName} added={grp.joined} key={grp.id}/>) : <p className="text-xl text-purple/50 p-5"> You have no friends </p>} */}
+                  <GroupMembers refreshMembers={refreshMembers} setRefreshMembers={setRefreshMembers} createdGroup={createdGroup} setCreatedGroup={setCreatedGroup} />
                   {/* </div> */}
                 </div>
-                    {badInput.badMembers && <p className="text-[#D9534F] pl-1 font-bold text-sm" > Please add some members </p> }
+                {badInput.badMembers && <p className="text-[#D9534F] pl-1 font-bold text-sm" > Please add some members </p>}
               </div>
 
             </div>

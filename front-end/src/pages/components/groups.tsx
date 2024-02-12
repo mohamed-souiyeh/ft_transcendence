@@ -35,7 +35,7 @@ function Groups(props: any) {
   const joinGroup = () => {
     console.log("password: ", protectedRoom.password);
     axios.post(
-      "http://localhost:1337/conv/join",
+      `${process.env.REACT_URL}:1337/conv/join`,
       {
         channelId: props.group.id,
         userId: user.data.id,
@@ -54,7 +54,7 @@ function Groups(props: any) {
         password: undefined,
       })
       setIncorrectPassword("");
-      axios.get("http://localhost:1337/users/allforhome", {
+      axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
         withCredentials: true
       })
         .then((resp) => {
@@ -82,7 +82,7 @@ function Groups(props: any) {
 
   const leaveGroup = () => {
 
-    axios.post('http://localhost:1337/conv/leave',
+    axios.post(`${process.env.REACT_URL}:1337/conv/leave`,
       {
         channelId: props.group.id,
         userId: user.data.id,
@@ -90,7 +90,7 @@ function Groups(props: any) {
       {
         withCredentials: true,
       }).then((response) => {
-        axios.get("http://localhost:1337/users/allforhome", {
+        axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
           withCredentials: true
         })
           .then((resp) => {
@@ -121,7 +121,7 @@ function Groups(props: any) {
         <div className='grid'>
           <p className='text-xl pl-3 pt-2'> {props.group.channelName} </p>
           <div className="flex flex-row gap-1 items-center">
-          <p className='text-sm pl-3 pb-2 pt-1 text-impure-white/40'> {props.group.type} </p>
+            <p className='text-sm pl-3 pb-2 pt-1 text-impure-white/40'> {props.group.type} </p>
             <span className=' text-red-700 text-base'>{incorrectPassword}</span>
           </div>
         </div>

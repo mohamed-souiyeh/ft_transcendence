@@ -14,6 +14,8 @@ services:
       - studio
     networks:
       - front-end-network
+    environment:
+      - REACT_URL
 
   back-end-dev:
     image: back-end-dev

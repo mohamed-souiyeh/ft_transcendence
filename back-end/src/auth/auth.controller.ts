@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller, Get, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Logger, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GoogleAuthGuard } from './google/google-auth.guard';
 import { JwtAuthGuard } from './jwt/guard/jwt-auth.guard';
@@ -20,7 +20,10 @@ export class AuthController {
   @Get('refresh')
   @UseGuards(JwtRefreshGuard)
   async refresh(@Req() req: IRequestWithUser) {
-    return this.authService.refresh(req);
+    Logger.debug('refreshing...', 'AuthController.refresh');
+    const returned = await this.authService.refresh(req);
+    Logger.debug('refreshed.', 'AuthController.refresh');
+    return returned;
   }
 
   @Get('google')
