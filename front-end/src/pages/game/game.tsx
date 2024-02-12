@@ -194,12 +194,12 @@ function Game() {
         socket.on('userIDs', (user1:number, user2:number)=>
         {
             Promise.all([
-              axios.get(`http://localhost:1337/users/${user1}/avatar`, { withCredentials: true }),
-              axios.get(`http://localhost:1337/users/${user2}/avatar`, { withCredentials: true })
+              axios.get(`${process.env.REACT_URL}:1337/users/${user1}/avatar`, { withCredentials: true }),
+              axios.get(`${process.env.REACT_URL}:1337/users/${user2}/avatar`, { withCredentials: true })
             ])
             .then(([response1, response2]) => {
-              setAvatar1(`http://localhost:1337/users/${user1}/avatar`);
-              setAvatar2(`http://localhost:1337/users/${user2}/avatar`);
+              setAvatar1(`${process.env.REACT_URL}:1337/users/${user1}/avatar`);
+              setAvatar2(`${process.env.REACT_URL}:1337/users/${user2}/avatar`);
             })
             .catch(error => {
               console.error('Error fetching user data:', error);
@@ -224,13 +224,13 @@ function Game() {
         socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
         socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
         socket.on('balllaunched', (v:boolean)=>{ballLaunched=v;});
+        socket.on("gameStart", ()=>{gameState = false; setState(false)});
     }
     function renderGame(gl: WebGLRenderingContext | null)
     {
 
     if (foundMatch)
     {
-        socket.on("gameStart", ()=>{gameState = false; setState(false)});
 
         if (gl) {
           gl.clearColor(0.282, 0.17, 0.37, 1.0);

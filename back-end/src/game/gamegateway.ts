@@ -352,7 +352,7 @@ export class gameServer implements OnModuleInit {
 			(room => (room.firstClient === client ||
 			room.secondClient === client));
 
-		if (roomInvitationCheck.gameMode == "private")
+		if (roomInvitationCheck && roomInvitationCheck.gameMode == "private")
 		{
 			console.log('Player reserved ');
 			return ;
