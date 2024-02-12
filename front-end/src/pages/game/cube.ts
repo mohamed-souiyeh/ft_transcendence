@@ -27,6 +27,7 @@ export class Cube
 
     constructor(gl:WebGLRenderingContext | null, width:number, height:number, depth:number)
     { 
+      console.log("Cube created");
       const normals:number[] = 
         [
             0.0,  0.0,   -1.0,
@@ -123,75 +124,75 @@ export class Cube
       }
 
       this.vertexShaderSource =
-      "uniform mat4 view;" +
-      "uniform vec3 translation;" +
-      "uniform vec3 lightPos;" +        
-      "uniform mat4 projection;" +
-      "uniform float angleX;" +
-      "uniform float angleY;" +
-      "attribute vec3 pos;" +
-      "attribute vec3 normal;" +
-      "varying highp vec3 ppos;" +
-      "varying highp vec3 lightpos;" +
-      "varying highp vec3 norm;" +
-      "mat4 model;" +
-      "mat4 rotation = " +
-      "mat4" +
-      "(" +
-      "1, 0, 0, 0," +
-      "0, cos(angleX), -sin(angleX), 0," +
-      "0, sin(angleX), cos(angleX), 0," +
-      "0, 0, 0, 1" +
-      ");"+
-      "mat4 rotationY = " +
-      "mat4" +
-      "(" +
-      "cos(angleY), 0, sin(angleY), 0," +
-      "0, 1, 0, 0," +
-      "-sin(angleY), 0, cos(angleY), 0," +
-      "0, 0, 0, 1" +
-      ");"+
-      "mat4 rotationYinv = " +
-      "mat4" +
-      "(" +
-      "-cos(angleY),  0,  -sin(angleY), 0," +
-      "0,            1,            0, 0," +
-      "sin(angleY), 0,  -cos(angleY), 0," +
-      "           0, 0,            0, 1" +
-      ");"+
-      "mat4 rotationInv = " +
-      "mat4" +
-      "(" +
-      "1, 0, 0, 0," +
-      "0, -cos(angleX), sin(angleX), 0," +
-      "0,  -sin(angleX), -cos(angleX), 0," +
-      "0, 0, 0, 1" +
-      ");"+
-      "void main()" +
-      "{" +
-      "mat4 model = rotationY * rotation;" +
-      "gl_Position =  projection * model * view * vec4(pos + translation, 1.0);" +
-      "norm = normal;" +
-      "ppos = vec3(model * vec4(pos, 1.0));" +
-      "lightpos = lightPos;" +
-      "}";
+        "uniform mat4 view;" +
+        "uniform vec3 translation;" +
+        "uniform vec3 lightPos;" +        
+        "uniform mat4 projection;" +
+        "uniform float angleX;" +
+        "uniform float angleY;" +
+        "attribute vec3 pos;" +
+        "attribute vec3 normal;" +
+        "varying highp vec3 ppos;" +
+        "varying highp vec3 lightpos;" +
+        "varying highp vec3 norm;" +
+        "mat4 model;" +
+        "mat4 rotation = " +
+        "mat4" +
+        "(" +
+        "1, 0, 0, 0," +
+        "0, cos(angleX), -sin(angleX), 0," +
+        "0, sin(angleX), cos(angleX), 0," +
+        "0, 0, 0, 1" +
+        ");"+
+        "mat4 rotationY = " +
+        "mat4" +
+        "(" +
+        "cos(angleY), 0, sin(angleY), 0," +
+        "0, 1, 0, 0," +
+        "-sin(angleY), 0, cos(angleY), 0," +
+        "0, 0, 0, 1" +
+        ");"+
+        "mat4 rotationYinv = " +
+        "mat4" +
+        "(" +
+        "-cos(angleY),  0,  -sin(angleY), 0," +
+        "0,            1,            0, 0," +
+        "sin(angleY), 0,  -cos(angleY), 0," +
+        "           0, 0,            0, 1" +
+        ");"+
+        "mat4 rotationInv = " +
+        "mat4" +
+        "(" +
+        "1, 0, 0, 0," +
+        "0, -cos(angleX), sin(angleX), 0," +
+        "0,  -sin(angleX), -cos(angleX), 0," +
+        "0, 0, 0, 1" +
+        ");"+
+        "void main()" +
+        "{" +
+        "mat4 model = rotationY * rotation;" +
+        "gl_Position =  projection * model * view * vec4(pos + translation, 1.0);" +
+        "norm = normal;" +
+        "ppos = vec3(model * vec4(pos, 1.0));" +
+        "lightpos = lightPos;" +
+        "}";
 
       this.fragementShaderSource =
-      "precision highp float;" +
-      "uniform vec3 color;" +
-      "uniform vec3 lightColor;" +
-      "varying highp vec3 norm;" +
-      "varying highp vec3 ppos;" +
-      "varying highp vec3 lightpos;" +
-      "void main()" +
-      "{" +
-      "vec3 ambient = lightColor * 0.4;" +
-      "vec3 normal = normalize(norm);" +
-      "vec3 lightDirection = normalize(lightpos - ppos);" +
-      "vec3 diffuse = max(vec3(dot(normal,lightDirection)), 0.0) * lightColor;" +
-      "vec3 finalColor = (diffuse + ambient) * color;" +
-      "gl_FragColor = vec4(finalColor, 1.0);" +
-      "}";
+        "precision highp float;" +
+        "uniform vec3 color;" +
+        "uniform vec3 lightColor;" +
+        "varying highp vec3 norm;" +
+        "varying highp vec3 ppos;" +
+        "varying highp vec3 lightpos;" +
+        "void main()" +
+        "{" +
+        "vec3 ambient = lightColor * 0.4;" +
+        "vec3 normal = normalize(norm);" +
+        "vec3 lightDirection = normalize(lightpos - ppos);" +
+        "vec3 diffuse = max(vec3(dot(normal,lightDirection)), 0.0) * lightColor;" +
+        "vec3 finalColor = (diffuse + ambient) * color;" +
+        "gl_FragColor = vec4(finalColor, 1.0);" +
+        "}";
 
       if (gl)
       {
@@ -286,5 +287,14 @@ export class Cube
         
         gl.drawArrays(gl.TRIANGLES, 0, 36);
 			}
+    }
+    cleanUp(gl:WebGLRenderingContext)
+    {
+      if (gl)
+      {
+        gl.deleteBuffer(this.vertexBuffer);
+        gl.deleteBuffer(this.normalsBuffer);
+        gl.deleteProgram(this.shaderProgram);
+      }
     }
   }
