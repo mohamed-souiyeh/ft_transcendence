@@ -21,7 +21,7 @@ export class room {
 	velocityAngle: number = 0;
 	score1: number = 0;
 	score2: number = 0;  
-	speed: number = 0.01;
+	speed: number = 0.02;
 	ballLaunched: boolean = false;
 	firstPlayerHaveTheBall: boolean = true;
 	secondPlayerHaveTheBall: boolean = false;

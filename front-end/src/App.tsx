@@ -244,7 +244,7 @@ function SetupSockets() {
     })
     ping_socket.on('private', (roomID:number,username:string) => 
     {
-        const message = username + " Invited you to a game in room " + roomID + " !";
+        const message = username + " Invited you to a game !";
         toast(<GameInviteToast msg={message}  joinGame={()=>handleJoinPrivate(roomID)} 
           declineGame={()=>handleDeclinePrivate(roomID)}/>
         );

@@ -1,14 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { WsException } from '@nestjs/websockets';
-import { parse } from 'cookie';
 import { Server } from 'socket.io';
-import { Socket } from 'socket.io';
-import { AuthService } from 'src/auth/auth.service';
-import { PrismaService } from 'src/database/prisma/prisma.service';
 import { ChatService } from 'src/sockets/chat/chat.service';
 import { room } from './Room';
 import { MatchesService } from 'src/database/matches/matches.service';
-import { MatchDto } from 'src/database/matches/matches.dto';
 
 
 @Injectable()
@@ -42,8 +36,8 @@ export class gameService
             room.ballPosY + 0.2 / 10 >= room.firstPaddlePos - 1 / 10) 
         {
             console.log('collisiooooon');
-            if (room.speed <= 0.05)
-                room.speed += 0.0001;
+            // if (room.speed <= 0.05)
+            //     room.speed += 0.001;
             if (room.firstPaddleSpeed <= 0.05)
                 room.firstPaddleSpeed += 0.0001;
             let y = room.firstPaddlePos - room.ballPosY;
@@ -151,7 +145,7 @@ export class gameService
 					}
                     else
                     {
-                        if (room.score1 >= 4 || room.score2 >= 4) 
+                        if (room.score1 >= 3 || room.score2 >= 3)
                         {
                             server.to(room.id + '').emit('gameover');
                             room.endTime = new Date();

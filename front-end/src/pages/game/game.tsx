@@ -46,7 +46,9 @@ function Game() {
         socket.emit("gameOver");
       }
     };
-    if (socket) {
+
+    if (socket)
+    {
       socket.emit("queuing");
       socket.on("inviteAccepted", () => {
         console.log("inviteAccepted");
@@ -161,69 +163,74 @@ function Game() {
     let secondPlayerHasTheBall: boolean = false;
     let ballLaunched: boolean = false;
 
-    function renderGame(gl: WebGLRenderingContext | null) {
-      let ar = w / h;
-      let fov = rad2Degree(71.1);
-      let n = 0.1;
-      let f = 1000.0;
-      let t = Math.tan(fov / 2) * n;
-      let r = t * ar;
-      let len = f - n;
+    let ar = w/h;
+    let fov = rad2Degree(71.1);
+    let n = 0.1;
+    let f = 1000.0;
+    let t = Math.tan(fov/2) * n;
+    let r = t * ar;
+    let len = f-n;
 
-      let projection: number[] =
-        [
-          2 * n / r, 0.0, 0.0, 0.0,
-          0.0, 2 * n / t, 0.0, 0.0,
-          0.0, 0.0, -(f + n) / len, -1,
-          0.0, 0.0, (-2 * f * n) / len, 1.0
-        ];
+    let projection:number[] = 
+    [
+      2*n/r,  0.0,       0.0,  0.0,
+      0.0, 2*n/t,         0.0,  0.0,
+      0.0,  0.0,  -(f+n)/len, -1,
+      0.0,  0.0, (-2*f*n)/len, 1.0
+    ];
 
-      let viewMatrix: number[] =
-        [
-          1, 0, 0, 0,
-          0, 1, 0, 0,
-          0, 0, -3, 0,
-          0, 0, 0, 1
-        ];
-      if (socket) {
-        socket.on('matchFound', (v: boolean) => { foundMatch = v; setMatchState(v); });
-        if (!fetchedAvatars) {
-          socket.on('userIDs', (user1: number, user2: number) => {
-            console.log(user1, user2);
+    let viewMatrix:number[] = 
+    [
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0,-3, 0,
+      0, 0, 0, 1
+    ];
+    if (socket)
+    {
+      socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
+      if(!fetchedAvatars)
+      {
+        socket.on('userIDs', (user1:number, user2:number)=>
+        {
             Promise.all([
               axios.get(`${process.env.REACT_URL}:1337/users/${user1}/avatar`, { withCredentials: true }),
               axios.get(`${process.env.REACT_URL}:1337/users/${user2}/avatar`, { withCredentials: true })
             ])
-              .then(([response1, response2]) => {
-                setAvatar1(`${process.env.REACT_URL}:1337/users/${user1}/avatar`);
-                setAvatar2(`${process.env.REACT_URL}:1337/users/${user2}/avatar`);
-              })
-              .catch(error => {
-                console.error('Error fetching user data:', error);
-              });
+            .then(([response1, response2]) => {
+              setAvatar1(`${process.env.REACT_URL}:1337/users/${user1}/avatar`);
+              setAvatar2(`${process.env.REACT_URL}:1337/users/${user2}/avatar`);
+            })
+            .catch(error => {
+              console.error('Error fetching user data:', error);
+            });
           })
         }
         fetchedAvatars = true;
         setFetchState(true);
-      }
+    }
+    if (socket)
+    {
+      
+        socket.emit('playing');
+        socket.on('score', (v:number, v1:number) => {
+          score1 = v;
+          score2 = v1;
+          setScore1((score1));
+          setScore2((score2));
+        });
+        socket.on('left', (v:number)=>{first.vector3D.y = v;});
+        socket.on('right', (v:number)=>{second.vector3D.y = v;});
+        socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
+        socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
+        socket.on('balllaunched', (v:boolean)=>{ballLaunched=v;});
+        socket.on("gameStart", ()=>{gameState = false; setState(false)});
+    }
+    function renderGame(gl: WebGLRenderingContext | null)
+    {
 
-      if (foundMatch) {
-        socket.on("gameStart", () => { gameState = false; setState(false) });
-        setScore1((score1));
-        setScore2((score2));
-        if (socket) {
-
-          socket.emit('playing');
-          socket.on('score', (v: number, v1: number) => {
-            score1 = v;
-            score2 = v1;
-          });
-          socket.on('left', (v: number) => { first.vector3D.y = v; });
-          socket.on('right', (v: number) => { second.vector3D.y = v; });
-          socket.on('ballPosX', (v: number) => { ball.vector3D.x = v; });
-          socket.on('ballPosY', (v: number) => { ball.vector3D.y = v; });
-          socket.on('balllaunched', (v: boolean) => { ballLaunched = v; });
-        }
+    if (foundMatch)
+    {
 
         if (gl) {
           gl.clearColor(0.282, 0.17, 0.37, 1.0);
