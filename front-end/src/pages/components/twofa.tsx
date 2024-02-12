@@ -53,7 +53,7 @@ function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue
           setPrompt(!prompt)
           user.data.TFAisEnabled = false
           Cookies.remove('user')
-          Cookies.set('user', JSON.stringify(user.data));
+          Cookies.set('user', JSON.stringify(user.data), { sameSite: 'strict' ,  secure: true });
         }
       })
       .catch((err) => {
@@ -86,7 +86,7 @@ function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue
           // console.log(JSON.stringify(user.data))
 
           Cookies.remove('user')
-          Cookies.set('user', JSON.stringify(user.data));
+          Cookies.set('user', JSON.stringify(user.data), { sameSite: 'strict', secure: true });
         }
         else {
           // console.log('code is rong', res.status)

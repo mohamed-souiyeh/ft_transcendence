@@ -227,7 +227,7 @@ function SetupSockets() {
         .then((resp) => {
           setUser(prevUser => ({ ...prevUser, data: resp.data }))
           Cookies.remove('user')
-          Cookies.set('user', JSON.stringify(resp.data) );
+          Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' ,  secure: true } );
         })
         .catch(()=> {
           navigate("/login")
