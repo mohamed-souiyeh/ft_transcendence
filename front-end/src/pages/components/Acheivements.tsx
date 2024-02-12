@@ -43,7 +43,7 @@ export default function Achievements() {
 
   return (
     <div className="h-[100%] w-[350px] rounded-t-3xl overflow-hidden">
-      <div className="bg-purple-sh-2 h-[100%] w-[350px] rounded-t-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1">
+      <div className="bg-purple-sh-2 h-[100%] w-[350px] rounded-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1">
         <div
           title="Played your first game ever"
           className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15"
