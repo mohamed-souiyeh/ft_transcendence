@@ -77,7 +77,7 @@ function Setup()
             .then((resp) => {
               setUser(prevUser => ({ ...prevUser, data: resp.data }))
               Cookies.remove('user')
-              Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax' , secure: true });
+              Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   });
               //re-set avatar.
 
               localStorage.removeItem('avatar')
