@@ -109,22 +109,7 @@ function Game() {
     document.addEventListener('keydown', (e) => {
       if (e.code == 'Space') {
         if (!ballLaunched) {
-          second.speed = 0.01;
-          first.speed = 0.01;
-          if (firstPlayerHasTheBall) {
-            ball.prevPositions.x = first.vector3D.x + 0.5;
-            ball.prevPositions.y = first.vector3D.y + 0.5;
-          }
-          if (secondPlayerHasTheBall) {
-            ball.prevPositions.x = second.vector3D.x - 0.5;
-            ball.prevPositions.y = second.vector3D.y - 0.5;
-          }
-          ball.velocityx = ball.vector3D.x - ball.prevPositions.x;
-          ball.velocityy = ball.vector3D.y - ball.prevPositions.y;
-          ball.prevPositions.x = ball.vector3D.x + 0.5;
-          ball.prevPositions.y = ball.vector3D.y + 0.5;
           ballLaunched = true;
-          ball.speed = 0.009;
         }
         if (socket)
           socket.emit('balllaunch', ballLaunched);
@@ -159,8 +144,6 @@ function Game() {
       }
     })
 
-    let firstPlayerHasTheBall: boolean = true;
-    let secondPlayerHasTheBall: boolean = false;
     let ballLaunched: boolean = false;
 
     let ar = w/h;

@@ -104,29 +104,10 @@ function BotMode()
         if (e.code == 'Space')
         {
             if (!ballLaunched)
-            {
-                second.speed = 0.01;
-                first.speed = 0.01;
-                if (firstPlayerHasTheBall)
-                {
-                    ball.prevPositions.x = first.vector3D.x + 0.5;
-                    ball.prevPositions.y = first.vector3D.y + 0.5;
-                }
-                if (secondPlayerHasTheBall)
-                {
-                    ball.prevPositions.x = second.vector3D.x - 0.5;
-                    ball.prevPositions.y = second.vector3D.y - 0.5;
-                }
-                ball.velocityx =  ball.vector3D.x - ball.prevPositions.x;
-                ball.velocityy =  ball.vector3D.y - ball.prevPositions.y;
-                ball.prevPositions.x = ball.vector3D.x + 0.5;
-                ball.prevPositions.y = ball.vector3D.y + 0.5;
                 ballLaunched = true;
-                ball.speed = 0.009;
-                }
-                if (socket)
+            if (socket)
                 socket.emit('balllaunch', ballLaunched);
-            }
+        }
         if (e.code == 'KeyW')
         {
             if (socket)
@@ -164,8 +145,6 @@ function BotMode()
         }
         })
 
-        let firstPlayerHasTheBall:boolean = true;
-        let secondPlayerHasTheBall:boolean = false;
         let ballLaunched:boolean = false;
 
         let ar = w/h;
@@ -370,10 +349,6 @@ function BotMode()
                 <div style={{ textAlign: "center"}}>
                     <h2 style={{fontSize:"30px", color:"rgb(255, 170, 255)"}}>This is just a training mode so this match won't be 
                         saved in your profile.</h2>
-                    {/* <h2 style={{fontSize:"40px", color:"rgb(255, 100, 255)"}}>How to play: </h2>
-                    <h2 style={{fontSize:"30px", color:"rgb(255, 100, 255)"}}>- Press space to launch the ball</h2>
-                    <h2 style={{fontSize:"30px", color:"rgb(255, 100, 255)"}}>- Press W-Z to move up</h2>
-                    <h2 style={{fontSize:"30px", color:"rgb(255, 100, 255)"}}>- Press S to move down</h2> */}
 
                 </div>
         </div>
