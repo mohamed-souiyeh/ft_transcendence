@@ -281,102 +281,104 @@ function BotMode()
   }, [socket]);
 
   return (<>
-          <div className="w-screen grid justify-center ">
+        <div
+                style={{ backgroundColor: 'rgba(71, 43, 94, 1.0)'}}
+                className="w-screen h-screen grid justify-center ">
 
-          <div style={{textAlign:"center",
-                      font:"status-bar",
-                      height: "100%"}}>
-          {<Profile score = {score1}
-                    score2= {score2}
-                    pic1={avatar}
-                    pic2={leftPic}/>}
-          <canvas style={{right:"300px",
-                          width: "100%",
-                          height: "100%"}}
-            ref={canvasRef}
-          /></div>
-          <div style={{ position: "absolute", 
-              top: 0, 
-              left: 0, 
-              width: "100%", 
-              height: "100%", 
-              display: "flex", 
-              justifyContent: "center", 
-              alignItems: "center",
-              pointerEvents: "none" }}>
-            {/* <h1>GO !</h1> */}
-          </div>
-          </div>
-          {!foundMatch && (
-            <div className="spinner">
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-            </div>
-          )} 
-          {gameState &&
-            (<div style={{ 
-              position: "absolute", 
-              top: "47%", 
-              left: "50%", 
-              width: "600px", 
-              height: "400px", 
-              backgroundColor: "rgba(128, 0, 129, 0.5)", 
-              transform: "translate(-50%, -50%)",
-              pointerEvents: "none",
-              borderRadius: "20px",
-              borderWidth: "5px",
-              borderColor: "rgba(255, 0, 255, 0.5)",
-            }}>
+                <div style={{textAlign:"center",
+                            font:"status-bar",
+                            height: "100%"}}>
+                {<Profile score = {score1}
+                            score2= {score2}
+                            pic1={avatar}
+                            pic2={leftPic}/>}
+                <canvas style={{right:"300px",
+                                width: "100%",
+                                height: "100%"}}
+                    ref={canvasRef}
+                />
+                </div>
+                <div style={{ position: "absolute", 
+                    top: 0, 
+                    left: 0, 
+                    width: "100%", 
+                    height: "100%", 
+                    display: "flex", 
+                    justifyContent: "center", 
+                    alignItems: "center",
+                    pointerEvents: "none" }}>
+                </div>
+                {!foundMatch && (
+                    <div className="spinner">
+                    </div>
+                )} 
+                {gameState &&
+                    (<div style={{ 
+                    position: "absolute", 
+                    top: "47%", 
+                    left: "50%", 
+                    width: "600px", 
+                    height: "400px", 
+                    backgroundColor: "rgba(128, 0, 129, 0.5)", 
+                    transform: "translate(-50%, -50%)",
+                    pointerEvents: "none",
+                    borderRadius: "20px",
+                    borderWidth: "5px",
+                    borderColor: "rgba(255, 0, 255, 0.5)",
+                    }}>
 
-              <div className="lds-dual-ring"></div>
-              <h1 style={{ 
-              position: "absolute",
-              left:"28%"}}>GAME OVER</h1>
+                    <div className="lds-dual-ring"></div>
+                    <h1 style={{ 
+                    position: "absolute",
+                    left:"28%"}}>GAME OVER</h1>
 
-              {win && (<h1 style={{ 
-              position: "absolute",
-              top:"20%",
-              left:"43%",
-              fontSize:"25px"}}>YOU WIN</h1>)}
+                    {win && (<h1 style={{ 
+                        position: "absolute",
+                        top:"20%",
+                        left:"43%",
+                        fontSize:"25px"}}>YOU WIN</h1>)}
 
-              {!win && (<h1 style={{ 
-              position: "absolute",
-              top:"20%",
-              left:"42%",
-              fontSize:"25px"}}>YOU LOSE</h1>)}
+                    {!win && (<h1 style={{ 
+                        position: "absolute",
+                        top:"20%",
+                        left:"42%",
+                        fontSize:"25px"}}>YOU LOSE</h1>)}
 
-              <h1 style={{ 
-              position: "absolute",
-              top:"40%",
-              left:"30%",
-              fontSize:"90px"}}>{score1}</h1>
-              <h1 style={{ 
-              position: "absolute",
-              top:"40%",
-              left:"64%",
-              fontSize:"90px"}}>{score2}</h1>
-            </div>)
-          }
-          <div style={{ textAlign: "center", marginTop: "120px" }}>
-          <button 
-              onClick={leaveGame}
-              style={{ color: "white", background: "#DFA7FC", width: 60, height: 60, border: "none", padding: 0}}>
-            <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
-          </button>
-          </div>
-          <div style={{ textAlign: "center"}}>
-          <h2 style={{fontSize:"30px", color:"rgb(255, 170, 255)"}}>This is just a training mode so this match won't be 
-            saved in your profile.</h2>
-           <h2 style={{fontSize:"40px", color:"rgb(255, 100, 255)"}}>How to play: </h2>
-           <h2 style={{fontSize:"30px"}}>- Press space to launch the ball</h2>
-           <h2 style={{fontSize:"30px"}}>- Press W to move up</h2>
-           <h2 style={{fontSize:"30px"}}>- Press S to move down</h2>
-          </div>
-          </>
-          );
+                    <h1 style={{ 
+                        position: "absolute",
+                        top:"40%",
+                        left:"30%",
+                        fontSize:"90px"}}>
+                            {score1}
+                        </h1>
+                    <h1 style={{ 
+                            position: "absolute",
+                            top:"40%",
+                            left:"64%",
+                            fontSize:"90px"}}>
+                                {score2}
+                        </h1>
+                    </div>)
+                }
+                <div style={{ textAlign: "center", marginTop: "120px" }}>
+                <button 
+                    onClick={leaveGame}
+                    style={{ color: "white", background: "#DFA7FC", width: 60, height: 60, border: "none", padding: 0}}>
+                    <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
+                </button>
+                </div>
+                <div style={{ textAlign: "center"}}>
+                    <h2 style={{fontSize:"30px", color:"rgb(255, 170, 255)"}}>This is just a training mode so this match won't be 
+                        saved in your profile.</h2>
+                    <h2 style={{fontSize:"40px", color:"rgb(255, 100, 255)"}}>How to play: </h2>
+                    <h2 style={{fontSize:"30px", color:"rgb(255, 100, 255)"}}>- Press space to launch the ball</h2>
+                    <h2 style={{fontSize:"30px", color:"rgb(255, 100, 255)"}}>- Press W-Z to move up</h2>
+                    <h2 style={{fontSize:"30px", color:"rgb(255, 100, 255)"}}>- Press S to move down</h2>
+
+                </div>
+        </div>
+        </>
+    );
 }
 
 export default BotMode;

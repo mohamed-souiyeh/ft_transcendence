@@ -35,7 +35,7 @@ export class gameService
             room.ballPosY - 0.2 / 10 <= room.firstPaddlePos + 1 / 10 &&
             room.ballPosY + 0.2 / 10 >= room.firstPaddlePos - 1 / 10) 
         {
-            console.log('collisiooooon');
+            // console.log('collisiooooon');
             // if (room.speed <= 0.05)
             //     room.speed += 0.001;
             if (room.firstPaddleSpeed <= 0.05)
@@ -43,14 +43,14 @@ export class gameService
             let y = room.firstPaddlePos - room.ballPosY;
             let x = room.ballPosX - 0.97;
             room.velocityAngle = (Math.random() % 180) * 180/Math.PI;
-            console.log("angle ", room.velocityAngle);
+            // console.log("angle ", room.velocityAngle);
             room.ballVelocityX = -1;
         }
         if (room.ballPosX - 0.2 / 10 <= -0.97 && 
             room.ballPosY - 0.2 / 10 <= room.secondPaddlePos + 1 / 10 && 
             room.ballPosY + 0.2 / 10 >= room.secondPaddlePos - 1 / 10) 
         {
-            console.log('collisiooooon');
+            // console.log('collisiooooon');
             if (room.speed <= 0.05)
                 room.speed += 0.0001;
             if (room.secondPaddleSpeed <= 0.05)
@@ -161,7 +161,7 @@ export class gameService
                                         * room.ballVelocityY);
 
                     {
-                        console.log(`${room.id}`);
+                        // console.log(`${room.id}`);
                         server.to(`${room.id}`).emit('ballPosX', (room.ballPosX));
                         server.to(`${room.id}`).emit('ballPosY', (room.ballPosY));
                         server.to(`${room.id}`).emit('score', room.score1, room.score2);

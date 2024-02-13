@@ -292,7 +292,9 @@ function Game() {
     []);
 
   return (<>
-    <div className="w-screen grid justify-center ">
+    <div 
+      style={{ backgroundColor: 'rgba(71, 43, 94, 1.0)'}}
+      className="w-screen h-screen grid justify-center ">
 
       <div style={{
         textAlign: "center",
@@ -310,7 +312,8 @@ function Game() {
           height: "100%"
         }}
           ref={canvasRef}
-        /></div>
+        />
+      </div>
       <div style={{
         position: "absolute",
         top: 0,
@@ -324,71 +327,71 @@ function Game() {
       }}>
         {/* <h1>GO !</h1> */}
       </div>
-    </div>
-    {!foundMatch && (
-      <div className="spinner">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-    )}
-    {gameState &&
-      (<div style={{
-        position: "absolute",
-        top: "47%",
-        left: "50%",
-        width: "600px",
-        height: "400px",
-        backgroundColor: "rgba(128, 0, 129, 0.5)",
-        transform: "translate(-50%, -50%)",
-        pointerEvents: "none",
-        borderRadius: "20px",
-        borderWidth: "5px",
-        borderColor: "rgba(255, 0, 255, 0.5)",
-      }}>
+          {!foundMatch && (
+            <div className="spinner">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          )}
+          {gameState &&
+            (<div style={{
+              position: "absolute",
+              top: "47%",
+              left: "50%",
+              width: "600px",
+              height: "400px",
+              backgroundColor: "rgba(128, 0, 129, 0.5)",
+              transform: "translate(-50%, -50%)",
+              pointerEvents: "none",
+              borderRadius: "20px",
+              borderWidth: "5px",
+              borderColor: "rgba(255, 0, 255, 0.5)",
+            }}>
 
-        <div className="lds-dual-ring"></div>
-        <h1 style={{
-          position: "absolute",
-          left: "28%"
-        }}>GAME OVER</h1>
+              <div className="lds-dual-ring"></div>
+              <h1 style={{
+                position: "absolute",
+                left: "28%"
+              }}>GAME OVER</h1>
 
-        {win && (<h1 style={{
-          position: "absolute",
-          top: "20%",
-          left: "43%",
-          fontSize: "25px"
-        }}>YOU WIN</h1>)}
+              {win && (<h1 style={{
+                position: "absolute",
+                top: "20%",
+                left: "43%",
+                fontSize: "25px"
+              }}>YOU WIN</h1>)}
 
-        {!win && (<h1 style={{
-          position: "absolute",
-          top: "20%",
-          left: "42%",
-          fontSize: "25px"
-        }}>YOU LOSE</h1>)}
+              {!win && (<h1 style={{
+                position: "absolute",
+                top: "20%",
+                left: "42%",
+                fontSize: "25px"
+              }}>YOU LOSE</h1>)}
 
-        <h1 style={{
-          position: "absolute",
-          top: "40%",
-          left: "30%",
-          fontSize: "90px"
-        }}>{score1}</h1>
-        <h1 style={{
-          position: "absolute",
-          top: "40%",
-          left: "64%",
-          fontSize: "90px"
-        }}>{score2}</h1>
-      </div>)
-    }
-    <div style={{ textAlign: "center", marginTop: "120px" }}>
-      <button
-        onClick={leaveGame}
-        style={{ color: "white", background: "#DFA7FC", width: 60, height: 60, border: "none", padding: 0 }}>
-        <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
-      </button>
+              <h1 style={{
+                position: "absolute",
+                top: "40%",
+                left: "30%",
+                fontSize: "90px"
+              }}>{score1}</h1>
+              <h1 style={{
+                position: "absolute",
+                top: "40%",
+                left: "64%",
+                fontSize: "90px"
+              }}>{score2}</h1>
+            </div>)
+          }
+          <div style={{ textAlign: "center", marginTop: "120px" }}>
+            <button
+              onClick={leaveGame}
+              style={{ color: "white", background: "#DFA7FC", width: 60, height: 60, border: "none", padding: 0 }}>
+              <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
+            </button>
+          </div>
     </div>
 
   </>

@@ -56,55 +56,12 @@ export class gameServer implements OnModuleInit {
 
 	async handleDisconnect(client: Socket) {
 		let match = new MatchDto();
-		let roomCheck = Array.from(this.roomsList.values())
+		let roomCheck = Array.from(this.roomsList.values()) 
 			.find(room => room.firstClient === client
 				|| room.secondClient === client);
 		console.log("Leave room from disconnect");
-		if (roomCheck) {
-			let user1, user2;
-			if (roomCheck.firstClient)
-				user1 = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient);
-			if (roomCheck.secondClient)
-				user2 = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
-			this.server.to(`${roomCheck.id}`).emit("leaveGame");
-			if (roomCheck.gameMode != "robot") {
-				if (roomCheck.firstClient == client) {
-					match.winnerId = roomCheck.user1ID;
-					match.loserId = roomCheck.user2ID;
-					match.endedAt = roomCheck.endTime;
-					match.mode = roomCheck.gameMode;
-					match.winnerStats = {
-						score: roomCheck.score2,
-						name: roomCheck.secondName
-					};
-					match.loserStats = {
-						score: roomCheck.score1,
-						name: roomCheck.firstName
-					};
-				}
-				else if (roomCheck.secondClient == client) {
-					match.winnerId = roomCheck.user2ID;
-					match.loserId = roomCheck.user1ID;
-					match.mode = roomCheck.gameMode;
-					match.endedAt = roomCheck.endTime;
-					match.winnerStats = {
-						score: roomCheck.score1,
-						name: roomCheck.firstName
-					};
-					match.loserStats = {
-						score: roomCheck.score2,
-						name: roomCheck.secondName
-					};
-				}
-				if (match.winnerId && match.loserId)
-					this.gameService.matchesService.create(match);
-			}
-			if (user1)
-				this.userService.setOnlineStatus(user1.id);
-			if (user2)
-				this.userService.setOnlineStatus(user2.id);
+		if (roomCheck)
 			this.roomsList.delete(roomCheck.id);
-		}
 	}
 
 	@SubscribeMessage('botMode')
@@ -197,7 +154,7 @@ export class gameServer implements OnModuleInit {
 			.find(room => room.firstClient === client
 				|| room.secondClient === client);
 		console.log("Leave room");
-		if (roomCheck) {
+		if (roomCheck && roomCheck.roomState != "gameOver") {
 			let user1, user2;
 			if (roomCheck.firstClient)
 				user1 = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient);
@@ -206,8 +163,8 @@ export class gameServer implements OnModuleInit {
 			this.server.to(`${roomCheck.id}`).emit("leaveGame");
 			if (roomCheck.gameMode != "robot") {
 				if (roomCheck.firstClient == client) {
-					match.winnerId = roomCheck.user1ID;
-					match.loserId = roomCheck.user2ID;
+					match.winnerId = roomCheck.user2ID;
+					match.loserId = roomCheck.user1ID;
 					match.endedAt = roomCheck.endTime;
 					match.mode = roomCheck.gameMode;
 					match.winnerStats = {
@@ -220,8 +177,8 @@ export class gameServer implements OnModuleInit {
 					};
 				}
 				else if (roomCheck.secondClient == client) {
-					match.winnerId = roomCheck.user2ID;
-					match.loserId = roomCheck.user1ID;
+					match.winnerId = roomCheck.user1ID;
+					match.loserId = roomCheck.user2ID;
 					match.mode = roomCheck.gameMode;
 					match.endedAt = roomCheck.endTime;
 					match.winnerStats = {
@@ -265,8 +222,8 @@ export class gameServer implements OnModuleInit {
 					user2 = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
 				if (roomCheck.score1 > roomCheck.score2) {
 					console.log("Right");
-					match.winnerId = roomCheck.user2ID; 
-					match.loserId = roomCheck.user1ID;
+					match.winnerId = roomCheck.user1ID; 
+					match.loserId = roomCheck.user2ID;
 					match.endedAt = roomCheck.endTime;
 					match.mode = roomCheck.gameMode;
 					match.winnerStats = {
@@ -288,8 +245,8 @@ export class gameServer implements OnModuleInit {
 				}
 				else if (roomCheck.score1 < roomCheck.score2) {
 					console.log("Left");
-					match.winnerId = roomCheck.user1ID;
-					match.loserId = roomCheck.user2ID;
+					match.winnerId = roomCheck.user2ID;
+					match.loserId = roomCheck.user1ID;
 					match.mode = roomCheck.gameMode;
 					match.endedAt = roomCheck.endTime;
 					match.winnerStats = { score: roomCheck.score2, name: roomCheck.secondName };
