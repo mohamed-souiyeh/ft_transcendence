@@ -129,13 +129,16 @@ export class gameServer implements OnModuleInit {
 			this.server.to(`${roomCheck.id}`).emit("inviteAccepted");
 			this.server.to(`${roomCheck.id}`).emit("matchFound", true);
 			roomCheck.secondName = await this.gameService.chatService.getUserFromSocket(client).then((user) => {
-				return user.username;
+				if (user)
+					return user.username;
 			});
 			roomCheck.user2ID = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient).then((user) => {
-				return user.id;
+				if (user)
+					return user.id;
 			});
 			roomCheck.user1ID = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient).then((user) => {
-				return user.id;
+				if (user)
+					return user.id;
 			});
 			if (roomCheck.user1ID && roomCheck.user2ID)
 			{
