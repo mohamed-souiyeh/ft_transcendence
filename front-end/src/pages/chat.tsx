@@ -88,7 +88,7 @@ function Chat() {
     })
       .then((resp) => {
         setUser(prevUser => ({ ...prevUser, data: resp.data }))
-        Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict', secure: true });
+        Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax', secure: true });
       })
       .catch((err) => {
         console.log("error while getting user data in chat refresh dms", err);
@@ -139,7 +139,7 @@ function Chat() {
     })
       .then((resp) => {
         setUser(prevUser => ({ ...prevUser, data: resp.data }))
-        Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' ,  secure: true });
+        Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax' ,  secure: true });
       })
       .catch((err) => {
         console.log("error while getting user data in chat refresh channels", err);

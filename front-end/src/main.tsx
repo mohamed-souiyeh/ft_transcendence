@@ -86,12 +86,12 @@ axios.interceptors.response.use(
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  // <React.StrictMode> 
+  // <React.laxMode> 
 
   <AvatarProvider>
     <NotificationProvider>
       <App />
     </NotificationProvider>
   </AvatarProvider>
-  // </React.StrictMode>
+  // </React.laxMode>
 )

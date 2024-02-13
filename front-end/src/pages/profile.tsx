@@ -53,7 +53,7 @@ function Profile() {
             .then((resp) => {
               setUser(prevUser => ({ ...prevUser, data: resp.data }))
               Cookies.remove('user')
-              Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' , secure: true });
+              Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax' , secure: true });
             })
             .catch((err) => {
               console.log("My sad potato we have an error in updating user cookie in profile smh:", err);
@@ -86,7 +86,7 @@ function Profile() {
       .then((resp) => {
         setUser(prevUser => ({ ...prevUser, data: resp.data }))
         Cookies.remove('user')
-        Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' ,  secure: true });
+        Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax' ,  secure: true });
       })
       .catch((err)=> {
         console.log("My sad potato we have an error in updating user cookie in profile smh:", err);
@@ -139,7 +139,7 @@ function Profile() {
               .then((resp) => {
                 setUser(prevUser => ({ ...prevUser, data: resp.data }))
                 Cookies.remove('user')
-                Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' ,  secure: true });
+                Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax' ,  secure: true });
 
                 const reader = new FileReader();
                 reader.onload = () => {
