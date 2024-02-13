@@ -11,7 +11,8 @@ export default function ProgressCercle() {
 
   ];
   const { user } = useContext(UserContext);
-  let val = user.data.score
+  let val = user.data.score;
+  console.log("score: ", val);
   return (
     <div className="">
         <div className="ml-20 pr-6 pt-5">

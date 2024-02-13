@@ -43,30 +43,30 @@ const game_socket = io(`${process.env.REACT_URL}:1337/game`,
 function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any, declineGame?:any})
 {
   let [acceptedInvite, setInviteState] = useState(false);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!acceptedInvite)
-      {
-        if (declineGame)
-        {
-            declineGame();
-        }
-        console.log("the toast is closing");
-      }
-    }, 6000);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     if (!acceptedInvite)
+  //     {
+  //       if (declineGame)
+  //       {
+  //           declineGame();
+  //       }
+  //       console.log("the toast is closing");
+  //     }
+  //   }, 6000);
 
-    return () => clearTimeout(timer);
-  }, [acceptedInvite]);
+  //   return () => clearTimeout(timer);
+  // }, [acceptedInvite]);
 
   return (
     <div>
       <h3>{msg}</h3>
-      <button className="bg-purple cursor-pointer pointer-events-auto mr-3" 
-        // style={{
-        // backgroundColor:"purple", 
-        // marginRight: "10px",
-        // cursor:"pointer",
-        // pointerEvents:"auto" }}
+      <button style={{
+        backgroundColor:"purple", 
+        marginRight: "10px",
+        cursor:"pointer",
+        pointerEvents:"auto"
+      }}
         onClick={() =>
         {
             if (joinGame)
@@ -78,10 +78,9 @@ function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any
       >
         Accept
       </button>
-      <button className="bg-purple-sh-2 cursor-pointer pointer-events-auto" 
-        // style={{backgroundColor:"purple",
-        // cursor:"pointer",
-        // pointerEvents:"auto"}}
+      <button style={{backgroundColor:"purple",
+        cursor:"pointer",
+        pointerEvents:"auto"}}
         onClick={() =>
         {
             if (declineGame)
@@ -219,7 +218,10 @@ function SetupSockets() {
       //TODO - here we need to create the logic to start the notification logic
       //TODO - mark the network icon in the sidebar with a small red dot
       //TODO - and send a toastify notification
-      toast(`${msg.from} sent u a friend request`);
+      toast(`${msg.from} sent u a friend request`, {
+        pauseOnHover: false,
+        pauseOnFocusLoss: false
+      });
 
       axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
         withCredentials: true
@@ -227,7 +229,7 @@ function SetupSockets() {
         .then((resp) => {
           setUser(prevUser => ({ ...prevUser, data: resp.data }))
           Cookies.remove('user')
-          Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   } );
+          Cookies.set('user', JSON.stringify(resp.data) );
         })
         .catch(()=> {
           navigate("/login")
@@ -247,7 +249,10 @@ function SetupSockets() {
         const message = username + " Invited you to a game !";
         toast(<GameInviteToast msg={message}  joinGame={()=>handleJoinPrivate(roomID)} 
           declineGame={()=>handleDeclinePrivate(roomID)}/>
-        );
+          , {
+            pauseOnHover: false,
+            pauseOnFocusLoss: false
+          });
       });
 
     setUser(prevUser => ({
@@ -337,7 +342,6 @@ function App() {
                       <Route path="/" element={<LandingPage />} />
                       <Route path="/login" element={<SignUp />} />
                       <Route path="/loading" element={<Loading />} />
-                      
                       <Route path="*" element={<NotFound />} />
                       <Route path="/2fa" element={<TwoFAConfirmation />} />
                       {/* Private Routes */}
@@ -355,16 +359,15 @@ function App() {
                           <Chat />
                         </SocketContext.Provider>} />
 
-                      
+                        <Route path="/:username" element={<UserProfile />} />
+                        <Route path="/not-found" element={<NotFoundPage />} />
                         <Route path="/search" element={<Search/>} />
                         <Route path="/setup" element={<Setup />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/:username" element={<UserProfile />} />
-                        <Route path="/not-found" element={<NotFoundPage />} />
-                        {/* <Route path="/:username" element={<UserProfile />} /> */}
                         <Route path="/groups" element={<ManageGoups/>} />
                         <Route path="/search" element={<Search/>} />
-                        {/* <Route path="/not-found" element={<NotFoundPage />} /> */}
+                        <Route path="/not-found" element={<NotFoundPage />} />
                         <Route path="/game" 
                         element={
                           <SocketContext.Provider value={game_socket}>

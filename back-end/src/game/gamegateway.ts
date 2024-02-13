@@ -102,6 +102,19 @@ export class gameServer implements OnModuleInit {
 		client.join(`${room_.id}`);
 		this.roomsList.set(room_.id, room_); 
 		eventBus.emit("privateGame", user.id, invitedUserID, room_.id);
+
+		setTimeout(async () => {
+			if (room_ && room_.roomState === "invite") {
+				let user = await this.gameService.chatService.getUserFromSocket(room_.firstClient); 
+				if (!user)
+					return;
+				await this.userService.setOnlineStatus(user.id);
+				if (room_) {
+					this.roomsList.delete(room_.id);
+				console.log("Invite declined");
+		}
+			}
+		}, 6000);
 	}
 
 	@SubscribeMessage('acceptPlayingInvite')
