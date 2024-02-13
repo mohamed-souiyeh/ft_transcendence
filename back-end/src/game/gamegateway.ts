@@ -222,8 +222,8 @@ export class gameServer implements OnModuleInit {
 					user2 = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
 				if (roomCheck.score1 > roomCheck.score2) {
 					console.log("Right");
-					match.winnerId = roomCheck.user1ID; 
-					match.loserId = roomCheck.user2ID;
+					match.winnerId = roomCheck.user2ID; 
+					match.loserId = roomCheck.user1ID;
 					match.endedAt = roomCheck.endTime;
 					match.mode = roomCheck.gameMode;
 					match.winnerStats = {
@@ -245,8 +245,8 @@ export class gameServer implements OnModuleInit {
 				}
 				else if (roomCheck.score1 < roomCheck.score2) {
 					console.log("Left");
-					match.winnerId = roomCheck.user2ID;
-					match.loserId = roomCheck.user1ID;
+					match.winnerId = roomCheck.user1ID;
+					match.loserId = roomCheck.user2ID;
 					match.mode = roomCheck.gameMode;
 					match.endedAt = roomCheck.endTime;
 					match.winnerStats = { score: roomCheck.score2, name: roomCheck.secondName };
