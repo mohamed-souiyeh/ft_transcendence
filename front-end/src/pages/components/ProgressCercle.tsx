@@ -1,23 +1,23 @@
 
 import Progress from 'react-circle-progress-bar';
-import React, {useContext } from 'react';
 
-import { UserContext } from "../../App";
 
-export default function ProgressCercle() {
+export function ProgressCercle(userData:any) {
   const gradientStops = [
     { stop: 0.0, color: "#77D970" }, 
     { stop: 1, color: "#77D970" }, 
 
   ];
-  const { user } = useContext(UserContext);
-  let val = user.data.score
+  const score = userData.userData.score;
+
+  const max = 100;
+  console.log('userdata:',userData);
   return (
     <div className="">
         <div className="ml-20 pr-6 pt-5">
           <Progress
-            progress={val * 10 } 
-            size={10}
+            progress={((score * 100) / max) > max ? 101: ((score * 100) / max)} 
+            size={max}
             strokeWidth={10}
             background="#EDE9FB"
             gradient={gradientStops}
