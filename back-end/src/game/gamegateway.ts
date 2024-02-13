@@ -142,7 +142,7 @@ export class gameServer implements OnModuleInit {
 		let user = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient); 
 		if (!user)
 			return;
-		this.userService.setOnlineStatus(user.id);
+		await this.userService.setOnlineStatus(user.id);
 		if (roomCheck) {
 			this.roomsList.delete(roomCheck.id);
 		}
@@ -194,9 +194,9 @@ export class gameServer implements OnModuleInit {
 					this.gameService.matchesService.create(match);
 			}
 			if (user1)
-				this.userService.setOnlineStatus(user1.id);
+				await this.userService.setOnlineStatus(user1.id);
 			if (user2)
-				this.userService.setOnlineStatus(user2.id);
+				await this.userService.setOnlineStatus(user2.id);
 			this.roomsList.delete(roomCheck.id);
 		}
 	}
@@ -259,7 +259,7 @@ export class gameServer implements OnModuleInit {
 					let user = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
 					if (!user)
 						return;
-					this.userService.setOnlineStatus(user.id);
+					await this.userService.setOnlineStatus(user.id);
 				}
 				if (user1)
 				{
@@ -272,7 +272,7 @@ export class gameServer implements OnModuleInit {
 					if (playedMatches > 5 && wonMatches == 5)
 						await this.userService.createAchievement(user1.id, "Veteran");
 					console.log("Played matches user1: " + playedMatches);
-					this.userService.setOnlineStatus(user1.id);
+					await this.userService.setOnlineStatus(user1.id);
 				}
 				if (user2)
 				{
@@ -285,7 +285,7 @@ export class gameServer implements OnModuleInit {
 					if (playedMatches > 5 && wonMatches >= 5)
 						await this.userService.createAchievement(user2.id, "Veteran");
 					console.log("Played matches user2: " + playedMatches);
-					this.userService.setOnlineStatus(user2.id);
+					await this.userService.setOnlineStatus(user2.id);
 				}
 
 				this.gameService.matchesService.create(match);
