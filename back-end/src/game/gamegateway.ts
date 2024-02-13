@@ -59,7 +59,16 @@ export class gameServer implements OnModuleInit {
 		let roomCheck = Array.from(this.roomsList.values()) 
 			.find(room => room.firstClient === client
 				|| room.secondClient === client);
+		let user1, user2;
+		if (roomCheck && roomCheck.firstClient)
+			user1 = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient);
+		if (roomCheck && roomCheck.secondClient)
+			user2 = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
 		console.log("Leave room from disconnect");
+		if (user1)
+				await this.userService.setOnlineStatus(user1.id);
+		if (user2)
+			await this.userService.setOnlineStatus(user2.id);
 		if (roomCheck)
 			this.roomsList.delete(roomCheck.id);
 	}
@@ -210,9 +219,31 @@ export class gameServer implements OnModuleInit {
 					this.gameService.matchesService.create(match);
 			}
 			if (user1)
+			{
+				const playedMatches = (await this.userService.getUserDataForHome(user1.id)).matchesPlayed + 1;
+				const wonMatches = (await this.userService.getUserDataForHome(user1.id)).wins;
+				if (playedMatches == 1)
+					await this.userService.createAchievement(user1.id, "newComer");
+				if (playedMatches == 5)
+					await this.userService.createAchievement(user1.id, "Player");
+				if (playedMatches > 5 && wonMatches == 5)
+					await this.userService.createAchievement(user1.id, "Veteran");
+				console.log("Played matches user1: " + playedMatches);
 				await this.userService.setOnlineStatus(user1.id);
+			}
 			if (user2)
+			{
+				const playedMatches = (await this.userService.getUserDataForHome(user2.id)).matchesPlayed + 1;
+				const wonMatches = (await this.userService.getUserDataForHome(user2.id)).wins;
+				if (playedMatches == 1)
+					await this.userService.createAchievement(user2.id, "newComer");
+				if (playedMatches >= 5)
+					await this.userService.createAchievement(user2.id, "Player");
+				if (playedMatches > 5 && wonMatches >= 5)
+					await this.userService.createAchievement(user2.id, "Veteran");
+				console.log("Played matches user2: " + playedMatches);
 				await this.userService.setOnlineStatus(user2.id);
+			}
 			this.roomsList.delete(roomCheck.id);
 		}
 	}
