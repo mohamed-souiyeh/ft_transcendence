@@ -17,7 +17,12 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
+    "esModuleInterop": true,
     "paths": {
+      "include": [
+        // other include patterns...
+        "src/database/users/FormDataInterceptorConfig/avatarConfig.ts"
+      ],
       "@nestjs/common": ["./packages/common"],
       "@nestjs/common/*": ["./packages/common/*"],
       "@nestjs/core": ["./packages/core"],
@@ -35,7 +40,7 @@
       "@nestjs/platform-fastify": ["./packages/platform-fastify"],
       "@nestjs/platform-fastify/*": ["./packages/platform-fastify/*"],
       "@nestjs/platform-socket.io": ["./packages/platform-socket.io"],
-      "@nestjs/platform-socket.io/*": ["./packages/platform-socket.io/*"],
+      "@nestjs/platform-socket.io/*": ["./packages/platform-socket.io/*"]
     }
   }
 }

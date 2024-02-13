@@ -1,6 +1,5 @@
 services:
   front-end-dev:
-    env_file: ../back-end/.env
     image: front-end-dev
     restart: always
     build: ./front-end-dev/
@@ -12,11 +11,13 @@ services:
       - sharedv:/root/shared
     depends_on:
       - back-end-dev
+      - studio
     networks:
       - front-end-network
+    environment:
+      - REACT_URL
 
   back-end-dev:
-    env_file: ../back-end/.env
     image: back-end-dev
     restart: always
     build: ./back-end-dev/
@@ -31,17 +32,72 @@ services:
     networks:
       - back-end-network
       - front-end-network
+    environment:
+      - DATABASE_URL
+      - FT_APP_ID
+      - FT_APP_SECRET
+      - FT_REDIRECT_URI
+      - GOOGLE_CLIENT_ID
+      - GOOGLE_REDIRECT_URI
+      - GOOGLE_SECRET
+      - JWT_SECRET
+      - NODE_VERSION
+      - POSTGRES_HOST
+      - POSTGRES_NAME
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_USER
+      - PRIVATE_KEY_PATH
+      - PUBLIC_CERT_PATH
+      - JWT_REFRESH_SECRET
+      - REFRESH_TOKEN_KEY
+      - ACCESS_TOKEN_KEY
+      - TWO_FACTOR_AUTHENTICATION_APP_NAME
+      - HOME_URL
+      - LOGIN_URL
+      - SETUP_URL
+      - TFA_URL
+      - LOADING_URL
+      - DEFAULT_AVATAR
+      - DEFAULT_CHANNEL_AVATAR
+
+  studio:
+    image: studio
+    restart: always
+    build: ./studio/
+    container_name: studio
+    ports:
+      - "5555:5555"
+    volumes:
+      - sharedv:/root/shared
+    depends_on:
+      - postgres
+    networks:
+      - back-end-network
+    environment:
+      - DATABASE_URL
+      - NODE_VERSION
+      - POSTGRES_HOST
+      - POSTGRES_NAME
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_USER
 
   postgres:
     image: postgres
     restart: always
-    env_file: ../back-end/.env
+    container_name: postgres
     volumes:
       - postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     networks:
       - back-end-network
+    environment:
+      - POSTGRES_HOST
+      - POSTGRES_NAME
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_USER
+      - POSTGRES_DB
 
 
 networks:
