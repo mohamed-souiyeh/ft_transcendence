@@ -37,8 +37,8 @@ import axios from "axios";
 import { NotificationProvider, useNotificationContext } from "./contexts/notificationContext";
 //TODO - channel doesnt send msgs and the users dont get added in the channel creation
 
-const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
-  { withCredentials: true });
+// const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
+//   { withCredentials: true });
 
 function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any, declineGame?:any})
 {
@@ -101,6 +101,7 @@ export const UserContext = createContext({
     chatException: {},
     requests: {},
     ping: {},
+    game_socket: {},
     // avatar: {},
   }, setUser: React.Dispatch<React.SetStateAction<boolean>>
 });
@@ -154,6 +155,9 @@ function SetupSockets() {
     //     console.log("Ooooooopsiii ", err.message);
     //   });
 
+
+    const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
+  { withCredentials: true });
 
     game_socket.on("inviteAccepted", ()=>{
       navigate("/game");
@@ -259,6 +263,7 @@ function SetupSockets() {
       ...prevUser,
       ping: ping_socket,
       chat: chat_socket,
+      game_socket: game_socket
     }));
 
     // console.log("the user context is in setup sockets :", user);
@@ -352,10 +357,10 @@ function App() {
                         </>
                       }>
                         <Route path="/home" element={
-                          <SocketContext.Provider value={game_socket}>
+                          <SocketContext.Provider value={user.game_socket}>
                             <Home />
                           </SocketContext.Provider>} />
-                        <Route path="/chat" element={<SocketContext.Provider value={game_socket}>
+                        <Route path="/chat" element={<SocketContext.Provider value={user.game_socket}>
                           <Chat />
                         </SocketContext.Provider>} />
 
@@ -370,7 +375,7 @@ function App() {
                         <Route path="/not-found" element={<NotFoundPage />} />
                         <Route path="/game" 
                         element={
-                          <SocketContext.Provider value={game_socket}>
+                          <SocketContext.Provider value={user.game_socket}>
                             <Game />
                           </SocketContext.Provider>
                         } />

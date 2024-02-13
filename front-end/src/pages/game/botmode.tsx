@@ -370,10 +370,10 @@ function BotMode()
                 <div style={{ textAlign: "center"}}>
                     <h2 style={{fontSize:"30px", color:"rgb(255, 170, 255)"}}>This is just a training mode so this match won't be 
                         saved in your profile.</h2>
-                    <h2 style={{fontSize:"40px", color:"rgb(255, 100, 255)"}}>How to play: </h2>
+                    {/* <h2 style={{fontSize:"40px", color:"rgb(255, 100, 255)"}}>How to play: </h2>
                     <h2 style={{fontSize:"30px", color:"rgb(255, 100, 255)"}}>- Press space to launch the ball</h2>
                     <h2 style={{fontSize:"30px", color:"rgb(255, 100, 255)"}}>- Press W-Z to move up</h2>
-                    <h2 style={{fontSize:"30px", color:"rgb(255, 100, 255)"}}>- Press S to move down</h2>
+                    <h2 style={{fontSize:"30px", color:"rgb(255, 100, 255)"}}>- Press S to move down</h2> */}
 
                 </div>
         </div>
