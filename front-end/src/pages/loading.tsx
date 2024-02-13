@@ -23,7 +23,7 @@ function Loading() {
     })
       .then((resp) => {
         setUser(prevUser => ({ ...prevUser, data: resp.data }))
-        Cookies.set('user', JSON.stringify(resp.data));
+        Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' , secure: true });
         setAvararFunction(resp.data.id)
         if (!user.data.isProfileSetup) {
           navigate("/setup")

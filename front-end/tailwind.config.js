@@ -19,7 +19,7 @@ module.exports = withMT({
   theme: {
     extend: {
       colors: {
-        'green': '#00FF00',
+        'green': '#77D970',
         'gray':'#B4B4B3',
         'purple-sh-2': '#201E2D',
         'purple-sh-1': '#302C42',
@@ -36,7 +36,7 @@ module.exports = withMT({
         'violet':'#800080',
         'purple-start': '#9c27b0',
         'purple-end': '#7b1fa2',
-        'team':'8785A2'
+        'team':'8785A2',
       },
       height: {
         'l-card-h': '26rem',
