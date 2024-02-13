@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { UserContext } from "../../App";
-import ProgressCercle from "../../pages/components/ProgressCercle";
+import { ProgressCercle }from "../../pages/components/ProgressCercle";
 
 export default function UserInfo() {
 
@@ -201,7 +201,7 @@ export default function UserInfo() {
         </div>}
       </div>
         <div className="">
-          {<ProgressCercle />}
+          {<ProgressCercle userData={userData}/>}
         </div>
     
     

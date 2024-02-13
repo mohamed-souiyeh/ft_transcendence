@@ -218,4 +218,4 @@ function Bubble(props) {
   )
 }
 
-export default Bubble
+export default Bubble;
