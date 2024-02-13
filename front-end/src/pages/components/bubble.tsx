@@ -134,7 +134,7 @@ function Bubble(props) {
                   <MenuList className="bg-purple-sh-2 border border-purple">
                     <MenuItem onClick={() => { visitProfile() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Visit profile</MenuItem>
                     {isAdmin &&
-                      (props.authorInfo.role === "modirator" ?
+                      (props.authorInfo?.role === "modirator" ?
                         <MenuItem onClick={() => { removeAdmin() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Remove admin</MenuItem>
                         : <MenuItem onClick={() => { setAsAdmin() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Set as admin</MenuItem>)}
                     {isAdmin &&
