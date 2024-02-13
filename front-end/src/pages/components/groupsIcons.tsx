@@ -57,10 +57,10 @@ function GroupsIcons(props: object) {
       <MenuList className="bg-purple-sh-2 border border-purple">
         <MenuItem onClick={() => {leaveGroup()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Leave Group</MenuItem>
         { (isAdmin || isOwner) &&  <MenuItem onClick={() => {addMembers()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Add Members</MenuItem> }
-        { isOwner && <MenuItem onClick={() => {passwordSettings()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Password Settings</MenuItem> }
+        { isOwner && <MenuItem onClick={() => {passwordSettings()}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Privacy Settings</MenuItem> }
       </MenuList>
     </Menu>
   )
 }
 
-export default GroupsIcons
+export default GroupsIcons;

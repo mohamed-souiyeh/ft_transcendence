@@ -41,7 +41,7 @@ function Search() {
     <>
       <SideBar />
       <Navbar />
-      <div className="w-screen h-screen grid place-items-center">
+      <div className="w-screen h-screen bg-purple-sh-1 grid place-items-center">
         <div className="w-[50%] h-[90%] bg-purple-sh-2 rounded-xl p-3 border border-purple-sh-1  overflow-y-scroll scrollbar-thin scrollbar-thumb-purple-sh-1 ">
 
           <div className="flex flex-row-reverse py-2" >
