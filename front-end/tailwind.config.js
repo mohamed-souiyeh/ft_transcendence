@@ -36,7 +36,7 @@ module.exports = withMT({
         'violet':'#800080',
         'purple-start': '#9c27b0',
         'purple-end': '#7b1fa2',
-        'team':'8785A2'
+        'team':'8785A2',
       },
       height: {
         'l-card-h': '26rem',

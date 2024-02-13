@@ -8,14 +8,16 @@ export default function ProgressCercle() {
   const gradientStops = [
     { stop: 0.0, color: "#77D970" }, 
     { stop: 1, color: "#77D970" }, 
+
   ];
   const { user } = useContext(UserContext);
+  let val = user.data.score
   return (
     <div className="">
         <div className="ml-20 pr-6 pt-5">
           <Progress
-            progress={user.data.score} 
-            size={100}
+            progress={val * 10 } 
+            size={10}
             strokeWidth={10}
             background="#EDE9FB"
             gradient={gradientStops}

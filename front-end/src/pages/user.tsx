@@ -12,16 +12,16 @@ function UserProfile() {
         {<NavBar />}
         <div className="grid mt-10 md:mt-20 mx-auto w-80 md:h-auto md:w-10/12 lg:w-6/12">
           <UserInfo />
-          <div className="flex space-x-72">
-            <p className=" font-semibold text-xl tracking-wider text-purple-tone-1 pt-4 md:pt-10 ml-2 ">
+          <div className="flex space-x-72 mt-20">
+            <p className=" font-semibold text-xl tracking-wider text-purple-tone-1 pt-4 md:pt-10 ml-6 ">
               Achievements
             </p>
-            <p className=" font-semibold text-xl tracking-wider text-purple-tone-1 pt-4 md:pt-10 ml-2 ">
+            <p className=" font-semibold text-xl tracking-wider text-purple-tone-1 pt-4 md:pt-10 ml-4 ">
               Game History
             </p>
           </div>
 
-          <div className="flex mt-auto">
+          <div className="flex mt-auto justify-center ">
             {<Acheivements />}
             {<GameHistory />}
           </div>
