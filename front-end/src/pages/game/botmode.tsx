@@ -249,6 +249,7 @@ function BotMode()
                 second.cleanUp(gl);
                 ball.cleanUp(gl);
             }
+            socket.disconnect();
         }
   }, [socket]);
 

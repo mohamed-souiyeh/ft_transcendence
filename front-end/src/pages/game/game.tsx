@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState, useContext } from 'react';
-import axios from 'axios';
 import Profile from "../components/userProfileIcone";
 import { Cube } from './cube';
 import quitButton from './exitGame.png';
@@ -48,9 +47,10 @@ function Game() {
       }
     };
 
+    socket.emit("queuing");
     if (socket)
     {
-      socket.emit("queuing");
+      console.log("Game page socket ");
       socket.on("inviteAccepted", () => {
         console.log("inviteAccepted");
         console.log("Game state ", gameState);
@@ -180,15 +180,6 @@ function Game() {
       {
         socket.on('userIDs', (user1:number, user2:number)=>
         {
-            // Promise.all([
-            //   axios.get(`${process.env.REACT_URL}:1337/users/${user1}/avatar`, { withCredentials: true }),
-            //   axios.get(`${process.env.REACT_URL}:1337/users/${user2}/avatar`, { withCredentials: true })
-            // ])
-            // .then(([response1, response2]) => {
-            // })
-            // .catch(error => {
-            //   console.error('Error fetching user data:', error);
-            // });
             setAvatar1(`${process.env.REACT_URL}:1337/users/${user1}/avatar`);
             setAvatar2(`${process.env.REACT_URL}:1337/users/${user2}/avatar`);
           })
@@ -278,7 +269,7 @@ function Game() {
       socket.emit("leaveRoom");
     }
   },
-    []);
+  []);
 
   return (<>
     <div 

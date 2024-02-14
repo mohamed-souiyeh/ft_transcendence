@@ -3,10 +3,10 @@ import {
 }
 	from '@nestjs/common';
 import {
-	SubscribeMessage,
-	WebSocketGateway,
-	WebSocketServer
-}
+		SubscribeMessage,
+		WebSocketGateway,
+		WebSocketServer
+	}
 	from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
 import { UsersService } from 'src/database/users/users.service';
@@ -78,11 +78,20 @@ export class gameServer implements OnModuleInit {
 			user2 = await this.getUser(roomCheck.secondClient);
 		console.log("Leave room from disconnect");
 		if (user1)
+		{
+			console.log("User1 ", user1.id);
 			await this.userService.setOnlineStatus(user1.id);
+		}
 		if (user2)
+		{
+			console.log("User2 ", user2.id);
 			await this.userService.setOnlineStatus(user2.id);
+		}
 		if (roomCheck)
+		{
+			this.server.to(`${roomCheck.id}`).emit("leaveGame");
 			this.roomsList.delete(roomCheck.id);
+		}
 	}
 
 	@SubscribeMessage('botMode')
@@ -90,7 +99,13 @@ export class gameServer implements OnModuleInit {
 		let user = await this.getUser(client);
 		if (!user)
 			return;
-	
+
+		let userStatus: string = await this.userService.getStatus(user.id);
+		if (userStatus == "busy") {
+			console.log("Already queuing");
+			return;
+		}
+		await this.userService.setBusyStatus(user.id);
 		let room_ = await new room();
 		room_.firstClient = client;
 		room_.gameMode = "robot";
@@ -111,7 +126,7 @@ export class gameServer implements OnModuleInit {
 			await this.userService.getStatus(user.id) == "busy" ) {
 			return;
 		}
-		this.userService.setBusyStatus(user.id);
+		await this.userService.setBusyStatus(user.id);
 		console.log("Invite player");
 		let room_ = new room();
 		room_.id = this.roomID;
@@ -173,7 +188,6 @@ export class gameServer implements OnModuleInit {
 	@SubscribeMessage('declinePlayingInvite')
 	async declineMatchInvite(client: Socket, roomID: number) {
 		console.log("Player decline invite ", roomID);
-		// The invited user will decline the invite and the room will be deleted and both users will be disconnected
 		let roomCheck = Array.from(this.roomsList.values())
 		.find(room => room.id === roomID);
 		let user = await this.getUser(roomCheck.firstClient); 
@@ -192,6 +206,12 @@ export class gameServer implements OnModuleInit {
 				|| room.secondClient === client);
 		console.log("Leave room");
 		if (roomCheck && roomCheck.roomState != "gameOver") {
+			if (this.roomsList.has(roomCheck.id))
+			{
+
+				this.roomsList.get(roomCheck.id).roomState = "gameOver";
+				console.log("Set game over now !!");
+			}
 			let user1, user2;
 			if (roomCheck.firstClient)
 				user1 = await this.getUser(roomCheck.firstClient);
