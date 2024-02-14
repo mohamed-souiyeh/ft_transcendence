@@ -1,8 +1,5 @@
-import React , {useRef, useEffect, useState} from 'react';
-import ReactDOM from 'react-dom/client';
-import axios from 'axios';
+import React , {useRef, useEffect, useState, useContext} from 'react';
 import Profile from "../components/userProfileIcone";
-import {io} from 'socket.io-client';
 import {Cube} from './cube';
 import quitButton from './exitGame.png';
 import { useSocket } from '../../clientSocket';
@@ -11,6 +8,7 @@ import pic from '../../assets/taha.jpg'
 import './spinner.css';
 import { useNavigate } from 'react-router-dom';
 import { useAvatarContext } from '../../contexts/avatar';
+import { UserContext } from '../../App';
 
 function rad2Degree(angle:number) : number
 {
@@ -31,7 +29,7 @@ function BotMode()
   let navigate = useNavigate();
   const frameRef = useRef<number>(0);
 
-  const socket = useSocket("game");
+  const socket = useContext(UserContext).user.game_socket;
 
   const leaveGame = () => {
     if (socket)
@@ -58,8 +56,8 @@ function BotMode()
 
             if (gl) 
             {
-                gl.canvas.width = 900;
-                gl.canvas.height = 600;
+                gl.canvas.width = 500;
+                gl.canvas.height = 300;
                 frameRef.current = 
                 requestAnimationFrame(() => renderGame(gl));
             }
@@ -174,74 +172,69 @@ function BotMode()
         {
             if (!foundMatch)
                 socket.on('matchFound', (v:boolean)=>{foundMatch =v; setMatchState(v);});
-        }
-        function renderGame(gl: WebGLRenderingContext | null)
-        {
-
-        if (foundMatch)
-        {
-        setScore1((score1));
-        setScore2((score2));
-        if (socket)
-        {
             socket.emit('playing');
             socket.on('score', (v:number, v1:number) => {
                 score1 = v;
                 score2 = v1;
+                setScore1((score1));
+                setScore2((score2));
             });
             socket.on('left', (v:number)=>{first.vector3D.y = v;});
             socket.on('right', (v:number)=>{second.vector3D.y = v;});
             socket.on('ballPosX', (v:number)=>{ball.vector3D.x = v;});
             socket.on('ballPosY', (v:number)=>{ball.vector3D.y = v;});
             socket.on('balllaunched', (v:boolean)=>{ballLaunched=v;});
-            
         }
-            
-            if (gl)
-            {
-            gl.clearColor(0.282, 0.17, 0.37, 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            gl.enable(gl.DEPTH_TEST);
-    
-            terrain.renderEntity(gl, 36);
-            terrain.setColor(gl, [0.41, 0.26,0.5]);
-            terrain.rotateX(gl, rad2Degree(0.004));
-            terrain.rotateY(gl, rad2Degree(0.0));
-            terrain.setLightSource(gl, [0.0, 0.0, -0.6], [1.0, 1.0, 1.0]);
-            terrain.set3DMatrices(gl, projection, viewMatrix);
 
-            first.renderEntity(gl, 36);
-            first.rotateX(gl, rad2Degree(0.004));
-            first.rotateY(gl, rad2Degree(0.0));
-            first.setColor(gl, [0.7, 0.6, 1.8]);
-            first.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
-            first.set3DMatrices(gl, projection, viewMatrix);
+        function renderGame(gl: WebGLRenderingContext | null)
+        {
+            if (foundMatch)
+            {
+                if (gl)
+                {
+                    gl.clearColor(0.282, 0.17, 0.37, 1.0);
+                    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                    gl.enable(gl.DEPTH_TEST);
             
-            second.renderEntity(gl, 36);
-            second.rotateX(gl, rad2Degree(0.004));
-            second.rotateY(gl, rad2Degree(0.0));
-            second.setColor(gl, [0.7, 0.6, 1.8]);
-            second.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
-            second.set3DMatrices(gl, projection, viewMatrix);
-    
-            ball.renderEntity(gl, 36);
-            ball.rotateX(gl, rad2Degree(0.004));
-            ball.rotateY(gl, rad2Degree(0.0));
-            ball.setColor(gl, [0.8, 0.1, 0.8]);
-            ball.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 2.0, 1.0]);
-            ball.set3DMatrices(gl, projection, viewMatrix);
+                    terrain.renderEntity(gl, 36);
+                    terrain.setColor(gl, [0.41, 0.26,0.5]);
+                    terrain.rotateX(gl, rad2Degree(0.004));
+                    terrain.rotateY(gl, rad2Degree(0.0));
+                    terrain.setLightSource(gl, [0.0, 0.0, -0.6], [1.0, 1.0, 1.0]);
+                    terrain.set3DMatrices(gl, projection, viewMatrix);
+
+                    first.renderEntity(gl, 36);
+                    first.rotateX(gl, rad2Degree(0.004));
+                    first.rotateY(gl, rad2Degree(0.0));
+                    first.setColor(gl, [0.7, 0.6, 1.8]);
+                    first.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
+                    first.set3DMatrices(gl, projection, viewMatrix);
+                    
+                    second.renderEntity(gl, 36);
+                    second.rotateX(gl, rad2Degree(0.004));
+                    second.rotateY(gl, rad2Degree(0.0));
+                    second.setColor(gl, [0.7, 0.6, 1.8]);
+                    second.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 1.0, 1.0]);
+                    second.set3DMatrices(gl, projection, viewMatrix);
+            
+                    ball.renderEntity(gl, 36);
+                    ball.rotateX(gl, rad2Degree(0.004));
+                    ball.rotateY(gl, rad2Degree(0.0));
+                    ball.setColor(gl, [0.8, 0.1, 0.8]);
+                    ball.setLightSource(gl, [0.0, 0.0, -0.1], [1.0, 2.0, 1.0]);
+                    ball.set3DMatrices(gl, projection, viewMatrix);
+                }
             }
-        }
-        
-        frameRef.current = requestAnimationFrame(() => renderGame(gl));
+            
+            frameRef.current = requestAnimationFrame(() => renderGame(gl));
         }
 
         const handle = () =>
         {
         if (gl)
         {
-            gl.canvas.width = 900;
-            gl.canvas.height = 600;
+            gl.canvas.width = 500;
+            gl.canvas.height = 300;
         }
         };
 
@@ -349,7 +342,7 @@ function BotMode()
                 <div style={{ textAlign: "center"}}>
                     <h2 style={{fontSize:"30px", color:"rgb(255, 170, 255)"}}>This is just a training mode so this match won't be 
                         saved in your profile.</h2>
-
+                    <h2>QWERTY use W - A to move AZERTY use Z - A</h2>
                 </div>
         </div>
         </>

@@ -15,7 +15,7 @@ export class AuthService {
   ) { }
 
   hello(req) {
-    return `hello world! from user ${req.user.email}\nof id ${req.user.id}.`;
+    return `hello world!`;
   }
 
   async getUserFromAuthenticationToken(jwt: string, refreshJwt: string) {

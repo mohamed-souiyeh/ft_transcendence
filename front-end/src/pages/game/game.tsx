@@ -5,7 +5,7 @@ import { Cube } from './cube';
 import quitButton from './exitGame.png';
 import './spinner.css';
 import { useNavigate } from 'react-router-dom';
-import { SocketContext } from '../../clientSocket';
+import { UserContext } from '../../App';
 
 function rad2Degree(angle: number): number {
   return angle * 180 / Math.PI;
@@ -27,7 +27,7 @@ function Game() {
   let navigate = useNavigate();
   const frameRef = useRef<number>(0);
 
-  const socket = useContext(SocketContext);
+  const socket = useContext(UserContext).user.game_socket;
 
   const leaveGame = () => {
     if (socket)
@@ -36,6 +36,7 @@ function Game() {
   }
 
   useEffect(() => {
+    console.log("Game page socket ", socket);
     const handleWinner = (v: boolean) => { setWinState(v); };
     const handleLeaveGame = () => { navigate("/home"); };
     const handleAlreadyPlaying = () => { navigate("/home"); };
@@ -106,30 +107,31 @@ function Game() {
     ball.prevPositions.y = first.vector3D.y + 0.5;
     ball.prevPositions.z = -0.01;
 
-    document.addEventListener('keydown', (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => { 
       if (e.code == 'Space') {
-        if (!ballLaunched) {
-          ballLaunched = true;
-        }
-        if (socket)
-          socket.emit('balllaunch', ballLaunched);
+      if (!ballLaunched) {
+        ballLaunched = true;
       }
-      if (e.code == 'KeyW') {
-        if (socket) {
-          socket.emit('right', 1);
-          socket.emit('left', 1);
+      if (socket)
+        socket.emit('balllaunch', ballLaunched);
+    }
+    if (e.code == 'KeyW') {
+      if (socket) {
+        socket.emit('right', 1);
+        socket.emit('left', 1);
 
-        }
       }
-      if (e.code == 'KeyS') {
-        if (socket) {
-          socket.emit('right', -1);
-          socket.emit('left', -1);
-        }
+    }
+    if (e.code == 'KeyS') {
+      if (socket) {
+        socket.emit('right', -1);
+        socket.emit('left', -1);
       }
-    })
+    }}
 
-    document.addEventListener('keyup', (e) => {
+    document.addEventListener('keydown', handleKeyDown)
+
+    const handleKeyUp = (e) => {
       if (e.code == 'KeyW') {
         if (socket) {
           socket.emit('right', 0);
@@ -142,7 +144,9 @@ function Game() {
           socket.emit('left', 0);
         }
       }
-    })
+    }
+
+    document.addEventListener('keyup', handleKeyUp);
 
     let ballLaunched: boolean = false;
 
@@ -176,17 +180,17 @@ function Game() {
       {
         socket.on('userIDs', (user1:number, user2:number)=>
         {
-            Promise.all([
-              axios.get(`${process.env.REACT_URL}:1337/users/${user1}/avatar`, { withCredentials: true }),
-              axios.get(`${process.env.REACT_URL}:1337/users/${user2}/avatar`, { withCredentials: true })
-            ])
-            .then(([response1, response2]) => {
-              setAvatar1(`${process.env.REACT_URL}:1337/users/${user1}/avatar`);
-              setAvatar2(`${process.env.REACT_URL}:1337/users/${user2}/avatar`);
-            })
-            .catch(error => {
-              console.error('Error fetching user data:', error);
-            });
+            // Promise.all([
+            //   axios.get(`${process.env.REACT_URL}:1337/users/${user1}/avatar`, { withCredentials: true }),
+            //   axios.get(`${process.env.REACT_URL}:1337/users/${user2}/avatar`, { withCredentials: true })
+            // ])
+            // .then(([response1, response2]) => {
+            // })
+            // .catch(error => {
+            //   console.error('Error fetching user data:', error);
+            // });
+            setAvatar1(`${process.env.REACT_URL}:1337/users/${user1}/avatar`);
+            setAvatar2(`${process.env.REACT_URL}:1337/users/${user2}/avatar`);
           })
         }
         fetchedAvatars = true;
@@ -263,13 +267,15 @@ function Game() {
     window.addEventListener("resize", handle);
     return () => {
       cancelAnimationFrame(frameRef.current);
+      window.removeEventListener("resize", handle);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
       socket.off("winner", handleWinner);
       socket.off("leaveGame", handleLeaveGame);
       socket.off("alreadyPlaying", handleAlreadyPlaying);
       socket.off("alreadyQueuing", handleAlreadyQueuing);
       socket.off("gameover", handleGameOver);
-      socket.disconnect();
-      socket.connect();
+      socket.emit("leaveRoom");
     }
   },
     []);

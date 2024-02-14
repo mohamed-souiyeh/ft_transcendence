@@ -22,8 +22,6 @@ import ManageGoups from "./pages/manageGoups";
 import BotMode from "./pages/game/botmode";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
-import { SocketContext } from "./clientSocket";
-import { io } from 'socket.io-client';
 import 'react-toastify/dist/ReactToastify.css';
 import './Toasts.css';
 import { PwdPopupProvider } from "./contexts/pwdPopupContext";
@@ -31,42 +29,24 @@ import { AddFriendsPopupProvider } from "./contexts/addFriendsPopupContext";
 import { ProtectedRoomProvider } from "./contexts/ProtectedRoomContext";
 import Search from "./pages/search";
 import { useAvatarContext } from "./contexts/avatar";
-import locale from "antd/es/date-picker/locale/en_US";
 import NotFoundPage from "./pages/notfoundpage";
 import axios from "axios";
 import { NotificationProvider, useNotificationContext } from "./contexts/notificationContext";
 //TODO - channel doesnt send msgs and the users dont get added in the channel creation
 
-// const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
-//   { withCredentials: true });
-
 function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any, declineGame?:any})
 {
   let [acceptedInvite, setInviteState] = useState(false);
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     if (!acceptedInvite)
-  //     {
-  //       if (declineGame)
-  //       {
-  //           declineGame();
-  //       }
-  //       console.log("the toast is closing");
-  //     }
-  //   }, 6000);
-
-  //   return () => clearTimeout(timer);
-  // }, [acceptedInvite]);
 
   return (
     <div>
       <h3>{msg}</h3>
       <button style={{
-        backgroundColor:"purple", 
-        marginRight: "10px",
-        cursor:"pointer",
-        pointerEvents:"auto"
-      }}
+          backgroundColor:"purple", 
+          marginRight: "10px",
+          cursor:"pointer",
+          pointerEvents:"auto"
+        }}
         onClick={() =>
         {
             if (joinGame)
@@ -113,13 +93,15 @@ function KickTheBastard() {
   useEffect(() => {
 
     const kick = () => {
-      if (typeof user.chat.disconnect === 'function')
-      user.chat.disconnect();
+      if (typeof user.chat?.disconnect === 'function')
+        user.chat.disconnect();
+      if (typeof user.ping?.disconnect === 'function')
+        user.ping.disconnect();
+      if (typeof user.game_socket?.disconnect === 'function')
+        user.game_socket.disconnect();
 
       setUser({ data: {} });
-      // console.log("the user context is after seting it :", user);
       Cookies.remove('user');
-      // console.log("kicking the bastard")
       navigate('/login');
     };
 
@@ -140,54 +122,12 @@ function SetupSockets() {
 
 
   useEffect(() => {
-    //   axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
-    //   { 
-    //     withCredentials: true,
-    //     responseType: 'arraybuffer' 
-    //   })
-    //   .then((res) =>
-    //   {
-    //     const blob = new Blob([res.data], {type: 'image/jpeg'});
-    //     const url = URL.createObjectURL(blob);
-    //     console.log("we got the image");
-    //     setUser(prevUser => ({...prevUser, avatar: url}));
-    //   }).catch((err) => {
-    //     console.log("Ooooooopsiii ", err.message);
-    //   });
 
-
-    const game_socket = io(`${process.env.REACT_URL}:1337/game`, 
-  { withCredentials: true });
+    const game_socket = setupSocket(`${process.env.REACT_URL}:1337/game`) ;
 
     game_socket.on("inviteAccepted", ()=>{
       navigate("/game");
     })
-
-    const chat_socket = setupSocket(`${process.env.REACT_URL}:1337/chat`);
-    chat_socket.on("exception", (err) => {
-      // Handle the error here
-      console.log("in the chat exception");
-      setUser(prevUser => ({
-        ...prevUser,
-        chatException: err,
-      }));
-      // console.log(err); // Prints the error message
-    });
-
-    //modified/ruined by laila==============================================================================================================================
-    // axios.get(`${process.env.REACT_URL}:1337/users/${user.data.id}/avatar`,
-    //   { 
-    //     withCredentials: true,
-    //     responseType: 'arraybuffer' 
-    //   })
-    //   .then((res) =>
-    //   {
-    //       const blob = new Blob([res.data], {type: 'image/jpeg'});
-    //       const url = URL.createObjectURL(blob);
-    //       setUser(prevUser => ({...prevUser, avatar: url}));
-    //     }).catch((err) => {
-    //     console.log("Ooooooopsiii ", err.message);
-    //   });
 
     const handleJoinPrivate = (roomID) => {
       game_socket.emit('acceptPlayingInvite', roomID);
@@ -196,6 +136,19 @@ function SetupSockets() {
     const handleDeclinePrivate = (roomID) => {
       game_socket.emit('declinePlayingInvite', roomID);
     }
+
+//---------------------------------------------------------------------------
+    const chat_socket = setupSocket(`${process.env.REACT_URL}:1337/chat`);
+
+    chat_socket.on("exception", (err) => {
+      // Handle the error here
+      console.log("in the chat exception");
+      setUser(prevUser => ({
+        ...prevUser,
+        chatException: err,
+      }));
+    });
+
 
     const ping_socket = setupSocket(`${process.env.REACT_URL}:1337`);
 
@@ -272,8 +225,9 @@ function SetupSockets() {
       ping_socket.off();
       chat_socket.disconnect();
       chat_socket.off();
-      // game_socket.disconnect();
-      // game_socket.off();
+      game_socket.disconnect();
+      game_socket.off();
+      console.log("sockets disconnected");
       clearInterval(setIntervalId);
     };
   }, []);
@@ -356,14 +310,8 @@ function App() {
                           <SetupSockets/>
                         </>
                       }>
-                        <Route path="/home" element={
-                          <SocketContext.Provider value={user.game_socket}>
-                            <Home />
-                          </SocketContext.Provider>} />
-                        <Route path="/chat" element={<SocketContext.Provider value={user.game_socket}>
-                          <Chat />
-                        </SocketContext.Provider>} />
-
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/chat" element={<Chat />} />
                         <Route path="/:username" element={<UserProfile />} />
                         <Route path="/not-found" element={<NotFoundPage />} />
                         <Route path="/search" element={<Search/>} />
@@ -373,12 +321,7 @@ function App() {
                         <Route path="/groups" element={<ManageGoups/>} />
                         <Route path="/search" element={<Search/>} />
                         <Route path="/not-found" element={<NotFoundPage />} />
-                        <Route path="/game" 
-                        element={
-                          <SocketContext.Provider value={user.game_socket}>
-                            <Game />
-                          </SocketContext.Provider>
-                        } />
+                        <Route path="/game" element={<Game />} />
                         <Route path="/bot" element={<BotMode />} />
                       </Route>
                     </Routes>

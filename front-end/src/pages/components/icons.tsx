@@ -2,11 +2,11 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { networkTabs } from "../chat.enums";
-import { SocketContext} from "../../clientSocket";
 import { useContext } from "react";
 import { MenuDefault } from "./menuDefault";
 
 import { Menu, MenuHandler, MenuList, MenuItem} from "@material-tailwind/react";
+import { UserContext } from "../../App";
 
 // export function MenuDefault() {
 
@@ -15,7 +15,7 @@ function Icons(props) {
   const [state, setState] = useState(false)
   const menuRef = useRef(null);
   const navigate = useNavigate()
-  const game_socket = useContext(SocketContext);
+  const game_socket = useContext(UserContext).user.game_socket;
 
   let { user, unmount } = props;
 

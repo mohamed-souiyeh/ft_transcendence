@@ -14,6 +14,7 @@ import { gameService } from './game.service';
 import { room } from './Room';
 import { MatchDto } from 'src/database/matches/matches.dto';
 import { eventBus } from 'src/eventBus';
+import { JwtAuthService } from 'src/auth/jwt/jwt.service';
 
 // Managing the sockets
 @WebSocketGateway({
@@ -32,7 +33,9 @@ export class gameServer implements OnModuleInit {
 
 	constructor(
 		private gameService: gameService,
-		private userService: UsersService) { }
+		private userService: UsersService,
+		private jwtAuthService: JwtAuthService
+		) { }
 
 	onModuleInit() {
 		this.gameService.gameLoop(this.server, this.roomsList);
@@ -48,12 +51,21 @@ export class gameServer implements OnModuleInit {
 		console.log("Status ", userStatus);
 		if (userStatus == "busy") {
 			console.log("Already queuing");
-			this.server.to(`${client.id}`).emit("alreadyQueuing");
 			return;
 		}
-		client.join(`${user.id}`);
 	}
 
+	getUser = async (client: Socket) => {
+		const { jwt } = await this.gameService.chatService.getTokensFromSocket(client);
+		
+		const payload = await this.jwtAuthService.decodetoken(jwt);
+
+		const user = await this.userService.findUserById(payload.id);
+
+		return user;
+	}
+
+	//---------------------------- [ change from here ] ----------------------------
 	async handleDisconnect(client: Socket) {
 		let match = new MatchDto();
 		let roomCheck = Array.from(this.roomsList.values()) 
@@ -61,12 +73,12 @@ export class gameServer implements OnModuleInit {
 				|| room.secondClient === client);
 		let user1, user2;
 		if (roomCheck && roomCheck.firstClient)
-			user1 = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient);
+			user1 = await this.getUser(roomCheck.firstClient);
 		if (roomCheck && roomCheck.secondClient)
-			user2 = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
+			user2 = await this.getUser(roomCheck.secondClient);
 		console.log("Leave room from disconnect");
 		if (user1)
-				await this.userService.setOnlineStatus(user1.id);
+			await this.userService.setOnlineStatus(user1.id);
 		if (user2)
 			await this.userService.setOnlineStatus(user2.id);
 		if (roomCheck)
@@ -75,7 +87,7 @@ export class gameServer implements OnModuleInit {
 
 	@SubscribeMessage('botMode')
 	async setGameAsBotMode(client: Socket) {
-		let user = await this.gameService.chatService.getUserFromSocket(client);
+		let user = await this.getUser(client);
 		if (!user)
 			return;
 	
@@ -92,7 +104,7 @@ export class gameServer implements OnModuleInit {
 	@SubscribeMessage('invite')
 	async invitePlayer(client: Socket, invitedUserID: number) 
 	{
-		let user = await this.gameService.chatService.getUserFromSocket(client); 
+		let user = await this.getUser(client); 
 		if (!user)
 			return; 
 		if (await this.userService.getStatus(invitedUserID) == "busy" ||
@@ -114,7 +126,7 @@ export class gameServer implements OnModuleInit {
 
 		setTimeout(async () => {
 			if (room_ && room_.roomState === "invite") {
-				let user = await this.gameService.chatService.getUserFromSocket(room_.firstClient); 
+				let user = await this.getUser(room_.firstClient); 
 				if (!user)
 					return;
 				await this.userService.setOnlineStatus(user.id);
@@ -137,15 +149,15 @@ export class gameServer implements OnModuleInit {
 			roomCheck.roomState = "ready";
 			this.server.to(`${roomCheck.id}`).emit("inviteAccepted");
 			this.server.to(`${roomCheck.id}`).emit("matchFound", true);
-			roomCheck.secondName = await this.gameService.chatService.getUserFromSocket(client).then((user) => {
+			roomCheck.secondName = await this.getUser(client).then((user) => {
 				if (user)
 					return user.username;
 			});
-			roomCheck.user2ID = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient).then((user) => {
+			roomCheck.user2ID = await this.getUser(roomCheck.secondClient).then((user) => {
 				if (user)
 					return user.id;
 			});
-			roomCheck.user1ID = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient).then((user) => {
+			roomCheck.user1ID = await this.getUser(roomCheck.firstClient).then((user) => {
 				if (user)
 					return user.id;
 			});
@@ -164,7 +176,7 @@ export class gameServer implements OnModuleInit {
 		// The invited user will decline the invite and the room will be deleted and both users will be disconnected
 		let roomCheck = Array.from(this.roomsList.values())
 		.find(room => room.id === roomID);
-		let user = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient); 
+		let user = await this.getUser(roomCheck.firstClient); 
 		if (!user)
 			return;
 		await this.userService.setOnlineStatus(user.id);
@@ -182,9 +194,9 @@ export class gameServer implements OnModuleInit {
 		if (roomCheck && roomCheck.roomState != "gameOver") {
 			let user1, user2;
 			if (roomCheck.firstClient)
-				user1 = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient);
+				user1 = await this.getUser(roomCheck.firstClient);
 			if (roomCheck.secondClient)
-				user2 = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
+				user2 = await this.getUser(roomCheck.secondClient);
 			this.server.to(`${roomCheck.id}`).emit("leaveGame");
 			if (roomCheck.gameMode != "robot") {
 				if (roomCheck.firstClient == client) {
@@ -264,9 +276,9 @@ export class gameServer implements OnModuleInit {
 			{
 				let user1, user2;
 				if (roomCheck.firstClient)
-					user1 = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient);
+					user1 = await this.getUser(roomCheck.firstClient);
 				if (roomCheck.secondClient)
-					user2 = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
+					user2 = await this.getUser(roomCheck.secondClient);
 				if (roomCheck.score1 > roomCheck.score2) {
 					console.log("Right");
 					match.winnerId = roomCheck.user2ID; 
@@ -286,7 +298,7 @@ export class gameServer implements OnModuleInit {
 						console.log("Score ", (roomCheck.score1 - roomCheck.score2));
 					});
 					this.server.to(`${roomCheck.firstClient.id}`).emit("winner", false);
-					let user = await this.gameService.chatService.getUserFromSocket(roomCheck.firstClient);
+					let user = await this.getUser(roomCheck.firstClient);
 					if (!user)
 						return;
 				}
@@ -303,7 +315,7 @@ export class gameServer implements OnModuleInit {
 						console.log("Score ", (roomCheck.score2 - roomCheck.score1));
 					});
 					this.server.to(`${roomCheck.secondClient.id}`).emit("winner", false);
-					let user = await this.gameService.chatService.getUserFromSocket(roomCheck.secondClient);
+					let user = await this.getUser(roomCheck.secondClient);
 					if (!user)
 						return;
 					await this.userService.setOnlineStatus(user.id);
@@ -345,7 +357,7 @@ export class gameServer implements OnModuleInit {
 	async waitingForRandomOponent(client: Socket) {
 		console.log("Player queuing");
 
-		let user = await this.gameService.chatService.getUserFromSocket(client);
+		let user = await this.getUser(client);
 		if (!user)
 			return;
 		let userStatus: string = await this.userService.getStatus(user.id);
