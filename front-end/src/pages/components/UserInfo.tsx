@@ -8,11 +8,8 @@ import { ProgressCercle }from "../../pages/components/ProgressCercle";
 
 export default function UserInfo() {
 
-
-
   const [isFriendAdded, setIsFriendAdded] = useState(false);
   const [isFriendPending, setIsFriendPending] = useState(false);
-  // const [isUserBlocked, setIsUserBlocked] = useState(false);
   const [imagePath, setImagePath] = useState('');
   const [userData, setUserData] = useState('');
   const navigate = useNavigate();
@@ -21,50 +18,38 @@ export default function UserInfo() {
 
 
   useEffect(() => {
-    console.log("isFriendAdded: ", isFriendAdded);
-    console.log("isFriendPending: ", isFriendPending);
-  }, [isFriendAdded, isFriendPending]);
-
-  useEffect(() => {
 
     const fetchUserData = () => {
       axios.get(`${process.env.REACT_URL}:1337/users/Public_data/${username}`,
         { withCredentials: true }
       ).then((response) => {
-        console.log("response: ", response);
-        setUserData(response.data);
-        const id = response.data['id'];
-        axios.get(`${process.env.REACT_URL}:1337/users/check_notification?receiverId=${id}`, {
-        withCredentials: true
-      }).then((res) => {
-        console.log("res in fetch data : ", res);
-        setIsFriendPending(res.data.isPending);
-        setIsFriendAdded(res.data.isFriend);
-      }).catch((err) => {
-        console.log("error while checking notification: ", err);
-      })
-      setImagePath(`${process.env.REACT_URL}:1337/users/${id}/avatar`);
-      }).catch(error => {
-        console.error('Error fetching user data:', error);
-        navigate("/not-found");
-      });
+          setUserData(response.data);
+          const id = response.data['id'];
+          axios.get(`${process.env.REACT_URL}:1337/users/check_notification?receiverId=${id}`, {
+            withCredentials: true
+          }).then((res) => {
+              setIsFriendPending(res.data.isPending);
+              setIsFriendAdded(res.data.isFriend);
+            }).catch(() => {})
+          setImagePath(`${process.env.REACT_URL}:1337/users/${id}/avatar`);
+        }).catch(()=> {
+          navigate("/not-found");
+        });
     };
 
     axios.get(`${process.env.REACT_URL}:1337/users/check_blocked?otherUserUsername=${username}`, {
-        withCredentials: true,
-      }).then((res) => {
-        console.log("res in check blocked: ", res);
+      withCredentials: true,
+    }).then((res) => {
         if (res.data.isBlocked) {
           navigate("/not-found");
           return;
         }
         fetchUserData();
-      }).catch((err) => {
-        console.log("error while checking blocked: ", err);
+      }).catch(() => {
         navigate("/not-found");
       });
 
-    }, [username, navigate]);
+  }, [username, navigate]);
 
 
   const alert = (title: string, text: string, icon: string) => {
@@ -94,13 +79,13 @@ export default function UserInfo() {
 
       }
     }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Unfriend successfully!", "", "success");
-      } else if (result.isDenied) {
-        Swal.fire("Good, be more social bro", "", "success");
-        setIsFriendAdded(true);
-      }
-    });
+        if (result.isConfirmed) {
+          Swal.fire("Unfriend successfully!", "", "success");
+        } else if (result.isDenied) {
+          Swal.fire("Good, be more social bro", "", "success");
+          setIsFriendAdded(true);
+        }
+      });
   }
 
 
@@ -116,11 +101,9 @@ export default function UserInfo() {
         { withCredentials: true }
       );
 
-      console.log("response in handle friend: ", response);
       setIsFriendPending(true);
       alert("Friend Added", "You have added the user to your friends list.", "success");
     } catch (error) {
-      console.error('Error adding friend:', error);
       alert("Error", "An error occurred while trying to add the user as a friend.", "error");
     }
   };
@@ -133,12 +116,10 @@ export default function UserInfo() {
         { id: userData['id'] },
         { withCredentials: true }
       );
-      console.log(response.data);
       setIsFriendAdded(false);
       setIsFriendPending(false);
       alert2();
     } catch (error) {
-      console.error('Error unfriending user:', error);
       alert("Error", "An error occurred while trying to unfriend the user.", "error");
     }
   };
@@ -150,13 +131,12 @@ export default function UserInfo() {
       await axios.post(
         `${process.env.REACT_URL}:1337/users/block`,
         { id: userData['id'] }, {
-        withCredentials: true
-      });
+          withCredentials: true
+        });
       alert("User blocked successfully", "", "question");
       //TODO - we can navigate the user to the network page that would be better
       navigate("/home");
     } catch (error) {
-      console.error('Error blocking user:', error);
     }
   };
   useEffect(() => {
@@ -175,9 +155,9 @@ export default function UserInfo() {
             <span className="w-8 h-8 rounded-full bg-green absolute bottom-0.5 right-0.5"></span>
           )}
         </div>
-       
+
       </div>
-    
+
       <div className="grid place-content-center ">
         <p className="text-white font-bold text-xl ml-10">{userData ? userData.username.toUpperCase() + (userData.username === user.data.username ? "(aka you)" : "") : "Undefined User"}</p>
 
@@ -200,11 +180,11 @@ export default function UserInfo() {
           </button>
         </div>}
       </div>
-        <div className="">
-          {<ProgressCercle userData={userData}/>}
-        </div>
-    
-    
+      <div className="">
+        {<ProgressCercle userData={userData}/>}
+      </div>
+
+
     </div>
   );
 }

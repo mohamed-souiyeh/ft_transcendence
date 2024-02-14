@@ -38,7 +38,7 @@ type msgType = typeof dummymsg;
 function Rooms(props: object) {
 
   const [val, setVal] = useState('')
-  const maxLength = 20;
+  const maxLength = 100;
   const { channel } = useChannelContext()
   const [msgs, setMsgs] = useState<msgType[]>([])
   const { user } = useContext(UserContext);
@@ -67,18 +67,11 @@ function Rooms(props: object) {
       convId: channel.id,
       convType: channel.type,
     }, (err, msgs) => {
-      if (err) {
-        console.log("error in getting messages: ", err);
-        console.log("exeption: ", user.chatException);
-        return;
-      }
-      // console.log("the res is: ", JSON.stringify(msgs, null, 2));
-      setMsgs(msgs);
-    });
-
-    // console.log("channel is: ", channel);
-    // console.log("user is: ", user);
-    // console.log("is banned :", channel.usersState.find((userState) => userState.userId === user.data.id).state);
+        if (err) {
+          return;
+        }
+        setMsgs(msgs);
+      });
 
     const state = channel.usersState.find((userState) => userState.userId === user.data.id)?.state;
 
@@ -86,7 +79,6 @@ function Rooms(props: object) {
     setIsMuted(state === 'muted');
 
     user.chat.on('broadcast', (msg) => {
-      // console.log("the msg is: ", msg);
       setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
@@ -133,18 +125,17 @@ function Rooms(props: object) {
             </div>
           </div>
 
-          <div className="h-[87%] overflow-scroll scrollbar-thin scrollbar-thumb-purple-sh-0 " ref={messagesEndRef}>
+          <div className="h-[87%] overflow-y-scroll scrollbar-thin scrollbar-thumb-purple-sh-0 " ref={messagesEndRef}>
             {(msgs.length ?
               msgs.map(
                 (msg) => {
                   let message = msg.message
 
                   if (msg.authorInfo.usersAuthorBlockedBy.find((blockedUser) => blockedUser.id === user.data.id))
-                    message = "you are blocked by this user";
+                  message = "you are blocked by this user";
                   if (isBaned)
-                    message = "you are banned from this channel";
+                  message = "you are banned from this channel";
 
-                  console.log("the message is: ", msgs);
 
                   return <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={message} key={msg.id} isBanned={(isBaned || isMuted)}
                     authorState={channel.usersState.find((userState) => userState.userId === msg.authorInfo.id)?.state}

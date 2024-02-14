@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import newComerPic from "../../assets/newcomer.png";
 import playerPic from "../../assets/player.png";
 import veteranPic from "../../assets/veteran.png";
@@ -21,11 +21,8 @@ export default function Achievements() {
       { withCredentials: true } )
       .then(res => {
         setAchievs(res.data.achievements)
-        console.log("eeee: ", res.data.achievements)
       })
-      .catch(()=>{
-        console.log("Error getting matches history!!")
-      })
+      .catch(()=>{})
   }, [])
 
   useEffect (() => { 
@@ -42,8 +39,8 @@ export default function Achievements() {
 
 
   return (
-    <div className="h-[100%] w-[350px] rounded-t-3xl overflow-hidden">
-      <div className="bg-purple-sh-2 h-[100%] w-[350px] rounded-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1">
+    <div className="h-[100%] w-[350px] rounded-t-3xl">
+      <div className="bg-purple-sh-2 h-[100%] w-[350px] rounded-3xl ">
         <div
           title="Played your first game ever"
           className="m-4 h-24 flex justify-start items-center border-b-2 border-purple/15"

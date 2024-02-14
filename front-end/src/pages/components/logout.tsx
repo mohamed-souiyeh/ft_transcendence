@@ -14,9 +14,8 @@ function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
     axios.get(`${process.env.REACT_URL}:1337/auth/logout`, {
       withCredentials: true
     })
-    .then((resp) => {
+      .then((resp) => {
         if (resp.status == 200){
-          // console.log("user successfully logged out")
           Cookies.remove('user')
           localStorage.removeItem('avatar');
           user.chat.disconnect();
@@ -24,9 +23,7 @@ function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
           nav("/login")
         }
       })
-    .catch( (err) => {
-        console.log("there's no where to run", err)
-      })
+      .catch(() => {})
   }
 
   if (!open) return null

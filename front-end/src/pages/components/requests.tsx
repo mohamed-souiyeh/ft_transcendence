@@ -11,33 +11,27 @@ function Requests(props) {
     axios.post(`${process.env.REACT_URL}:1337/notifications/friend-request/accept`, request, {
       withCredentials: true,
     }).then(() => {
-      console.log("friend request accepted");
-      unmount(networkTabs.REQUESTS);
-    }).catch((err) => {
-      console.log("error in accepting friend request", err);
-    });
+        unmount(networkTabs.REQUESTS);
+      })
+      .catch(() => {});
   };
 
   const declineRequest = () => {
     axios.post(`${process.env.REACT_URL}:1337/notifications/friend-request/refuse`, request, {
       withCredentials: true,
     }).then(() => {
-      console.log("friend request declined");
-      unmount(networkTabs.REQUESTS);
-    }).catch(() => {
-      console.log("error in accepting friend request")
-    });
+        unmount(networkTabs.REQUESTS);
+      })
+      .catch(() => {});
   };
 
   const blockUser = () => {
     axios.post(`${process.env.REACT_URL}:1337/notifications/friend-request/block`, request, {
       withCredentials: true,
     }).then(() => {
-      console.log("friend request blocked");
-      unmount(networkTabs.REQUESTS);
-    }).catch(() => {
-      console.log("error in accepting friend request")
-    });
+        unmount(networkTabs.REQUESTS);
+      })
+      .catch(() => {});
   };
 
   const [img, setImg] = useState('')
@@ -53,7 +47,6 @@ function Requests(props) {
         <p className='text-lg px-7' > {sender.username} </p>
       </div>
       <div className='flex flex-row-reverse  place-items-center basis-1/2' >
-        {/* bc we gon call those two icons tgther so much, i will make a component for it */}
         <div className="pt-1 cursor-pointer" onClick={blockUser}>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M0 11.9999C0 18.6167 5.38318 23.9999 11.9999 23.9999C18.6167 23.9999 23.9999 18.6167 23.9999 11.9999C23.9999 5.38318 18.6168 0 11.9999 0C5.38306 0 0 5.38318 0 11.9999ZM19.7522 11.9999C19.7522 16.2746 16.2746 19.7522 11.9999 19.7522C10.633 19.7522 9.34838 19.3953 8.23203 18.7717L18.7716 8.23203C19.3952 9.34838 19.7522 10.633 19.7522 11.9999ZM11.9999 4.24777C13.3669 4.24777 14.6515 4.60471 15.7679 5.2283L5.22841 15.768C4.60471 14.6516 4.24777 13.367 4.24777 11.9999C4.24777 7.72533 7.72533 4.24777 11.9999 4.24777Z" fill="#8176AF" />
