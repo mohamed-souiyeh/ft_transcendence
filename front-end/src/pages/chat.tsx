@@ -70,17 +70,13 @@ function Chat() {
   const [refreshDms, setRefreshDms] = useState(false);
 
   useEffect(() => {
-    console.log("user: ", user);
-    console.log("dms refreshed");
     axios.get(`${process.env.REACT_URL}:1337/conv/dms`,
       {
         withCredentials: true,
       }).then((res) => {
-        // console.log("this is the chat page response :", res);
         setDms(res.data.dms);
         setRefreshDms(false);
-      }).catch((err) => {
-        console.log("error in chat page: ", err);
+      }).catch(() => {
       });
 
     axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
@@ -90,8 +86,7 @@ function Chat() {
         setUser(prevUser => ({ ...prevUser, data: resp.data }))
         Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict', secure: true });
       })
-      .catch((err) => {
-        console.log("error while getting user data in chat refresh dms", err);
+      .catch(() => {
       })
 
   }, [refreshDms])
@@ -103,7 +98,6 @@ function Chat() {
         setChannel({})
       }
       setSelected(subpages.CHAT);
-      console.log("dm is: ", dm);
     }
   }, [dm])
 
@@ -114,7 +108,6 @@ function Chat() {
   const [refreshChannels, setRefreshChannels] = useState(false);
 
   useEffect(() => {
-    console.log("channels refreshed");
     axios.get(`${process.env.REACT_URL}:1337/conv/channels`,
       {
         withCredentials: true,
@@ -124,14 +117,12 @@ function Chat() {
         if (Object.keys(channel).length) {
           const current = res.data.channels.find((refreshedChannel) => refreshedChannel.id === channel.id);
 
-          console.log('current channel is: ', current);
           if (current)
             setChannel(current);
           else
             setChannel({});
         }
-      }).catch((err) => {
-        console.log("error in chat page: ", err);
+      }).catch(() => {
       });
 
     axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
@@ -141,8 +132,7 @@ function Chat() {
         setUser(prevUser => ({ ...prevUser, data: resp.data }))
         Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' ,  secure: true });
       })
-      .catch((err) => {
-        console.log("error while getting user data in chat refresh channels", err);
+      .catch(() => {
       })
   }, [refreshChannels]);
 

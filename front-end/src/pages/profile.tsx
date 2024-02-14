@@ -38,7 +38,7 @@ function Profile() {
     e.preventDefault()
 
     if (name.length)
-      formdata.set("username", name);
+    formdata.set("username", name);
 
     axios.post(`${process.env.REACT_URL}:1337/users/update/username`, formdata, {
       withCredentials: true
@@ -55,9 +55,7 @@ function Profile() {
               Cookies.remove('user')
               Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' , secure: true });
             })
-            .catch((err) => {
-              console.log("My sad potato we have an error in updating user cookie in profile smh:", err);
-            })
+            .catch(() => {})
         }
       })
       .catch(() => {
@@ -72,11 +70,8 @@ function Profile() {
       .then(res => {
         setHistoty(res.data.allMatches)
         setAchievs(res.data.achievements)
-        console.log("eeee: ", res.data.achievements)
       })
-      .catch(() => {
-        console.log("Error getting matches history!!")
-      })
+      .catch(() => {})
   }, [])
 
   useEffect( () => {
@@ -88,9 +83,7 @@ function Profile() {
         Cookies.remove('user')
         Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' ,  secure: true });
       })
-      .catch((err)=> {
-        console.log("My sad potato we have an error in updating user cookie in profile smh:", err);
-      })
+      .catch(()=> {})
   },[])
 
   useEffect (() => { 
@@ -151,15 +144,11 @@ function Profile() {
                 reader.readAsDataURL(image);
 
               })
-              .catch((err)=> {
-                console.log("My sad potato we have an error:profile file", err);
-              })
+              .catch(()=> {})
           }
         })
-        .catch((e)=>{
-          console.log("My sad potato we have an error in profile file:", e);
+        .catch(()=>{
           setBadFile(true)
-          // setErrMsg(e.response.data.message)
         });
     }
 

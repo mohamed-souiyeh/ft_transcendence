@@ -15,10 +15,6 @@ function Bubble(props) {
   const { isBanned } = props;
   let isAdmin = false;
 
-  // console.log("userInfo: ", props.authorInfo);
-  // console.log("userState: ", props.authorState);
-
-
   if (Object.keys(channel).length) {
     isAdmin = (channel.usersState.find(fuser => fuser.userId === user.data.id)?.role === "modirator" || channel.usersState.find(fuser => fuser.userId === user.data.id)?.role === "owner") && !isBanned;
 
@@ -92,7 +88,6 @@ function Bubble(props) {
       //that is the only line we have to change, read docs
       duration == 1 ? now.setMinutes(now.getMinutes() + 1) : (duration == 2 ? now.setMinutes(now.getMinutes() + 10) : now.setFullYear(now.getFullYear() + 1000000))
 
-      console.log("aaaaaaaaaa: ", now.toISOString())
       user.chat.emit('muteUser', {
         convType: channel.type,
         convId: channel.id,
@@ -109,11 +104,11 @@ function Bubble(props) {
         convId: channel.id,
         targetedUserId: props.authorInfo.id,
       });
-    } console.log("unmuted");
+    } 
   }
 
-    const [openMenu, setOpenMenu] = useState(false);
-    const [openMute, setOpenMute] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
+  const [openMute, setOpenMute] = useState(false);
 
 
   return (
@@ -161,30 +156,30 @@ function Bubble(props) {
                       )}
                     {
                       (isAdmin && props.authorState !== "banned") &&
-                      (props.authorState === "muted" ?
-                        <MenuItem onClick={() => { unmute() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">unmute user</MenuItem>
-                        : 
+                        (props.authorState === "muted" ?
+                          <MenuItem onClick={() => { unmute() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">unmute user</MenuItem>
+                          : 
 
-                        <Menu placement="right-start" open={openMute} handler={setOpenMute} allowHover offset={15} >
-                          <MenuHandler className="flex items-center justify-between text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">
-                            <MenuItem >
-                              Mute for
-                              <svg xmlns="http://www.w3.org/2000/svg" width="8" height="14" viewBox="0 0 8 14" fill="none">
-                                <path d="M7.99951 7.00098L0.499512 13.9292V0.0727734L7.99951 7.00098Z" fill="#796FA4"/>
-                              </svg>
-                            </MenuItem>
-                          </MenuHandler >
-                          <MenuList className="bg-purple-sh-2 border border-purple">
-                            <MenuItem onClick={() => {mute(1)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">1 Minute</MenuItem>
-                            <MenuItem onClick={() => {mute(2)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">10 Minute</MenuItem>
-                            <MenuItem onClick={() => {mute(3)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Forever</MenuItem>
-                          </MenuList>
-                        </Menu>
+                          <Menu placement="right-start" open={openMute} handler={setOpenMute} allowHover offset={15} >
+                            <MenuHandler className="flex items-center justify-between text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">
+                              <MenuItem >
+                                Mute for
+                                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="14" viewBox="0 0 8 14" fill="none">
+                                  <path d="M7.99951 7.00098L0.499512 13.9292V0.0727734L7.99951 7.00098Z" fill="#796FA4"/>
+                                </svg>
+                              </MenuItem>
+                            </MenuHandler >
+                            <MenuList className="bg-purple-sh-2 border border-purple">
+                              <MenuItem onClick={() => {mute(1)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">1 Minute</MenuItem>
+                              <MenuItem onClick={() => {mute(2)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">10 Minute</MenuItem>
+                              <MenuItem onClick={() => {mute(3)}} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Forever</MenuItem>
+                            </MenuList>
+                          </Menu>
 
 
                         )}
 
-                          {/* <MenuItem onClick={() => { mute() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Mute for 10 mins</MenuItem> */}
+                    {/* <MenuItem onClick={() => { mute() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Mute for 10 mins</MenuItem> */}
 
 
                     {isAdmin && <MenuItem onClick={() => { kickUser() }} className="text-purple-tone-2 hover:bg-purple-sh-0 hover:text-purple-tone-2">Kick user</MenuItem>}
@@ -195,7 +190,7 @@ function Bubble(props) {
                   props.authorInfo?.role === "kicked" ?
                     `kicked user (${props.username})`
                     :
-                  props.username} </p>
+                    props.username} </p>
               }
             </div>
             <div className='flex bg-purple rounded-b-xl rounded-tr-xl p-2 m-3 mt-0 break-words shadow-xl'>

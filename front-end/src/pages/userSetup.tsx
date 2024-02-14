@@ -15,12 +15,10 @@ function Setup()
   //NOTE - from here start the code comunicationg with the back_end
   let inputRef = useRef(null);
   let [srcImg, setProfilePic] = useState<File | null>(null);
-  // SetStateAction<string>
   let [userName, setName] = useState("");
   let formdata = new FormData();
-  let [userNameMessage, setUsername] = useState("This nickname is already taken, like your crush");
+  // let [userNameMessage, setUsername] = useState("This nickname is already taken, like your crush");
   let [errMsg, setErrMsg] = useState("");
-  // let [badUserName, setBadUserName] = useState(false)
   const navigate = useNavigate();
 
   const click = () =>
@@ -43,20 +41,16 @@ function Setup()
       setErrMsg("File Too large, we're not Nasa plz choose a smaller file")
     }
     else
-      setProfilePic(event.target.files[0]);
+    setProfilePic(event.target.files[0]);
   };
 
 
   const changeBoth = () =>
 {
-    // console.log("username is :", `|${userName}|`);
-    console.log("image is :", srcImg);
-
-
     if (userName.length)
-      formdata.set("username", userName);
+    formdata.set("username", userName);
     if (srcImg)
-      formdata.set("avatar", srcImg);
+    formdata.set("avatar", srcImg);
 
     axios.
       post(`${process.env.REACT_URL}:1337/users/update`, formdata,
@@ -64,13 +58,8 @@ function Setup()
           withCredentials: true
         })
       .then( (res)=> {
-        // console.log("type of res :", typeof res );
-        // console.log("response from the back-end after update in user setup :", res);
-        setUsername("");
+        // setUsername("");
         if (res.status == 200) {
-          // navigate("/home");
-          // ----------------------
-
           axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
             withCredentials: true
           })
@@ -78,50 +67,41 @@ function Setup()
               setUser(prevUser => ({ ...prevUser, data: resp.data }))
               Cookies.remove('user')
               Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' , secure: true });
-              //re-set avatar.
-
               localStorage.removeItem('avatar')
               setAvatarFunction(user.data.id)
             })
-            .catch((err)=> {
-              console.log("My sad potato we have an error:", err);
-            })
+            .catch(()=> {})
 
-          // ----------------------
           navigate("/home")
         }
       })
       .catch((e)=>{
-        console.log("My sad potato we have an error:", e);
-        // console.log(e.response.data.message);
         setErrMsg(e.response.data.message)
-        setUsername(e.response);
+        // setUsername(e.response);
       });
 
 
-  const setAvatarFunction = (id : string) => { 
-    axios.get(`${process.env.REACT_URL}:1337/users/${id}/avatar`,
-      {
-        withCredentials: true,
-        responseType: 'arraybuffer'
-      })
-      .then((response) => {
-        if (response.status == 200) {
-          let image = btoa(
-            new Uint8Array(response.data)
-              .reduce((data, byte) => data + String.fromCharCode(byte), '')
-          );
+    const setAvatarFunction = (id : string) => { 
+      axios.get(`${process.env.REACT_URL}:1337/users/${id}/avatar`,
+        {
+          withCredentials: true,
+          responseType: 'arraybuffer'
+        })
+        .then((response) => {
+          if (response.status == 200) {
+            let image = btoa(
+              new Uint8Array(response.data)
+                .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
 
-          const base64Image =`data:${response.headers['content-type'].toLowerCase()};base64,${image}` 
+            const base64Image =`data:${response.headers['content-type'].toLowerCase()};base64,${image}` 
 
-          setAvatar(base64Image)
-          localStorage.setItem('avatar', base64Image);
-        }
-      }).catch((err) => {
-        console.log("an error occured in Loading.tsx while trying to get the avatar ", err)
-      });
-  }
-    // setBadUserName(true);
+            setAvatar(base64Image)
+            localStorage.setItem('avatar', base64Image);
+          }
+        })
+        .catch(() => {});
+    }
   }
 
   if (!Object.keys(user.data).length || user.data.isProfileSetup)

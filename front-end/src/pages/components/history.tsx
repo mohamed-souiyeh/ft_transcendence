@@ -9,7 +9,6 @@ function History(obj) {
   useEffect(() => {
     setLoserImg(`${process.env.REACT_URL}:1337/users/${obj.data.loser.id}/avatar`);
     setWinnerImg(`${process.env.REACT_URL}:1337/users/${obj.data.winner.id}/avatar`);
-    console.log("what the actual fuck");
   }, [])
 
 

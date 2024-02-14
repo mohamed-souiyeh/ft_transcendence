@@ -38,11 +38,9 @@ function Home() {
       withCredentials: true
     })
       .then((resp) => {
-        console.log("leaderboard:", resp.data)
         setTopPlayers(resp.data)
       })
       .catch(()=> {
-        console.log("OOOooopsss!")
       })
   },[])
 

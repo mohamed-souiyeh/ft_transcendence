@@ -10,11 +10,7 @@ function Contacts(props) {
   const { user, dmInfo } = props;
   const [img, setImg] = useState('')
 
-
-  // console.log("this is the user in contacts :", user);
-
   //NOTE - we need to add the status of the user from the back-end
-
   const clicked = () => {
     // if (dm.id === dmInfo.id) return;
     setDm({
@@ -22,11 +18,6 @@ function Contacts(props) {
       username: user.username,
       userId: user.id,
     })
-    console.log("User id ", user.id);
-    // console.log("user => ", user);
-    // console.log("clicked on the contact");
-    // console.log("the user is: ", user);
-    // console.log("the dm is: ", dm);
   }
 
   useEffect(() => {

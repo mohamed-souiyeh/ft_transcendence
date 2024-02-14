@@ -30,7 +30,7 @@ function Messages(props: any) {
     isBlockedRef.current = isBlocked;
   }, [isBlocked]);
 
-  const maxLength = 42;
+  const maxLength = 100;
 
   const { user } = useContext(UserContext);
   const { setRefreshDms } = props;
@@ -46,17 +46,13 @@ function Messages(props: any) {
 
   // useEffect(() => {
   //   const setIntervalId: NodeJS.Timeout = setInterval(() => {
-  //     // console.log("dm is: ", dm);
   //     user.chat.timeout(1000).emit('checkDmpls', {
   //       convId: dm.id,
   //       convType: dm.type,
   //     }, (err, res) => {
   //       if (err) {
-  //         console.log("error in checking if the user is blocked: ", err)
-  //         // console.log("the res is: ", res);
   //         return;
   //       }
-  //       // console.log("isBlocked is: ", res);
   //       if (res.isBlocked !== isBlockedRef.current)
   //         setIsBlocked(res.isBlocked);
   //     });
@@ -74,27 +70,21 @@ function Messages(props: any) {
     user.chat.timeout(1000).emit('checkDmpls', {
       convId: dm.id,
       convType: dm.type,
-    }, (err, res) => {
-      if (err) return console.log("error in checking if the user is blocked: ", err);
-      console.log("isBlocked is: ", res);
-      setIsBlocked(res.isBlocked);
-      if (res.isBlocked === false) {
-        //NOTE - fetch the messages of the dm using the dm.id and dm.type from the chatGatway
-        user.chat.timeout(5000).emit('getAllMessages', {
-          convId: dm.id,
-          convType: dm.type,
-        }, (err, messages) => {
-          if (err) return console.log("error in getting all messages: ", err);
-          console.log("messages are: ", messages);
-          setMsgs(messages);
-        })
-      }
-    })
+    }, (res) => {
+        setIsBlocked(res.isBlocked);
+        if (res.isBlocked === false) {
+          //NOTE - fetch the messages of the dm using the dm.id and dm.type from the chatGatway
+          user.chat.timeout(5000).emit('getAllMessages', {
+            convId: dm.id,
+            convType: dm.type,
+          }, (messages) => {
+              setMsgs(messages);
+            })
+        }
+      })
 
-    // console.log("user: ", user);
 
     user.chat.on('broadcast', (msg) => {
-      console.log("msg is: ", msg);
       setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
@@ -102,7 +92,6 @@ function Messages(props: any) {
       setRefreshDms(true);
     });
 
-    console.log("dm is: ", dm);
     setImg(`${process.env.REACT_URL}:1337/users/${dm.userId}/avatar`);
     return () => {
       user.chat.off('broadcast');
@@ -123,7 +112,6 @@ function Messages(props: any) {
           convId: dm.id,
         });
       }
-      // console.log("user.chat is: ", user.chat);
       setVal('');
     }
   }

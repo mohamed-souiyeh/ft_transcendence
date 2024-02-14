@@ -363,8 +363,7 @@ function App() {
                         <Route path="/not-found" element={<NotFoundPage />} />
                         {/* <Route path="/:username" element={<UserProfile />} /> */}
                         <Route path="/groups" element={<ManageGoups/>} />
-                        <Route path="/search" element={<Search/>} />
-                        {/* <Route path="/not-found" element={<NotFoundPage />} /> */}
+                        {/* <Route path="/lost" element={< NotFoundPage/>} /> */}
                         <Route path="/game" 
                         element={
                           <SocketContext.Provider value={game_socket}>

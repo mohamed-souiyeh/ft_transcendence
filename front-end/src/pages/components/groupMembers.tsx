@@ -49,11 +49,6 @@ function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refres
 
   let { channel } = useChannelContext();
 
-
-  useEffect(() => {
-    console.log("data: ", data);
-  }, [data])
-
   useEffect(() => {
     if (refreshMembers && !isChannel) {
       setData(prevData => prevData.map((friend) => ({ ...friend, added: false })));
@@ -62,14 +57,11 @@ function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refres
   }, [refreshMembers]);
 
   useEffect(() => {
-    console.log("useEffect data: ", data);
     setData([]);
     axios.get(`${process.env.REACT_URL}:1337/users/friends`,
       {
         withCredentials: true,
       }).then((res) => {
-        // console.log("this is the friends response :", res);
-        console.log("friends: ", res.data.friends);
         let friends: {
           id: number,
           username: string,
@@ -82,9 +74,8 @@ function GroupMembers({ createdGroup, setCreatedGroup, isChannel = false, refres
           friends = friends.filter((friend) => tmp_channel.users.find((user) => user.id === friend.id) === undefined);
         }
         setData(friends);
-      }).catch((err) => {
-        console.log("error in friends page: ", err);
-      });
+      })
+      .catch(() => {});
   }, [])
 
 
