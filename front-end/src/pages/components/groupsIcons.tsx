@@ -14,11 +14,6 @@ function GroupsIcons(props: object) {
   const isOwner = channel.usersState.find((userState: any) => userState.userId === user.data.id)?.role === 'owner'; 
   const isAdmin = channel.usersState.find((userState: any) => userState.userId === user.data.id)?.role === 'modirator';
 
-  // console.log("isOwner: ", isOwner);
-  // console.log("isAdmin: ", isAdmin);
-  // console.log("user: ", user);
-  // console.log("channel: ", channel);
-
   const leaveGroup = () => {
     if (user.chat) {
       user.chat.emit('leaveChannel', {
@@ -26,18 +21,15 @@ function GroupsIcons(props: object) {
         convType: channel.type,
       });
       refreshChannels(true);
-      console.log("I'm outta here")
     }
   }
 
   const addMembers = () => {
-    console.log("Add Members, iwa this one needs a page or popup as well")
     setAddFriendsPopup(true)
   }
 
   const passwordSettings = () => {
     setPwdPopup(true)
-    console.log('add, remove or edit Password')
   }
 
   return (

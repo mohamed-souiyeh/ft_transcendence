@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 function Ranked(player: Object) {
   const [img, setImagePath] = useState('')
   useEffect(() => {
-    // console.log("player: ", player);
     setImagePath(`${process.env.REACT_URL}:1337/users/${player.id}/avatar`);
   }, [])
   return (

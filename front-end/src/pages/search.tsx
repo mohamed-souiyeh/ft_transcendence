@@ -2,7 +2,6 @@ import { useState, useContext } from "react";
 import Navbar from "./components/navbar";
 import SearchResaults from "./components/searchResaults";
 import SideBar from "./components/sidebar";
-import { UserContext } from "../App";
 import axios from "axios";
 
 
@@ -28,12 +27,9 @@ function Search() {
         withCredentials: true,
       }
     ).then((res) => {
-      console.log("the search results :", res.data);
-      setSearchResaults(res.data);
-    })
-      .catch((err) => {
-        console.log("there is an error in serch: ", err);
+        setSearchResaults(res.data);
       })
+      .catch(() => {})
 
   }
 

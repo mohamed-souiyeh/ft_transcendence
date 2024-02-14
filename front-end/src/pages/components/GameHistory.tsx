@@ -14,11 +14,8 @@ export default function GameHistory() {
       })
       .then((res) => {
         setHistoty(res.data.allMatches);
-        console.log("eeee: ", res.data.achievements);
       })
-      .catch(() => {
-        console.log("Error getting matches history!!");
-      });
+      .catch(() => {});
   }, []);
   return (
     <>

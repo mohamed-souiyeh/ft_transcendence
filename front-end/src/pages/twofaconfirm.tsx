@@ -25,12 +25,10 @@ function TwoFAConfirmation () {
     })
       .then((res) => {
         if (res.status == 200){
-          // console.log("success")
           nav("/loading")
         }
       })
       .catch((err) => {
-        // console.log("errororor; ", err)
         if (err.status != 401){
           setErrMsg("Error! Wrong code.")
         }
@@ -56,7 +54,7 @@ function TwoFAConfirmation () {
 
         <form onSubmit={verifyCode} className='grid place-content-center pt-8'>
           <input type='text' name="verfCode" placeholder="Enter 6 digits code" className='w-[440px] h-12 bg-purple-sh-2 outline-none rounded-lg text-impure-white px-2 place-self-center' />
-          
+
           <div className="text-[#D9534F] font-bold font-mono pl-4" >
             {errMsg}
           </div>

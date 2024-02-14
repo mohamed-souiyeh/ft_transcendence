@@ -2,29 +2,22 @@ import { useContext, useEffect, useState } from "react";
 import { useProtectedRoomContext } from "../../contexts/ProtectedRoomContext"
 import { UserContext } from "../../App";
 import axios from "axios";
-import Channels from "./channels";
 import Cookies from 'js-cookie';
 
 
 
 function Groups(props: any) {
-
-
-
-  const { user, setUser } = useContext(UserContext) // global variable
+  const { user, setUser } = useContext(UserContext)
   const { refreshGroups } = props;
   const [incorrectPassword, setIncorrectPassword] = useState("");
 
   useEffect(() => {
-    console.log("hiiiiiiiii", props)
-    console.log("user is here", user);
     setIncorrectPassword("");
   }, []);
 
   const { protectedRoom, setProtectedRoom } = useProtectedRoomContext()
 
   // useEffect(() => {
-  //   console.log("protectedRoom is here", protectedRoom);
   //   if (protectedRoom.state === true && protectedRoom.password !== undefined) {
   //     joinGroup();
   //   }
@@ -33,7 +26,6 @@ function Groups(props: any) {
 
 
   const joinGroup = () => {
-    console.log("password: ", protectedRoom.password);
     axios.post(
       `${process.env.REACT_URL}:1337/conv/join`,
       {
@@ -44,40 +36,31 @@ function Groups(props: any) {
       {
         withCredentials: true,
       }
-    ).then((response) => {
-      console.log("joined channel")
-      console.log("response", response);
-      console.log("----------------");
-
-      setProtectedRoom({
-        state: false,
-        password: undefined,
-      })
-      setIncorrectPassword("");
-      axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
-        withCredentials: true
-      })
-        .then((resp) => {
-          console.log("refreshed the user data: ", resp);
-          setUser(prevUser => ({ ...prevUser, data: resp.data }))
-          Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'  });
-          refreshGroups(true);
+    ).then(() => {
+        setProtectedRoom({
+          state: false,
+          password: undefined,
         })
-        .catch((err) => {
-          console.log("error while getting user data in groops", err);
+        setIncorrectPassword("");
+        axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
+          withCredentials: true
         })
-    }).catch((error) => {
-      console.log("error while joining a group", error);
-      setIncorrectPassword(error.response.data.message);
-      setProtectedRoom({
-        state: false,
-        password: undefined,
+          .then((resp) => {
+            setUser(prevUser => ({ ...prevUser, data: resp.data }))
+            Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict', secure: true });
+            refreshGroups(true);
+          })
+          .catch(() => {})
+      })
+      .catch((error) => {
+        setIncorrectPassword(error.response.data.message);
+        setProtectedRoom({
+          state: false,
+          password: undefined,
+        });
       });
-    });
 
     // Handle success, update UI or state if needed
-    console.log("Joined channel successfully");
-    //  console.log("propos",props);
   }
 
   const leaveGroup = () => {
@@ -89,7 +72,7 @@ function Groups(props: any) {
       },
       {
         withCredentials: true,
-      }).then((response) => {
+      }).then(() => {
         axios.get(`${process.env.REACT_URL}:1337/users/allforhome`, {
           withCredentials: true
         })
@@ -98,14 +81,9 @@ function Groups(props: any) {
             Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   });
             refreshGroups(true);
           })
-          .catch((err) => {
-            console.log("error while getting user data in groops", err);
-          })
-      }).catch((error) => {
-        console.log("error while leaving a group", error)
-      });
+          .catch(() => {})
+      }).catch(() => {});
 
-    console.log("Leaved channel successfully")
   }
 
   const setPassword = () => {

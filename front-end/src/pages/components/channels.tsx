@@ -1,6 +1,4 @@
-import { useEffect } from "react"
 import { useChannelContext } from "../../contexts/channelContext"
-import { SocketContext } from "../../clientSocket"
 import GroupsIcons from "./groupsIcons"
 
 const mokChannel = {
@@ -65,22 +63,15 @@ const mokChannel = {
 type channelType = typeof mokChannel;
 
 function Channels(props: object) {
-
-
   const { channel, setChannel } = useChannelContext()
   const currentChannel: channelType = props.currentChannel;
-
   const { setRefreshChannels } = props;
 
 
   // useEffect(() => {
-  //   console.log("channel is: ", channel)
   // }, [channel]);
 
   const clicked = () => {
-    console.log("channel clicked");
-    console.log("currentChannel is: ", currentChannel);
-    // console.log("contact is: ", contact)
     setChannel(currentChannel)
   }
 

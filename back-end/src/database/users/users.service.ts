@@ -22,6 +22,19 @@ export class UsersService {
     "HMMD",
     "Barbarousa",
     "barbarousa",
+    "setup",
+    "profile",
+    "search",
+    "not-found",
+    "groups",
+    "game",
+    "loading",
+    "login",
+    "2fa",
+    "bot",
+    "chat",
+    "home",
+
   ];
 
   //SECTION - CREATE OPERATIONS

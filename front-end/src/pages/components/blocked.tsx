@@ -4,9 +4,6 @@ import { useEffect, useState } from 'react';
 
 function Blocked(props) {
   const { blocked, unmount } = props;
-
-  console.log("blocked is: ", blocked);
-
   const [img, setImg] = useState('')
 
   useEffect(() => {
@@ -16,12 +13,11 @@ function Blocked(props) {
   const UnblockUser = () => {
     axios.post(`${process.env.REACT_URL}:1337/users/unblock`, blocked, {
       withCredentials: true,
-    }).then(() => {
-      console.log("user unblocked");
-      unmount(networkTabs.BLOCKED);
-    }).catch(() => {
-      console.log("error in unblocking user")
-    });
+    })
+      .then(() => {
+        unmount(networkTabs.BLOCKED);
+      })
+      .catch(() => {});
   };
 
   return (
@@ -32,7 +28,6 @@ function Blocked(props) {
         <p className='text-lg px-7' > {blocked.status} </p>
       </div>
       <div className='flex flex-row-reverse  place-items-center basis-1/2' >
-
         <button className="rounded-lg bg-purple-sh-0 focus:outline-none border-none hover:bg-purple text-sm" onClick={UnblockUser}>Unblock</button>
       </div>
     </div>

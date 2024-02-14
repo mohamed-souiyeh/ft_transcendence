@@ -22,13 +22,10 @@ function AddFriendsPopup() {
   const { user } = useContext(UserContext);
 
   useEffect(() => {
-    console.log("createdGroup: ", createdGroup);
   }, [createdGroup])
 
   const handleSubmit = (e : React.FormEvent) => {
     e.preventDefault()
-    // console.log("Functionality isn't added yet !! i am just closing the popup as if we implemented submition action..")
-    //-------------Functionality needed here ...
     if (user.chat) {
       for (const member of createdGroup.members) {
         user.chat.emit('addUser', {
@@ -38,7 +35,6 @@ function AddFriendsPopup() {
         });
       }
     }
-    //------------------------------------------
     setAddFriendsPopup(false)
   }
 

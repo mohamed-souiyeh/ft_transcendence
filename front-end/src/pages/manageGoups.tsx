@@ -15,7 +15,10 @@ function ManageGoups() {
     badPwd: false,
     badPrv: false,
     badMembers: false,
+    badChars: false,
   })
+  const maxLength = 100;
+  const nameMaxLength = 25;
   const { protectedRoom } = useProtectedRoomContext()
   const [val, setVal] = useState("")
   const [state, setState] = useState(false)
@@ -31,16 +34,13 @@ function ManageGoups() {
   const [refreshMembers, setRefreshMembers] = useState(false);
 
 
-  useEffect(() => {
-    console.log("manage groups page is mounted");
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCreatedGroup((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+
+      setCreatedGroup((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
   };
 
   useEffect(() => {
@@ -60,7 +60,7 @@ function ManageGoups() {
 
   const [groupData, setGroupData] = useState([]);
   const [refreshGroups, setRefreshGroups] = useState(false);
-  const { user, setUser } = useContext(UserContext)
+  const { setUser } = useContext(UserContext)
   useEffect(() => {
     if (!val) return setGroupData([]);
 
@@ -70,10 +70,8 @@ function ManageGoups() {
     })
       .then(response => {
         setGroupData(response.data);
-        console.log("response from channel is here :D", response.data)
       })
       .catch(error => {
-        console.error('There was an error!', error);
       });
       setRefreshGroups(false);
 
@@ -90,11 +88,8 @@ function ManageGoups() {
     })
       .then(response => {
         setGroupData(response.data);
-        console.log("response from channel is here :D", response.data)
       })
-      .catch(error => {
-        console.error('There was an error!', error);
-      });
+      .catch(()=> {});
   }
 
 
@@ -104,9 +99,7 @@ function ManageGoups() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // console.log("submitting some data..")
-    // console.log("_name:",createdGroup.name,'privacy:', createdGroup.privacy,'desc:', createdGroup.description)
-    // console.log("pwd:",createdGroup.password, 'conf pwd:', confirmationPwd, 'members:', createdGroup.members)
+    const regex: RegExp = /[a-zA-Z0-9_]*$/;
     if (!Object.keys(createdGroup.members).length) {
       setBadInput({ ...badInput, badMembers: true })
       return;
@@ -119,11 +112,15 @@ function ManageGoups() {
       setBadInput({ ...badInput, badPrv: true })
       return;
     }
-    if (!createdGroup.name) {
+    if (!createdGroup.name || !regex.test(createdGroup.name)) {
       setBadInput({ ...badInput, badName: true })
       return;
     }
-    // console.log("this is what should be sent:", createdGroup);
+
+    if (!regex.test(createdGroup.description) && createdGroup.description.length){
+      setBadInput({ ...badInput, badChars: true })
+      return;
+    }
     axios.post(`${process.env.REACT_URL}:1337/conv/createChannel`, {
       channelName: createdGroup.name,
       channelDescription: createdGroup.description,
@@ -133,7 +130,7 @@ function ManageGoups() {
     }, {
       withCredentials: true,
     })
-      .then(response => {
+      .then(()=> {
         setCreatedGroup({
           name: "",
           privacy: "",
@@ -145,20 +142,15 @@ function ManageGoups() {
           withCredentials: true
         })
           .then((resp) => {
-            console.log("refreshed the user data: ", resp);
             setUser(prevUser => ({ ...prevUser, data: resp.data }))
             Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   });
             setRefreshGroups(true)
           })
-          .catch((err) => {
-            console.log("error while getting user data in groops", err);
+          .catch(() => {
           })
         setRefreshMembers(true)
-        console.log("response from creat channel is here: ", response.data)
       })
-      .catch(error => {
-        console.error('There was an error!: ', error);
-      });
+      .catch(()=> {});
   }
 
 
@@ -198,7 +190,7 @@ function ManageGoups() {
 
               <div className="flex-col h-full p-4 basis-1/2 " >
                 <p className="text-2xl" > Group Name: </p>
-                <input type="text" name="name" value={createdGroup.name} onChange={handleInputChange} placeholder="group name" className="bg-purple-sh-0 rounded-lg w-72 placeholder:text-impure-white/30 focus:outline-none p-2" />
+                <input type="text" maxLength={nameMaxLength} name="name" value={createdGroup.name} onChange={handleInputChange} placeholder="group name" className="bg-purple-sh-0 rounded-lg w-72 placeholder:text-impure-white/30 focus:outline-none p-2" />
                 {badInput.badName && <p className="text-[#D9534F] font-bold text-sm" > Please Enter a valid name</p>}
 
                 <p className="text-2xl pt-3" > privacy: </p>
@@ -213,6 +205,7 @@ function ManageGoups() {
                   </div>
                 </div>
                 {badInput.badPrv && <p className="text-[#D9534F] font-bold text-sm" > Please choose privacy </p>}
+
                 {state &&
                   <div ref={menuRef} className="border border-purple  shadow-xl shadow-purple-sh-2 bg-purple-sh-0 rounded-lg mt-1 absolute w-72">
                     <div onClick={() => { setPrivacy("public") }} className="hover:bg-purple-sh-1 hover:cursor-pointer rounded-lg p-2">
@@ -237,10 +230,11 @@ function ManageGoups() {
                   </div>
                 }
                 <p className="text-2xl pt-3" > description: </p>
-                <textarea name="description" value={createdGroup.description} onChange={handleInputChange} className="bg-purple-sh-0 rounded-lg  focus:outline-none p-2" cols={35} rows={4} />
+                <textarea name="description" maxLength={maxLength} value={createdGroup.description} onChange={handleInputChange} className="bg-purple-sh-0 rounded-lg  focus:outline-none p-2" cols={35} rows={4} />
                 <div className="flex w-full place-content-center pt-3">
                   <button type="submit" className="bg-purple-sh-1 hover:bg-purple-sh-0 rounded-lg object-center w-[60%]"> Create Group </button>
                 </div>
+                {badInput.badChars && <p className="text-[#D9534F] pl-1 font-bold text-sm" > Only characters are allowed in name and description </p>}
 
               </div>
               <div className="flex-col h-full p-4 basis-1/2 " >

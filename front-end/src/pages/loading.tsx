@@ -54,9 +54,7 @@ function Loading() {
             setAvatar(base64Image)
             localStorage.setItem('avatar', base64Image);
           }
-        }).catch((err) => {
-          console.log("an error occured in Loading.tsx while trying to get the avatar ", err)
-        });
+        }).catch(() => {});
     }
   }, []);
 

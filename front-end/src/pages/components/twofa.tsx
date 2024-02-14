@@ -13,12 +13,7 @@ function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue
 
 
   useEffect(() => {
-    // <<<<<<< HEAD
-    //     // if (!codeFetched) {
-    //     axios.get("`${process.env.REACT_URL}:1337/2fa/generate",
-    // =======
     axios.get(`${process.env.REACT_URL}:1337/2fa/generate`,
-      // >>>>>>> master
       {
         withCredentials: true,
         responseType: 'arraybuffer'
@@ -34,20 +29,16 @@ function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue
           setCode(`data:${response.headers['content-type'].toLowerCase()};base64,${image}`);
           setStatus(true);
         }
-      }).catch((err) => {
-        // console.log("an error occured: ", err)
-      });
-    // setStatus(true);
+      })
+      .catch(() => {});
   }, []);
 
   const handleDisable = () => {
-    // console.log("send request here");
     axios.get(`${process.env.REACT_URL}:1337/2fa/deactivate`, {
       withCredentials: true
     })
       .then((resp) => {
         if (resp.status == 200) {
-          // console.log("2fa is off")
 
           setSwitchValue(!switchValue);
           setPrompt(!prompt)
@@ -56,13 +47,12 @@ function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue
           Cookies.set('user', JSON.stringify(user.data), { sameSite: 'lax'   });
         }
       })
-      .catch((err) => {
-        // console.log("dang an error: ", err)
-      })
+      .catch(() => {})
   }
 
   const handleClose = () => {
-    setSwitchValue(!switchValue)
+    // setSwitchValue(!switchValue)
+    setSwitchValue(user.data.TFAisEnabled)
     setPrompt(!prompt)
   }
 
@@ -79,31 +69,26 @@ function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue
     })
       .then((res) => {
         if (res.status === 200) {
-          // console.log('the code is correct')
           setEnable(true)
           user.data.TFAisEnabled = true;
-          // console.log(user)
-          // console.log(JSON.stringify(user.data))
-
           Cookies.remove('user')
           Cookies.set('user', JSON.stringify(user.data), { sameSite: 'lax'  });
         }
         else {
-          // console.log('code is rong', res.status)
           setConfirmed(false)
         }
       })
-      .catch((e) => {
-        // console.log('an Error occured!!', e.response.data.message);
+      .catch(() => {
         setConfirmed(false)
       })
-    // console.log('Code inserted by user is:', Code);
   }
+
+  
 
   return (
     <>
-      <div className='h-screen w-screen absolute top-0 left-0 grid place-content-center'>
-        <div className='h-[400px] w-[300px] backdrop-blur-sm bg-purple bg-opacity-30 rounded-3xl grid place-content-center z-50'>
+      <div onClick={() => {handleClose()}} className='h-screen w-screen absolute top-0 left-0 grid place-content-center'>
+        <div onClick={(e) => {e.stopPropagation()}}className='h-[400px] w-[300px] backdrop-blur-sm bg-purple bg-opacity-30 rounded-3xl grid place-content-center z-50'>
 
           {!enable && switchValue && <>
             <div className="grid place-content-center py-20">
@@ -113,7 +98,8 @@ function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue
               <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2" onClick={() => handleDisable()}>
                 Disable
               </button>
-              <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2" onClick={() => setPrompt(!prompt)}>
+              {/* <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2" onClick={() => setPrompt(!prompt)}> */}
+              <button type="button" className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2" onClick={() => {handleClose()}}>
                 Cancel
               </button>
             </div>
@@ -132,7 +118,7 @@ function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue
                 </div>
                 <div className="flex place-content-center gap-3 pt-1">
                   <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2" type="submit" value="Send" > Confirm </button>
-                  <button className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2" onClick={() => setPrompt(!prompt)}> Cancel </button>
+                  <button type="button" className="w-32 rounded-lg bg-purple-sh-1 focus:outline-none border-none hover:bg-purple-sh-2" onClick={() => {handleClose()}}> Cancel </button>
                 </div>
               </form>
             </div>

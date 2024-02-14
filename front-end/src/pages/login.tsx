@@ -20,7 +20,6 @@ function SignUp () {
   const {user}  = useContext(UserContext)
 
 
-  // console.log("this is the user in signup => ", user)
   const location = useLocation()
 
   var redirectTo

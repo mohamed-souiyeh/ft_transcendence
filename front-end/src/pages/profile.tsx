@@ -38,7 +38,7 @@ function Profile() {
     e.preventDefault()
 
     if (name.length)
-      formdata.set("username", name);
+    formdata.set("username", name);
 
     axios.post(`${process.env.REACT_URL}:1337/users/update/username`, formdata, {
       withCredentials: true
@@ -55,9 +55,7 @@ function Profile() {
               Cookies.remove('user')
               Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   });
             })
-            .catch((err) => {
-              console.log("My sad potato we have an error in updating user cookie in profile smh:", err);
-            })
+            .catch(() => {})
         }
       })
       .catch(() => {
@@ -72,11 +70,8 @@ function Profile() {
       .then(res => {
         setHistoty(res.data.allMatches)
         setAchievs(res.data.achievements)
-        console.log("eeee: ", res.data.achievements)
       })
-      .catch(() => {
-        console.log("Error getting matches history!!")
-      })
+      .catch(() => {})
   }, [])
 
   useEffect( () => {
@@ -88,9 +83,7 @@ function Profile() {
         Cookies.remove('user')
         Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   });
       })
-      .catch((err)=> {
-        console.log("My sad potato we have an error in updating user cookie in profile smh:", err);
-      })
+      .catch(()=> {})
   },[])
 
   useEffect (() => { 
@@ -151,15 +144,11 @@ function Profile() {
                 reader.readAsDataURL(image);
 
               })
-              .catch((err)=> {
-                console.log("My sad potato we have an error:profile file", err);
-              })
+              .catch(()=> {})
           }
         })
-        .catch((e)=>{
-          console.log("My sad potato we have an error in profile file:", e);
+        .catch(()=>{
           setBadFile(true)
-          // setErrMsg(e.response.data.message)
         });
     }
 
@@ -235,7 +224,7 @@ function Profile() {
 
           <div className="grid justify-center">
             <div className="h-[100%]  w-[350px] rounded-t-3xl overflow-hidden">
-              <div className="bg-purple-sh-2 h-[100%]  w-[350px] rounded-t-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1">
+              <div className="bg-purple-sh-2 h-[100%]  w-[350px] rounded-t-3xl ">
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-100">acheivements:</p>
                 </div>

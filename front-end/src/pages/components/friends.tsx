@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 function Friends(props) {
   const { friend, unmount, refreshDms } = props;
-  const { dm, setDm } = useDmContext();
+  const { setDm } = useDmContext();
   const [img, setImg] = useState('')
 
   useEffect(() => {
@@ -16,25 +16,20 @@ function Friends(props) {
     axios.post(`${process.env.REACT_URL}:1337/conv/createDM`, friend, {
       withCredentials: true,
     }).then((res) => {
-      refreshDms(true);
-      console.log("dm created");
-      console.log("dm is: ", res.data);
+        refreshDms(true);
+        //   {
+        //   ...dmInfo,
+        //   username: user.username,
+        //   userId: user.id,
+        // })
 
-
-    //   {
-    //   ...dmInfo,
-    //   username: user.username,
-    //   userId: user.id,
-    // })
-      
-      setDm({
-        ...res.data,
-        username: friend.username,
-        userId: friend.id,
+        setDm({
+          ...res.data,
+          username: friend.username,
+          userId: friend.id,
+        })
       })
-    }).catch((err) => {
-      console.log("error in creating dm: ", err);
-    });
+      .catch(() => {});
   };
 
   return (
@@ -47,8 +42,6 @@ function Friends(props) {
         </div>
       </div>
       <div className='flex flex-row-reverse  place-items-center basis-1/2' >
-        {/* bc we gon call those two icons tgther so much, i will make a component for it */}
-
         <Icons user={friend} unmount={unmount} />
         <div className="pl-3 cursor-pointer" onClick={() => handleChat()}>
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="23" viewBox="0 0 22 23" fill="none">
