@@ -100,10 +100,10 @@ function ManageGoups() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const regex: RegExp = /[a-zA-Z0-9_]*$/;
-    if (!Object.keys(createdGroup.members).length) {
-      setBadInput({ ...badInput, badMembers: true })
-      return;
-    }
+    // if (!Object.keys(createdGroup.members).length) {
+    //   setBadInput({ ...badInput, badMembers: true })
+    //   return;
+    // }
     if (createdGroup.privacy === "protected" && (createdGroup.password != confirmationPwd || !createdGroup.password)) {
       setBadInput({ ...badInput, badPwd: true })
       return;

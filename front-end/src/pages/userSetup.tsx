@@ -24,7 +24,7 @@ function Setup()
   const click = () =>
 {
     if (inputRef.current)
-    inputRef.current.click();
+      inputRef.current.click();
   };
 
   const onUserInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -41,16 +41,16 @@ function Setup()
       setErrMsg("File Too large, we're not Nasa plz choose a smaller file")
     }
     else
-    setProfilePic(event.target.files[0]);
+      setProfilePic(event.target.files[0]);
   };
 
 
   const changeBoth = () =>
 {
     if (userName.length)
-    formdata.set("username", userName);
+      formdata.set("username", userName);
     if (srcImg)
-    formdata.set("avatar", srcImg);
+      formdata.set("avatar", srcImg);
 
     axios.
       post(`${process.env.REACT_URL}:1337/users/update`, formdata,

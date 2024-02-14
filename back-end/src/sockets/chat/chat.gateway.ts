@@ -9,7 +9,7 @@ import { JwtPayload } from 'src/auth/jwt/JwtPayloadDto/JwtPayloadDto';
 import { Server, Socket } from 'socket.io';
 import Joi from 'joi';
 import { ConversationsService } from 'src/database/conversations/conversations.service';
-import { UseGuards } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { modiratorChatGuard } from './modiratorchat-guard/moderatorchat.guard';
 import { ChannelGuard } from './channel/channel.guard';
 import { DmGuard } from './dm/dm.guard';
@@ -82,12 +82,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   async addToRooms(user: any, client: Socket) {
 
     for (const dm of user.dms) {
-      // console.log("dm => ", dm);
+      Logger.debug(dm, "dm");
       client.join(`dm.${dm.id}`);
     }
 
     for (const channel of user.channels) {
-      // console.log("channel => ", channel);
+      Logger.debug(channel, "channel");
       client.join(`channel.${channel.id}`);
     }
     await this.checkIfActiveAgain(user);

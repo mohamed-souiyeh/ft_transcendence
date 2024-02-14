@@ -70,22 +70,35 @@ function Messages(props: any) {
     user.chat.timeout(1000).emit('checkDmpls', {
       convId: dm.id,
       convType: dm.type,
-    }, (res) => {
-        setIsBlocked(res.isBlocked);
-        if (res.isBlocked === false) {
-          //NOTE - fetch the messages of the dm using the dm.id and dm.type from the chatGatway
-          user.chat.timeout(5000).emit('getAllMessages', {
-            convId: dm.id,
-            convType: dm.type,
-          }, (messages) => {
-              setMsgs(messages);
-            })
-        }
-      })
+    }, (err, res) => {
+      if (err) {
+        console.log("shit error", err);
+        return;
+      }
+      console.log("is blocked", res);
+      setIsBlocked(res.isBlocked);
+      if (res.isBlocked === false) {
+        console.log("after the if");
+        //NOTE - fetch the messages of the dm using the dm.id and dm.type from the chatGatway
+        user.chat.timeout(5000).emit('getAllMessages', {
+          convId: dm.id,
+          convType: dm.type,
+        }, (err, messages) => {
+          if (err) {
+            console.log("shit error");
+            return;
+          }
+          setMsgs(messages);
+        })
+      }
+    })
 
 
     user.chat.on('broadcast', (msg) => {
-      setMsgs(prevMsgs => [...prevMsgs, msg]);
+      console.log(msg);
+      console.log(dm);
+      if (msg.convId === dm.id)
+        setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
     user.chat.on('update', () => {
@@ -94,6 +107,7 @@ function Messages(props: any) {
 
     setImg(`${process.env.REACT_URL}:1337/users/${dm.userId}/avatar`);
     return () => {
+      setMsgs([]);
       user.chat.off('broadcast');
     }
   }, [dm])

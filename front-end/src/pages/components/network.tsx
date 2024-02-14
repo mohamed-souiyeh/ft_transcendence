@@ -10,7 +10,7 @@ import { useNotificationContext } from "../../contexts/notificationContext"
 function Network(props) {
   const [tab, setTab] = useState(networkTabs.FRIENDS)
   const [refresh, setRefresh] = useState(false)
-  const {notification, setNotification} = useNotificationContext()
+  const { notification, setNotification } = useNotificationContext()
 
   const setTabNum = (id: number) => {
     setTab(id)
@@ -29,8 +29,9 @@ function Network(props) {
         setBlockedUsers(res.data.blockedUsers);
         setFriends(res.data.friends);
         setRefresh(false);
+        console.log(res.data);
       })
-      .catch(() => {});
+      .catch(() => { });
 
   }, [tab, refresh])
 
@@ -44,13 +45,13 @@ function Network(props) {
 
   const { refreshDms } = props;
   //well I know my poor memory and rushing might get me to remove that useEffect BUT DON'T, it's there to make sure we're running that code just once, there;s another useEff above that checks on tabs and that make re-rendering occure 
-  useEffect ( () => {
+  useEffect(() => {
 
-    if (notification){
+    if (notification) {
       setNotification(false)
       setTab(networkTabs.REQUESTS)
     }
-  },[])
+  }, [])
 
   return (
     <>
