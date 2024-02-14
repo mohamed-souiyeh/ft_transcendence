@@ -65,9 +65,7 @@ export class gameServer implements OnModuleInit {
 		return user;
 	}
 
-	//---------------------------- [ change from here ] ----------------------------
 	async handleDisconnect(client: Socket) {
-		let match = new MatchDto();
 		let roomCheck = Array.from(this.roomsList.values()) 
 			.find(room => room.firstClient === client
 				|| room.secondClient === client);

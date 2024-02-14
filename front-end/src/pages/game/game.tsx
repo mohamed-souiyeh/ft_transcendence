@@ -35,6 +35,7 @@ function Game() {
   }
 
   useEffect(() => {
+    socket.emit("queuing");
     console.log("Game page socket ", socket);
     const handleWinner = (v: boolean) => { setWinState(v); };
     const handleLeaveGame = () => { navigate("/home"); };
@@ -47,7 +48,6 @@ function Game() {
       }
     };
 
-    socket.emit("queuing");
     if (socket)
     {
       console.log("Game page socket ");
@@ -269,7 +269,7 @@ function Game() {
       socket.emit("leaveRoom");
     }
   },
-  []);
+  [socket]);
 
   return (<>
     <div 
