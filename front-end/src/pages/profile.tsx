@@ -235,7 +235,7 @@ function Profile() {
 
           <div className="grid justify-center">
             <div className="h-[100%]  w-[350px] rounded-t-3xl overflow-hidden">
-              <div className="bg-purple-sh-2 h-[100%]  w-[350px] rounded-t-3xl overflow-auto scrollbar-thin scrollbar-thumb-purple-sh-1">
+              <div className="bg-purple-sh-2 h-[100%]  w-[350px] rounded-t-3xl ">
                 <div className="sticky top-0 flex place-content-between bg-purple-sh-2 bg-opacity-70 backdrop-blur-sm rounded-t-3xl px-2 py-4 z-0" >
                   <p className="text-xl text-purple-tone-2 text-opacity-100">acheivements:</p>
                 </div>

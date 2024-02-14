@@ -21,7 +21,7 @@ function UserProfile() {
             </p>
           </div>
 
-          <div className="flex mt-auto justify-center ">
+          <div className="flex mt-auto justify-center h-[350px]">
             {<Acheivements />}
             {<GameHistory />}
           </div>
