@@ -78,7 +78,7 @@ function Groups(props: any) {
         })
           .then((resp) => {
             setUser(prevUser => ({ ...prevUser, data: resp.data }))
-            Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' ,  secure: true });
+            Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   });
             refreshGroups(true);
           })
           .catch(() => {})

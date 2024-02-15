@@ -53,7 +53,7 @@ function Profile() {
             .then((resp) => {
               setUser(prevUser => ({ ...prevUser, data: resp.data }))
               Cookies.remove('user')
-              Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' , secure: true });
+              Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   });
             })
             .catch(() => {})
         }
@@ -81,7 +81,7 @@ function Profile() {
       .then((resp) => {
         setUser(prevUser => ({ ...prevUser, data: resp.data }))
         Cookies.remove('user')
-        Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' ,  secure: true });
+        Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   });
       })
       .catch(()=> {})
   },[])
@@ -132,7 +132,7 @@ function Profile() {
               .then((resp) => {
                 setUser(prevUser => ({ ...prevUser, data: resp.data }))
                 Cookies.remove('user')
-                Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'strict' ,  secure: true });
+                Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   });
 
                 const reader = new FileReader();
                 reader.onload = () => {
