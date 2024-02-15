@@ -15,15 +15,15 @@ import { room } from './Room';
 import { MatchDto } from 'src/database/matches/matches.dto';
 import { eventBus } from 'src/eventBus';
 import { JwtAuthService } from 'src/auth/jwt/jwt.service';
+import { baseGateWayConfig } from 'src/sockets/baseGateWayConfig/baseGateWay.config';
+
+const gameGatewayConfig = {
+  ...baseGateWayConfig,
+  namespace: "game"
+}
 
 // Managing the sockets
-@WebSocketGateway({
-	cors: {
-		origin: true,
-		credentials: true
-	},
-	namespace: '/game'
-})
+@WebSocketGateway(gameGatewayConfig)
 export class gameServer implements OnModuleInit {
 	@WebSocketServer()
 	server: Server;
@@ -42,12 +42,12 @@ export class gameServer implements OnModuleInit {
 	}
 
 	async handleConnection(client: Socket) {
-		 
+    
 		console.log("Client connected to gamegateway", client.id);
-		let user = await this.gameService.chatService.getUserFromSocket(client);
+		const user = await this.gameService.chatService.getUserFromSocket(client);
 		if (user == null)
 			return;
-		let userStatus: string = await this.userService.getStatus(user.id);
+		const userStatus: string = await this.userService.getStatus(user.id);
 		console.log("Status ", userStatus);
 		if (userStatus == "busy") {
 			console.log("Already queuing");
@@ -66,7 +66,7 @@ export class gameServer implements OnModuleInit {
 	}
 
 	async handleDisconnect(client: Socket) {
-		let roomCheck = Array.from(this.roomsList.values()) 
+		const roomCheck = Array.from(this.roomsList.values()) 
 			.find(room => room.firstClient === client
 				|| room.secondClient === client);
 		let user1, user2;
@@ -117,7 +117,15 @@ export class gameServer implements OnModuleInit {
 	@SubscribeMessage('invite')
 	async invitePlayer(client: Socket, invitedUserID: number) 
 	{
-		let user = await this.getUser(client); 
+		const user = await this.getUser(client); 
+    const otherUser = await this.userService.findUserById(invitedUserID);
+
+    const isBlocked = await this.userService.getBlockStatus(user.id, otherUser.username);
+
+    if (isBlocked.isBlocked) {
+      return ;
+    }
+
 		if (!user)
 			return; 
 		if (await this.userService.getStatus(invitedUserID) == "busy" ||

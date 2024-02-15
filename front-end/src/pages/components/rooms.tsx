@@ -79,7 +79,8 @@ function Rooms(props: object) {
     setIsMuted(state === 'muted');
 
     user.chat.on('broadcast', (msg) => {
-      setMsgs(prevMsgs => [...prevMsgs, msg]);
+      if (channel.id === msg.convId)
+        setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
     user.chat.on('update', () => {

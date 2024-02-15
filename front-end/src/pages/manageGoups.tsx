@@ -16,9 +16,10 @@ function ManageGoups() {
     badPrv: false,
     badMembers: false,
     badChars: false,
+    badChannel: false,
   })
   const maxLength = 100;
-  const nameMaxLength = 25;
+  const nameMaxLength = 13;
   const { protectedRoom } = useProtectedRoomContext()
   const [val, setVal] = useState("")
   const [state, setState] = useState(false)
@@ -37,10 +38,10 @@ function ManageGoups() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-      setCreatedGroup((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+    setCreatedGroup((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   useEffect(() => {
@@ -73,13 +74,13 @@ function ManageGoups() {
       })
       .catch(error => {
       });
-      setRefreshGroups(false);
+    setRefreshGroups(false);
 
   }, [refreshGroups])
 
-  const getGroups = (e : React.FormEvent) => {
+  const getGroups = (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!val) return setGroupData([]);
 
 
@@ -89,7 +90,7 @@ function ManageGoups() {
       .then(response => {
         setGroupData(response.data);
       })
-      .catch(()=> {});
+      .catch(() => { });
   }
 
 
@@ -99,11 +100,13 @@ function ManageGoups() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const regex: RegExp = /[a-zA-Z0-9_]*$/;
-    // if (!Object.keys(createdGroup.members).length) {
-    //   setBadInput({ ...badInput, badMembers: true })
-    //   return;
-    // }
+
+    const regex: RegExp = /^[a-zA-Z0-9_]*$/;
+    if (!Object.keys(createdGroup.members).length) {
+      setBadInput({ ...badInput, badMembers: true })
+      return;
+    }
+
     if (createdGroup.privacy === "protected" && (createdGroup.password != confirmationPwd || !createdGroup.password)) {
       setBadInput({ ...badInput, badPwd: true })
       return;
@@ -112,12 +115,17 @@ function ManageGoups() {
       setBadInput({ ...badInput, badPrv: true })
       return;
     }
-    if (!createdGroup.name || !regex.test(createdGroup.name)) {
+    if (createdGroup.name.length < 3 || !regex.test(createdGroup.name)) {
       setBadInput({ ...badInput, badName: true })
       return;
     }
 
-    if (!regex.test(createdGroup.description) && createdGroup.description.length){
+    console.log("description: ", createdGroup.description);
+    console.log("description: ", regex.test(createdGroup.description));
+    console.log("description: ", createdGroup.description.length);
+
+
+    if (!regex.test(createdGroup.description) && createdGroup.description.length) {
       setBadInput({ ...badInput, badChars: true })
       return;
     }
@@ -130,7 +138,7 @@ function ManageGoups() {
     }, {
       withCredentials: true,
     })
-      .then(()=> {
+      .then(() => {
         setCreatedGroup({
           name: "",
           privacy: "",
@@ -143,14 +151,17 @@ function ManageGoups() {
         })
           .then((resp) => {
             setUser(prevUser => ({ ...prevUser, data: resp.data }))
-            Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'   });
+            Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax' });
             setRefreshGroups(true)
           })
           .catch(() => {
           })
         setRefreshMembers(true)
       })
-      .catch(()=> {});
+      .catch((err) => {
+        console.log("error in creating a channel: ", err.response.data.message);
+        setBadInput({ ...badInput, badChannel: true });
+      });
   }
 
 
@@ -235,6 +246,8 @@ function ManageGoups() {
                   <button type="submit" className="bg-purple-sh-1 hover:bg-purple-sh-0 rounded-lg object-center w-[60%]"> Create Group </button>
                 </div>
                 {badInput.badChars && <p className="text-[#D9534F] pl-1 font-bold text-sm" > Only characters are allowed in name and description </p>}
+                {badInput.badChannel && <p className="text-[#D9534F] pl-1 font-bold text-sm" > Bad channel name: only aA0-zZ9 and _ allowed</p>}
+
 
               </div>
               <div className="flex-col h-full p-4 basis-1/2 " >
@@ -247,7 +260,6 @@ function ManageGoups() {
                 </div>
                 {badInput.badMembers && <p className="text-[#D9534F] pl-1 font-bold text-sm" > Please add some members </p>}
               </div>
-
             </div>
           </form>
         </div>

@@ -485,6 +485,18 @@ export class ConversationsService {
       throw new BadRequestException("channelPassword is required for protected channels");
     }
 
+    const nameRegex: RegExp = /^[a-zA-Z0-9_]{3,13}$/;
+
+    if (!nameRegex.test(channelFromBody.channelName)) {
+      throw new BadRequestException("Bad channel name, only aA0-zZ9 and _ allowed");
+    }
+
+    const descriptionRegex: RegExp = /^[a-zA-Z0-9_]{0,100}$/;
+
+    if (!descriptionRegex.test(channelFromBody.channelDescription)) {
+      throw new BadRequestException("Bad channel descreption, no special chars are allowed.")
+    }
+
     // console.log("channel Data => ", channelData);
     if (channelData.channelPassword) {
       const hash = await bcrypt.hash(channelData.channelPassword, 10);
@@ -550,11 +562,11 @@ export class ConversationsService {
       where: { id: channelId },
     });
 
-    
+
     if (!channel) {
       throw new BadRequestException('Channel does not exist');
     }
-    
+
     console.log('password => ', password);
     // console.log('channel => ', channel);
     if (channel.type === ChannelType.protected && password) {
@@ -573,7 +585,7 @@ export class ConversationsService {
       throw new BadRequestException('User does not exist');
     }
 
-  
+
     await this.addUserToChannel(channelId, userId);
 
     // i need to think about user state :D here 
