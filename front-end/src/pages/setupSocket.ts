@@ -14,14 +14,15 @@ export function setupSocket(url: string) {
     // Handle the error here
     console.log("this is the 401 socket event error : ", err);
 
-    axios.get(`${process.env.REACT_URL}:1337/auth/refresh`, {
+    axios.get(`${process.env.REACT_URL}:1337/auth/hello`, {
       withCredentials: true
-    }).then(() => {
-      console.log("Token refreshed in socket!")
+    }).then((res) => {
+      // console.log("Token refreshed in socket!")
+      console.log(res.data);
+      socket.connect();
       //FIXME - this bastard is mostlikly is the root of the problem
     }).catch((err) => {
       console.log("Error while refreshing token in socket => ", err);
-      eventBus.emit('unauthorized');
     })
     // console.log("this is the 401 socket event error : ", err); // Prints the error message
   });

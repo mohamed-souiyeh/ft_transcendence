@@ -1,11 +1,10 @@
 import { useRef, useEffect, useState, useContext } from 'react';
-import axios from 'axios';
 import Profile from "../components/userProfileIcone";
 import { Cube } from './cube';
 import quitButton from './exitGame.png';
 import './spinner.css';
 import { useNavigate } from 'react-router-dom';
-import { SocketContext } from '../../clientSocket';
+import { UserContext } from '../../App';
 
 function rad2Degree(angle: number): number {
   return angle * 180 / Math.PI;
@@ -27,7 +26,7 @@ function Game() {
   let navigate = useNavigate();
   const frameRef = useRef<number>(0);
 
-  const socket = useContext(SocketContext);
+  const socket = useContext(UserContext).user.game_socket;
 
   const leaveGame = () => {
     if (socket)
@@ -36,6 +35,8 @@ function Game() {
   }
 
   useEffect(() => {
+    socket.emit("queuing");
+    console.log("Game page socket ", socket);
     const handleWinner = (v: boolean) => { setWinState(v); };
     const handleLeaveGame = () => { navigate("/home"); };
     const handleAlreadyPlaying = () => { navigate("/home"); };
@@ -49,7 +50,7 @@ function Game() {
 
     if (socket)
     {
-      socket.emit("queuing");
+      console.log("Game page socket ");
       socket.on("inviteAccepted", () => {
         console.log("inviteAccepted");
         console.log("Game state ", gameState);
@@ -106,45 +107,31 @@ function Game() {
     ball.prevPositions.y = first.vector3D.y + 0.5;
     ball.prevPositions.z = -0.01;
 
-    document.addEventListener('keydown', (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => { 
       if (e.code == 'Space') {
-        if (!ballLaunched) {
-          second.speed = 0.01;
-          first.speed = 0.01;
-          if (firstPlayerHasTheBall) {
-            ball.prevPositions.x = first.vector3D.x + 0.5;
-            ball.prevPositions.y = first.vector3D.y + 0.5;
-          }
-          if (secondPlayerHasTheBall) {
-            ball.prevPositions.x = second.vector3D.x - 0.5;
-            ball.prevPositions.y = second.vector3D.y - 0.5;
-          }
-          ball.velocityx = ball.vector3D.x - ball.prevPositions.x;
-          ball.velocityy = ball.vector3D.y - ball.prevPositions.y;
-          ball.prevPositions.x = ball.vector3D.x + 0.5;
-          ball.prevPositions.y = ball.vector3D.y + 0.5;
-          ballLaunched = true;
-          ball.speed = 0.009;
-        }
-        if (socket)
-          socket.emit('balllaunch', ballLaunched);
+      if (!ballLaunched) {
+        ballLaunched = true;
       }
-      if (e.code == 'KeyW') {
-        if (socket) {
-          socket.emit('right', 1);
-          socket.emit('left', 1);
+      if (socket)
+        socket.emit('balllaunch', ballLaunched);
+    }
+    if (e.code == 'KeyW') {
+      if (socket) {
+        socket.emit('right', 1);
+        socket.emit('left', 1);
 
-        }
       }
-      if (e.code == 'KeyS') {
-        if (socket) {
-          socket.emit('right', -1);
-          socket.emit('left', -1);
-        }
+    }
+    if (e.code == 'KeyS') {
+      if (socket) {
+        socket.emit('right', -1);
+        socket.emit('left', -1);
       }
-    })
+    }}
 
-    document.addEventListener('keyup', (e) => {
+    document.addEventListener('keydown', handleKeyDown)
+
+    const handleKeyUp = (e) => {
       if (e.code == 'KeyW') {
         if (socket) {
           socket.emit('right', 0);
@@ -157,10 +144,10 @@ function Game() {
           socket.emit('left', 0);
         }
       }
-    })
+    }
 
-    let firstPlayerHasTheBall: boolean = true;
-    let secondPlayerHasTheBall: boolean = false;
+    document.addEventListener('keyup', handleKeyUp);
+
     let ballLaunched: boolean = false;
 
     let ar = w/h;
@@ -193,17 +180,8 @@ function Game() {
       {
         socket.on('userIDs', (user1:number, user2:number)=>
         {
-            Promise.all([
-              axios.get(`${process.env.REACT_URL}:1337/users/${user1}/avatar`, { withCredentials: true }),
-              axios.get(`${process.env.REACT_URL}:1337/users/${user2}/avatar`, { withCredentials: true })
-            ])
-            .then(([response1, response2]) => {
-              setAvatar1(`${process.env.REACT_URL}:1337/users/${user1}/avatar`);
-              setAvatar2(`${process.env.REACT_URL}:1337/users/${user2}/avatar`);
-            })
-            .catch(error => {
-              console.error('Error fetching user data:', error);
-            });
+            setAvatar1(`${process.env.REACT_URL}:1337/users/${user1}/avatar`);
+            setAvatar2(`${process.env.REACT_URL}:1337/users/${user2}/avatar`);
           })
         }
         fetchedAvatars = true;
@@ -280,19 +258,23 @@ function Game() {
     window.addEventListener("resize", handle);
     return () => {
       cancelAnimationFrame(frameRef.current);
+      window.removeEventListener("resize", handle);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
       socket.off("winner", handleWinner);
       socket.off("leaveGame", handleLeaveGame);
       socket.off("alreadyPlaying", handleAlreadyPlaying);
       socket.off("alreadyQueuing", handleAlreadyQueuing);
       socket.off("gameover", handleGameOver);
-      socket.disconnect();
-      socket.connect();
+      socket.emit("leaveRoom");
     }
   },
-    []);
+  [socket]);
 
   return (<>
-    <div className="w-screen grid justify-center ">
+    <div 
+      style={{ backgroundColor: 'rgba(71, 43, 94, 1.0)'}}
+      className="w-screen h-screen grid justify-center ">
 
       <div style={{
         textAlign: "center",
@@ -310,7 +292,8 @@ function Game() {
           height: "100%"
         }}
           ref={canvasRef}
-        /></div>
+        />
+      </div>
       <div style={{
         position: "absolute",
         top: 0,
@@ -324,71 +307,71 @@ function Game() {
       }}>
         {/* <h1>GO !</h1> */}
       </div>
-    </div>
-    {!foundMatch && (
-      <div className="spinner">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-    )}
-    {gameState &&
-      (<div style={{
-        position: "absolute",
-        top: "47%",
-        left: "50%",
-        width: "600px",
-        height: "400px",
-        backgroundColor: "rgba(128, 0, 129, 0.5)",
-        transform: "translate(-50%, -50%)",
-        pointerEvents: "none",
-        borderRadius: "20px",
-        borderWidth: "5px",
-        borderColor: "rgba(255, 0, 255, 0.5)",
-      }}>
+          {!foundMatch && (
+            <div className="spinner">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          )}
+          {gameState &&
+            (<div style={{
+              position: "absolute",
+              top: "47%",
+              left: "50%",
+              width: "600px",
+              height: "400px",
+              backgroundColor: "rgba(128, 0, 129, 0.5)",
+              transform: "translate(-50%, -50%)",
+              pointerEvents: "none",
+              borderRadius: "20px",
+              borderWidth: "5px",
+              borderColor: "rgba(255, 0, 255, 0.5)",
+            }}>
 
-        <div className="lds-dual-ring"></div>
-        <h1 style={{
-          position: "absolute",
-          left: "28%"
-        }}>GAME OVER</h1>
+              <div className="lds-dual-ring"></div>
+              <h1 style={{
+                position: "absolute",
+                left: "28%"
+              }}>GAME OVER</h1>
 
-        {win && (<h1 style={{
-          position: "absolute",
-          top: "20%",
-          left: "43%",
-          fontSize: "25px"
-        }}>YOU WIN</h1>)}
+              {win && (<h1 style={{
+                position: "absolute",
+                top: "20%",
+                left: "43%",
+                fontSize: "25px"
+              }}>YOU WIN</h1>)}
 
-        {!win && (<h1 style={{
-          position: "absolute",
-          top: "20%",
-          left: "42%",
-          fontSize: "25px"
-        }}>YOU LOSE</h1>)}
+              {!win && (<h1 style={{
+                position: "absolute",
+                top: "20%",
+                left: "42%",
+                fontSize: "25px"
+              }}>YOU LOSE</h1>)}
 
-        <h1 style={{
-          position: "absolute",
-          top: "40%",
-          left: "30%",
-          fontSize: "90px"
-        }}>{score1}</h1>
-        <h1 style={{
-          position: "absolute",
-          top: "40%",
-          left: "64%",
-          fontSize: "90px"
-        }}>{score2}</h1>
-      </div>)
-    }
-    <div style={{ textAlign: "center", marginTop: "120px" }}>
-      <button
-        onClick={leaveGame}
-        style={{ color: "white", background: "#DFA7FC", width: 60, height: 60, border: "none", padding: 0 }}>
-        <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
-      </button>
+              <h1 style={{
+                position: "absolute",
+                top: "40%",
+                left: "30%",
+                fontSize: "90px"
+              }}>{score1}</h1>
+              <h1 style={{
+                position: "absolute",
+                top: "40%",
+                left: "64%",
+                fontSize: "90px"
+              }}>{score2}</h1>
+            </div>)
+          }
+          <div style={{ textAlign: "center", marginTop: "120px" }}>
+            <button
+              onClick={leaveGame}
+              style={{ color: "white", background: "#DFA7FC", width: 60, height: 60, border: "none", padding: 0 }}>
+              <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
+            </button>
+          </div>
     </div>
 
   </>

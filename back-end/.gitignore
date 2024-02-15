@@ -2,6 +2,7 @@
 /src/purplerain
 .env
 database-prisma-experements
+avatars
 
 # compiled output
 /dist

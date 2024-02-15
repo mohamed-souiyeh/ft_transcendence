@@ -70,6 +70,12 @@ axios.interceptors.response.use(
       }).catch((err) => {
         console.log("my sad shit, an err occured, it's :", err);
         
+        const isRefresh = error.request.responseURL === `${process.env.REACT_URL}:1337/auth/refresh`;
+
+        if (!isRefresh) {
+          return Promise.reject(error);
+        }
+
         eventBus.emit('unauthorized');
         return Promise.reject(error);
       });
@@ -86,12 +92,12 @@ axios.interceptors.response.use(
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  // <React.StrictMode> 
+  // <React.laxMode> 
 
   <AvatarProvider>
     <NotificationProvider>
       <App />
     </NotificationProvider>
   </AvatarProvider>
-  // </React.StrictMode>
+  // </React.laxMode>
 )

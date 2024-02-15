@@ -29,7 +29,7 @@ export class ErrorsInterceptor implements NestInterceptor {
                   route: request.path,
                   method: request.method
                 },
-                err.status || 500
+                err.status || 501
               )
           );
         })

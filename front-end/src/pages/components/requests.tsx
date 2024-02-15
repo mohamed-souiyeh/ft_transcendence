@@ -37,7 +37,7 @@ function Requests(props) {
   const [img, setImg] = useState('')
 
   useEffect(() => {
-    setImg(`${process.env.REACT_URL}:1337/users/${props.id}/avatar`);
+    setImg(`${process.env.REACT_URL}:1337/users/${sender.id}/avatar`);
   }, [])
 
   return (

@@ -15,7 +15,7 @@ export class AuthService {
   ) { }
 
   hello(req) {
-    return `hello world! from user ${req.user.email}\nof id ${req.user.id}.`;
+    return `hello world!`;
   }
 
   async getUserFromAuthenticationToken(jwt: string, refreshJwt: string) {
@@ -33,7 +33,7 @@ export class AuthService {
   async addTokenToCookie(res: Response, Token: string, key: string) {
     res.cookie(key, Token, {
       httpOnly: true,
-      // sameSite: 'strict',
+      sameSite: 'strict',
       // secure: true,
     });
   }

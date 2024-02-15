@@ -44,7 +44,7 @@ function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue
           setPrompt(!prompt)
           user.data.TFAisEnabled = false
           Cookies.remove('user')
-          Cookies.set('user', JSON.stringify(user.data), { sameSite: 'strict' ,  secure: true });
+          Cookies.set('user', JSON.stringify(user.data), { sameSite: 'lax'   });
         }
       })
       .catch(() => {})
@@ -72,7 +72,7 @@ function Popup({ switchValue, setSwitchValue, prompt, setPrompt }: { switchValue
           setEnable(true)
           user.data.TFAisEnabled = true;
           Cookies.remove('user')
-          Cookies.set('user', JSON.stringify(user.data), { sameSite: 'strict', secure: true });
+          Cookies.set('user', JSON.stringify(user.data), { sameSite: 'lax'  });
         }
         else {
           setConfirmed(false)
