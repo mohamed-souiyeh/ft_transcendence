@@ -104,19 +104,19 @@ function Messages(props: any) {
 
     user.chat.on('broadcast', (msg) => {
       console.log(msg);
-      console.log(dm);
-      if (msg.convId === dm.id)
+      console.log("dm is: ", dm);
+      if (msg.convId === dm.id && msg.convType === dm.type)
         setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
     user.chat.on('update', () => {
       setRefreshDms(true);
     });
-
     setImg(`${process.env.REACT_URL}:1337/users/${dm.userId}/avatar`);
+
     return () => {
       setMsgs([]);
-      user.chat.off('broadcast');
+      user.chat.off();
     }
   }, [dm])
 

@@ -268,11 +268,22 @@ function App() {
       setUser(prevUser => ({ ...prevUser, data: JSON.parse(userData) }));
     }
 
+    const intervalId = setInterval(() => {
+      axios.get(`${process.env.REACT_URL}:1337/auth/hello`, {
+        withCredentials: true
+      }).then(() => {
+      }).catch(() => {
+      });
+    }, 1000 * 60);
 
     const userAvatar = localStorage.getItem('avatar')
     if (userAvatar) {
       setAvatar(userAvatar)
     }
+
+    return () => {
+      clearInterval(intervalId);
+    };
 
   }, []);
 

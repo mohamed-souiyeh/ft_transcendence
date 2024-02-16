@@ -126,12 +126,14 @@ function ManageGoups() {
       return;
     }
 
-    console.log("description: ", createdGroup.description);
-    console.log("description: ", regex.test(createdGroup.description));
-    console.log("description: ", createdGroup.description.length);
+    // console.log("description: ", createdGroup.description);
+    // console.log("description: ", regex.test(createdGroup.description));
+    // console.log("description: ", createdGroup.description.length);
 
 
-    if (!regex.test(createdGroup.description) && createdGroup.description.length) {
+    const regexo: RegExp = /^[a-zA-Z0-9][a-zA-Z0-9_ ]*$/;
+
+    if (!regexo.test(createdGroup.description) && createdGroup.description.length) {
       setBadInput((badInput) => ({ ...badInput, badChars: true }))
       return;
     }

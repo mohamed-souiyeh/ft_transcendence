@@ -229,7 +229,7 @@ function Chat() {
               </div>
 
             </div>
-            {(channels.length ? channels.map((channel) => <Channels currentChannel={channel} key={channel.id} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No Groups yet :(</p>)}
+            {(channels.length ? channels.map((channel) => <Channels currentChannel={channel} key={channel.id} setRefreshChannels={setRefreshChannels} />) : <p className="text-2xl p-4 pt-7 text-purple-tone-2 text-opacity-60"> No Groups yet :(</p>)}
           </div>
         </div>
         <div className='relative basis-2/3 m-5 '>
