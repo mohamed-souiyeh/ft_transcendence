@@ -7,29 +7,37 @@ function Friends(props) {
   const { friend, unmount, refreshDms } = props;
   const { setDm } = useDmContext();
   const [img, setImg] = useState('')
+  const [status, setStatus] = useState("online");
 
   useEffect(() => {
     setImg(`${process.env.REACT_URL}:1337/users/${props.id}/avatar`);
+    axios.get(`${process.env.REACT_URL}:1337/users/status/${friend.id}`,
+      {
+        withCredentials: true,
+      }).then((res) => {
+        console.log("the status: ", res.data);
+        setStatus(res.data);
+      }).catch(() => { })
   }, [])
 
   const handleChat = () => {
     axios.post(`${process.env.REACT_URL}:1337/conv/createDM`, friend, {
       withCredentials: true,
     }).then((res) => {
-        refreshDms(true);
-        //   {
-        //   ...dmInfo,
-        //   username: user.username,
-        //   userId: user.id,
-        // })
+      refreshDms(true);
+      //   {
+      //   ...dmInfo,
+      //   username: user.username,
+      //   userId: user.id,
+      // })
 
-        setDm({
-          ...res.data,
-          username: friend.username,
-          userId: friend.id,
-        })
+      setDm({
+        ...res.data,
+        username: friend.username,
+        userId: friend.id,
       })
-      .catch(() => {});
+    })
+      .catch(() => { });
   };
 
   return (
@@ -38,7 +46,7 @@ function Friends(props) {
         <img src={img} className='rounded-full h-12 w-12' />
         <div className="grid">
           <p className='text-lg px-7 font-bold' > {friend.username} </p>
-          <p className='text-sm text-purple-tone-2/70 px-7' > {friend.status} </p>
+          <p className='text-sm text-purple-tone-2/70 px-7' > {status} </p>
         </div>
       </div>
       <div className='flex flex-row-reverse  place-items-center basis-1/2' >

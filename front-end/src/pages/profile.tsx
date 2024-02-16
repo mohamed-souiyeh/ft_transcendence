@@ -37,8 +37,13 @@ function Profile() {
   const changeUserName = (e: React.FormEvent) => {
     e.preventDefault()
 
+    const regex: RegExp = /^[a-zA-Z0-9][a-zA-Z0-9_]{1,12}$/;
+
+    if (!regex.test(name))
+      return setBadName(true)
+
     if (name.length)
-    formdata.set("username", name);
+      formdata.set("username", name);
 
     axios.post(`${process.env.REACT_URL}:1337/users/update/username`, formdata, {
       withCredentials: true
@@ -185,7 +190,7 @@ function Profile() {
           <div className=" m-6 grid place-content-center">
             <form className="flex w-[100%]" onSubmit={changeUserName}>
               <p className="text-2xl m-2">:</p>
-              <input title="Click To edit" className="w-[40%] bg-transparent border-none focus:outline-none focus:border-none text-2xl" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+              <input maxLength={13} title="Click To edit" className="w-[40%] bg-transparent border-none focus:outline-none focus:border-none text-2xl" type="text" value={name} onChange={(e) => setName(e.target.value)} />
               {badName && <p className="font-bold text-red-500 text-lg m-3"> bad Name! </p>}
               {success && <p className="font-bold text-light-green-500 text-lg m-3"> Updated! </p>}
               <button className="rounded-lg bg-purple-sh-2 hover:border hover:border-purple-sh-2 hover:bg-purple-sh-1 h-11" type="submit"> change </button>

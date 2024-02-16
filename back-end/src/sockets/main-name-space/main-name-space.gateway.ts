@@ -9,8 +9,9 @@ import { UserStatus } from '@prisma/client';
 import { JwtPayload } from 'src/auth/jwt/JwtPayloadDto/JwtPayloadDto';
 import { eventBus } from 'src/eventBus';
 import { UserDto } from 'src/database/users/User_DTO/User.dto';
+import { Logger } from '@nestjs/common';
 
-const LOGOUT_TIMEOUT = 4 * 60 * 1000;
+const LOGOUT_TIMEOUT = 1 * 60 * 1000;
 
 @WebSocketGateway(baseGateWayConfig)
 export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -79,6 +80,7 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
 
     scheduledLogoutMap.set(payload.id, setTimeout(() => {
       
+      Logger.debug('setting user ofline', 'disconnect function');
       this.usersService.setOfflineStatus(payload.id)
       .then(() => {
         // console.log("client is offline now")

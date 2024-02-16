@@ -118,6 +118,11 @@ export class UsersService {
 
   //SECTION - READ OPERATIONS
 
+
+
+
+
+  
   async getScore(id: number) {
     const user = await this.prismaService.user.findUnique({
       where: {
@@ -648,7 +653,7 @@ export class UsersService {
     const error_msg: string = 'Username must be between 5 and 13 characters long, and contain only letters and numbers and underscores';
 
 
-    const regex: RegExp = /^[a-zA-Z0-9_]{5,13}$/;
+    const regex: RegExp = /^[a-zA-Z0-9][a-zA-Z0-9_]{4,12}$/;
 
 
     if (!regex.test(username)) throw new ConflictException(error_msg);

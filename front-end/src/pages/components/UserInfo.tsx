@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { UserContext } from "../../App";
-import { ProgressCercle }from "../../pages/components/ProgressCercle";
+import { ProgressCercle } from "../../pages/components/ProgressCercle";
 
 export default function UserInfo() {
 
@@ -23,31 +23,31 @@ export default function UserInfo() {
       axios.get(`${process.env.REACT_URL}:1337/users/Public_data/${username}`,
         { withCredentials: true }
       ).then((response) => {
-          setUserData(response.data);
-          const id = response.data['id'];
-          axios.get(`${process.env.REACT_URL}:1337/users/check_notification?receiverId=${id}`, {
-            withCredentials: true
-          }).then((res) => {
-              setIsFriendPending(res.data.isPending);
-              setIsFriendAdded(res.data.isFriend);
-            }).catch(() => {})
-          setImagePath(`${process.env.REACT_URL}:1337/users/${id}/avatar`);
-        }).catch(()=> {
-          navigate("/not-found");
-        });
+        setUserData(response.data);
+        const id = response.data['id'];
+        axios.get(`${process.env.REACT_URL}:1337/users/check_notification?receiverId=${id}`, {
+          withCredentials: true
+        }).then((res) => {
+          setIsFriendPending(res.data.isPending);
+          setIsFriendAdded(res.data.isFriend);
+        }).catch(() => { })
+        setImagePath(`${process.env.REACT_URL}:1337/users/${id}/avatar`);
+      }).catch(() => {
+        navigate("/not-found");
+      });
     };
 
     axios.get(`${process.env.REACT_URL}:1337/users/check_blocked?otherUserUsername=${username}`, {
       withCredentials: true,
     }).then((res) => {
-        if (res.data.isBlocked) {
-          navigate("/not-found");
-          return;
-        }
-        fetchUserData();
-      }).catch(() => {
+      if (res.data.isBlocked) {
         navigate("/not-found");
-      });
+        return;
+      }
+      fetchUserData();
+    }).catch(() => {
+      navigate("/not-found");
+    });
 
   }, [username, navigate]);
 
@@ -79,13 +79,13 @@ export default function UserInfo() {
 
       }
     }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire("Unfriend successfully!", "", "success");
-        } else if (result.isDenied) {
-          Swal.fire("Good, be more social bro", "", "success");
-          setIsFriendAdded(true);
-        }
-      });
+      if (result.isConfirmed) {
+        Swal.fire("Unfriend successfully!", "", "success");
+      } else if (result.isDenied) {
+        Swal.fire("Good, be more social bro", "", "success");
+        setIsFriendAdded(true);
+      }
+    });
   }
 
 
@@ -131,20 +131,20 @@ export default function UserInfo() {
       await axios.post(
         `${process.env.REACT_URL}:1337/users/block`,
         { id: userData['id'] }, {
-          withCredentials: true
-        });
+        withCredentials: true
+      });
       alert("User blocked successfully", "", "question");
       //TODO - we can navigate the user to the network page that would be better
       navigate("/home");
     } catch (error) {
     }
   };
-  useEffect(() => {
+  // useEffect(() => {
 
-    if (userData.username === user.data.username) {
-      navigate('/profile'); 
-    }
-  }, [userData, navigate]); 
+  //   if (userData.username === user.data.username) {
+  //     navigate('/profile'); 
+  //   }
+  // }, [userData, navigate]); 
 
   return (
     <div className="flex bg-purple bg-opacity-30  border-[2px] border-purple/20 rounded-3xl">
@@ -181,7 +181,7 @@ export default function UserInfo() {
         </div>}
       </div>
       <div className="">
-        {<ProgressCercle userData={userData}/>}
+        {<ProgressCercle userData={userData} />}
       </div>
 
 

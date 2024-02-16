@@ -13,7 +13,7 @@ export class NotificationsService {
 
   async acceptFriendRequest(notification: NotificationDto) {
 
-    const notificationToDelete = await this.prismaService.notification.findUnique({
+    const notificationToDelete = await this.prismaService.notification.findFirst({
       where: {
         id: notification.id,
         senderId: notification.senderId,
@@ -21,12 +21,22 @@ export class NotificationsService {
       },
     });
 
+    const otherNotificationToDelete = await this.prismaService.notification.findFirst({
+      where: {
+        senderId: notification.receiverId,
+        receiverId: notification.senderId,
+      },
+    });
+
     if (!notificationToDelete)
       throw new NotFoundException("Notification not found");
 
+    if (otherNotificationToDelete)
+      await this.deleteNotification(otherNotificationToDelete.id);
+
     await this.usersService.createFriendship(notification.senderId, notification.receiverId);
 
-    return await this.deleteNotification(notification.id);
+    return await this.deleteNotification(notificationToDelete.id);
   }
 
   async refuseFriendRequest(notification: NotificationDto) {
@@ -38,10 +48,20 @@ export class NotificationsService {
       },
     });
 
+    const otherNotificationToDelete = await this.prismaService.notification.findFirst({
+      where: {
+        senderId: notification.receiverId,
+        receiverId: notification.senderId,
+      },
+    });
+
+    if (otherNotificationToDelete)
+      await this.deleteNotification(otherNotificationToDelete.id);
+
     if (!notificationToDelete)
       throw new NotFoundException("Notification not found");
 
-    return await this.deleteNotification(notification.id);
+    return this.deleteNotification(notification.id);
   }
 
   async blockAndDeleteFriendRequest(notification: NotificationDto) {
@@ -57,6 +77,16 @@ export class NotificationsService {
       },
     });
     
+    const otherNotificationToDelete = await this.prismaService.notification.findFirst({
+      where: {
+        senderId: notification.receiverId,
+        receiverId: notification.senderId,
+      },
+    });
+
+    if (otherNotificationToDelete)
+      await this.deleteNotification(otherNotificationToDelete.id);
+
     if (!notificationToDelete)
       throw new NotFoundException("Notification not found");
 
@@ -65,7 +95,7 @@ export class NotificationsService {
 
     await this.usersService.blockUser(receiver.id, sender.id);
 
-    return await this.deleteNotification(notification.id);
+    return this.deleteNotification(notification.id);
   }
 
   // ! jojo's section
@@ -93,15 +123,15 @@ export class NotificationsService {
     return createdNotification;
   }
 
-  async getNotificationById(id: number) {
-    return await this.prismaService.notification.findUnique({
-      where: { id },
+  async getNotificationById(notifId: number) {
+    return  this.prismaService.notification.findUnique({
+      where: { id: notifId },
     });
   }
 
-  async updateNotification(id: number, notificationDto: NotificationDto) {
-    return await this.prismaService.notification.update({
-      where: { id },
+  async updateNotification(notifId: number, notificationDto: NotificationDto) {
+    return  this.prismaService.notification.update({
+      where: { id: notifId },
       data: {
         senderId: notificationDto.senderId,
         receiverId: notificationDto.receiverId,
@@ -110,9 +140,11 @@ export class NotificationsService {
     });
   }
 
-  async deleteNotification(id: number) {
-    return await this.prismaService.notification.delete({
-      where: { id },
+  async deleteNotification(notifId: number) {
+    return this.prismaService.notification.delete({
+      where: { 
+        id: notifId
+      },
     });
   }
   //!

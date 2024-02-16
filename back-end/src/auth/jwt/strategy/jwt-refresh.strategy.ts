@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 import { Request } from 'express';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/database/users/users.service';
 import { JwtPayload } from '../JwtPayloadDto/JwtPayloadDto';
 
@@ -38,6 +38,8 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
     if (!refreshTokenIsValid) {
       await this.userService.replaceRefreshToken(payload.id, null);
       await this.userService.setAuthenticated(payload.id, false);
+
+      Logger.debug('setting user ofline', 'refresh function');
       await this.userService.setOfflineStatus(payload.id);
       throw new UnauthorizedException('3 refresh token is not valid');
     }

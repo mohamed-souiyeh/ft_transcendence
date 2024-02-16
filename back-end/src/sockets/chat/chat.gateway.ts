@@ -263,6 +263,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       message: 'user left',
     });
 
+    eventBus.emit('reconnect', payload.id);
     return { message: 'you left the channel' };
   }
 

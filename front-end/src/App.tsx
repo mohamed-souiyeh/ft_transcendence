@@ -8,7 +8,7 @@ import Game from "./pages/game/game";
 import LandingPage from "./pages/landingpage";
 import Setup from "./pages/userSetup";
 import RequireAuth from "./pages/components/requireAuth";
-import React, { useContext, useEffect, useState } from "react"; 
+import React, { useContext, useEffect, useState } from "react";
 import { createContext } from "react";
 import TwoFAConfirmation from "./pages/twofaconfirm";
 import Loading from "./pages/loading";
@@ -32,42 +32,40 @@ import { useAvatarContext } from "./contexts/avatar";
 import NotFoundPage from "./pages/notfoundpage";
 import axios from "axios";
 import { NotificationProvider, useNotificationContext } from "./contexts/notificationContext";
+import { interceptorData } from "./main";
 //TODO - channel doesnt send msgs and the users dont get added in the channel creation
 
-function GameInviteToast({msg, joinGame, declineGame}:{msg:string, joinGame?:any, declineGame?:any})
-{
+function GameInviteToast({ msg, joinGame, declineGame }: { msg: string, joinGame?: any, declineGame?: any }) {
   let [acceptedInvite, setInviteState] = useState(false);
 
   return (
     <div>
       <h3>{msg}</h3>
       <button style={{
-          backgroundColor:"purple", 
-          marginRight: "10px",
-          cursor:"pointer",
-          pointerEvents:"auto"
+        backgroundColor: "purple",
+        marginRight: "10px",
+        cursor: "pointer",
+        pointerEvents: "auto"
+      }}
+        onClick={() => {
+          if (joinGame) {
+            setInviteState(true);
+            joinGame();
+          }
         }}
-        onClick={() =>
-        {
-            if (joinGame)
-          {
-              setInviteState(true);
-              joinGame();
-            }
-          }}
       >
         Accept
       </button>
-      <button style={{backgroundColor:"purple",
-        cursor:"pointer",
-        pointerEvents:"auto"}}
-        onClick={() =>
-        {
-            if (declineGame)
-            {
-              declineGame();
-            }
-          }}
+      <button style={{
+        backgroundColor: "purple",
+        cursor: "pointer",
+        pointerEvents: "auto"
+      }}
+        onClick={() => {
+          if (declineGame) {
+            declineGame();
+          }
+        }}
       >
         Decline</button>
     </div>
@@ -123,9 +121,11 @@ function SetupSockets() {
 
   useEffect(() => {
 
-    const game_socket = setupSocket(`${process.env.REACT_URL}:1337/game`) ;
+    console.log("the user context is in setup sockets :", user);
 
-    game_socket.on("inviteAccepted", ()=>{
+    const game_socket = setupSocket(`${process.env.REACT_URL}:1337/game`);
+
+    game_socket.on("inviteAccepted", () => {
       navigate("/game");
     })
 
@@ -137,7 +137,7 @@ function SetupSockets() {
       game_socket.emit('declinePlayingInvite', roomID);
     }
 
-//---------------------------------------------------------------------------
+    //---------------------------------------------------------------------------
     const chat_socket = setupSocket(`${process.env.REACT_URL}:1337/chat`);
 
     chat_socket.on("exception", (err) => {
@@ -152,21 +152,19 @@ function SetupSockets() {
 
     const ping_socket = setupSocket(`${process.env.REACT_URL}:1337`);
 
-    ping_socket.on("exception", (err) =>
-    {
-        console.log("in the ping exception");
-        // Handle the error here
-        setUser(prevUser => ({
-          ...prevUser,
-          chatException: err,
-        }));
-        // console.log(err); // Prints the error message
-      });
+    ping_socket.on("exception", (err) => {
+      console.log("in the ping exception");
+      // Handle the error here
+      setUser(prevUser => ({
+        ...prevUser,
+        chatException: err,
+      }));
+      // console.log(err); // Prints the error message
+    });
 
-    const setIntervalId = setInterval(() =>
-    {
-        ping_socket.emit('ping');
-      }, 3 * 60 * 1000);
+    const setIntervalId = setInterval(() => {
+      ping_socket.emit('ping');
+    }, 0.5 * 60 * 1000);
 
 
     //TODO - this maybe broken it need testing because the notification event is sent from the main gateway not the chat gateway
@@ -186,9 +184,9 @@ function SetupSockets() {
         .then((resp) => {
           setUser(prevUser => ({ ...prevUser, data: resp.data }))
           Cookies.remove('user')
-          Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax'  });
+          Cookies.set('user', JSON.stringify(resp.data), { sameSite: 'lax' });
         })
-        .catch(()=> {
+        .catch(() => {
           navigate("/login")
         })
 
@@ -196,21 +194,18 @@ function SetupSockets() {
 
     ping_socket.on('reconnect', () => {
       console.log("reconnected");
-      ping_socket.disconnect();
-      ping_socket.connect();
       chat_socket.disconnect();
       chat_socket.connect();
     })
-    ping_socket.on('private', (roomID:number,username:string) => 
-    {
-        const message = username + " Invited you to a game !";
-        toast(<GameInviteToast msg={message}  joinGame={()=>handleJoinPrivate(roomID)} 
-          declineGame={()=>handleDeclinePrivate(roomID)}/>
-          , {
-            pauseOnHover: false,
-            pauseOnFocusLoss: false
-          });
-      });
+    ping_socket.on('private', (roomID: number, username: string) => {
+      const message = username + " Invited you to a game !";
+      toast(<GameInviteToast msg={message} joinGame={() => handleJoinPrivate(roomID)}
+        declineGame={() => handleDeclinePrivate(roomID)} />
+        , {
+          pauseOnHover: false,
+          pauseOnFocusLoss: false
+        });
+    });
 
     setUser(prevUser => ({
       ...prevUser,
@@ -221,11 +216,11 @@ function SetupSockets() {
 
     // console.log("the user context is in setup sockets :", user);
     return () => {
-      ping_socket.disconnect();
+      // ping_socket.disconnect();
       ping_socket.off();
-      chat_socket.disconnect();
+      // chat_socket.disconnect();
       chat_socket.off();
-      game_socket.disconnect();
+      // game_socket.disconnect();
       game_socket.off();
       console.log("sockets disconnected");
       clearInterval(setIntervalId);
@@ -250,8 +245,8 @@ function App() {
     requests: {},
   });
 
-  const {setAvatar} = useAvatarContext()
-  const {setNotification} = useNotificationContext()
+  const { setAvatar } = useAvatarContext()
+  const { setNotification } = useNotificationContext()
   //-----------------We are relying on cookies to save sessions, we should later rm the cookie in loggout, and also make sure we are not storing sensitive stuff
 
 
@@ -261,6 +256,9 @@ function App() {
 
   // const navigate = useNavigate();
   useEffect(() => {
+
+    interceptorData.isRefreshing = false;
+
     const userData = Cookies.get('user');
 
 
@@ -278,8 +276,8 @@ function App() {
 
   }, []);
 
-  useEffect( () => {
-    if (user.data && user.data.friendRequests){
+  useEffect(() => {
+    if (user.data && user.data.friendRequests) {
       setNotification(true)
       console.log('user have a new fr req')
     }
@@ -295,7 +293,7 @@ function App() {
               <PwdPopupProvider >
                 <AddFriendsPopupProvider>
                   <ProtectedRoomProvider >
-                    <ToastContainer/>
+                    <ToastContainer />
                     <Routes>
                       {/* Public Routes */}
                       <Route path="/" element={<LandingPage />} />
@@ -306,20 +304,20 @@ function App() {
                       {/* Private Routes */}
                       <Route element={
                         <>
-                          <RequireAuth/>
-                          <SetupSockets/>
+                          <RequireAuth />
+                          <SetupSockets />
                         </>
                       }>
                         <Route path="/home" element={<Home />} />
                         <Route path="/chat" element={<Chat />} />
                         <Route path="/:username" element={<UserProfile />} />
                         <Route path="/not-found" element={<NotFoundPage />} />
-                        <Route path="/search" element={<Search/>} />
+                        <Route path="/search" element={<Search />} />
                         <Route path="/setup" element={<Setup />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/:username" element={<UserProfile />} />
-                        <Route path="/groups" element={<ManageGoups/>} />
-                        <Route path="/search" element={<Search/>} />
+                        <Route path="/groups" element={<ManageGoups />} />
+                        <Route path="/search" element={<Search />} />
                         <Route path="/not-found" element={<NotFoundPage />} />
                         <Route path="/game" element={<Game />} />
                         <Route path="/bot" element={<BotMode />} />

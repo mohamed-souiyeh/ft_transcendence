@@ -47,6 +47,14 @@ function Setup()
 
   const changeBoth = () =>
 {
+
+    const regex: RegExp = /^[a-zA-Z0-9][a-zA-Z0-9_]{1,12}$/;
+
+    if (!regex.test(userName)) {
+      setErrMsg("Invalid username, no special chars or spaces allowed");
+      return;
+    }
+
     if (userName.length)
       formdata.set("username", userName);
     if (srcImg)
