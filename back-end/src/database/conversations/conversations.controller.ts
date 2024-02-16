@@ -5,11 +5,14 @@ import { IRequestWithUser } from 'src/auth/Interfaces/IRequestWithUser';
 import { createChanneldto } from './channel.dto/channel.dto';
 import { createDMdto } from './dmDTO/createDM.dto';
 import { eventBus } from 'src/eventBus';
+import { UsersService } from '../users/users.service';
+import e from 'express';
 
 @Controller('conv')
 export class ConversationsController {
 
-  constructor(private conversationService: ConversationsService) { }
+  constructor(private conversationService: ConversationsService,
+              private usersService: UsersService) { }
 
   @UseGuards(JwtAuthGuard)
   @Get('dms')
@@ -31,6 +34,14 @@ export class ConversationsController {
       dmId: createDM,
       userId: req.user.id,
     });
+
+    const user = await this.usersService.findUserByUsername(dmData.username);
+
+    eventBus.emit('DMCreated', {
+      dmId: createDM,
+      userId: user.id,
+    });
+
     return createDM;
   }
 

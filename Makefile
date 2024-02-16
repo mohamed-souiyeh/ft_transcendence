@@ -4,6 +4,9 @@ build: volumes install
 install:
 	(curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sh -s -- --no-package-manager --no-install
 
+
+re: down build
+
 # back-end: volumes studio
 # 	@./doppler run -- docker compose -f ./dev-ops/docker-compose.yml up -d --build  back-end-dev
 

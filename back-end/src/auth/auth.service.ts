@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { HttpRedirectResponse, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtAuthService } from './jwt/jwt.service';
 import { Response } from 'express';
 import { UsersService } from 'src/database/users/users.service';
 import { IRequestWithUser } from './Interfaces/IRequestWithUser';
-import { UserStatus } from '@prisma/client';
-import { UserDto } from 'src/database/users/User_DTO/User.dto';
 
 @Injectable()
 export class AuthService {
@@ -104,7 +102,7 @@ export class AuthService {
 
 
     //NOTE - redirect to home page
-    const redirect: HttpRedirectResponse = {
+    const redirect = {
       // use env vars here
       url: req.user.redirectUrl,
       statusCode: 302,
@@ -142,7 +140,7 @@ export class AuthService {
 
     // console.log('ftLogin =>', req.user);
     //NOTE - redirect to home page
-    const redirect: HttpRedirectResponse = {
+    const redirect = {
       // use env vars here
       url: req.user.redirectUrl,
       statusCode: 302,
