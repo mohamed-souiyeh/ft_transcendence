@@ -67,11 +67,11 @@ function Rooms(props: object) {
       convId: channel.id,
       convType: channel.type,
     }, (err, msgs) => {
-        if (err) {
-          return;
-        }
-        setMsgs(msgs);
-      });
+      if (err) {
+        return;
+      }
+      setMsgs(msgs);
+    });
 
     const state = channel.usersState.find((userState) => userState.userId === user.data.id)?.state;
 
@@ -79,7 +79,7 @@ function Rooms(props: object) {
     setIsMuted(state === 'muted');
 
     user.chat.on('broadcast', (msg) => {
-      if (channel.id === msg.convId)
+      if (channel.id === msg.convId && channel.type === msg.convType)
         setMsgs(prevMsgs => [...prevMsgs, msg]);
     });
 
@@ -88,8 +88,7 @@ function Rooms(props: object) {
     });
 
     return () => {
-      user.chat.off('broadcast');
-      user.chat.off('update');
+      user.chat.off();
     }
   }, [channel])
 
@@ -133,9 +132,9 @@ function Rooms(props: object) {
                   let message = msg.message
 
                   if (msg.authorInfo.usersAuthorBlockedBy.find((blockedUser) => blockedUser.id === user.data.id))
-                  message = "you are blocked by this user";
+                    message = "you are blocked by this user";
                   if (isBaned)
-                  message = "you are banned from this channel";
+                    message = "you are banned from this channel";
 
 
                   return <Bubble left={msg.authorInfo.username !== user.data.username} username={msg.authorInfo.username} message={message} key={msg.id} isBanned={(isBaned || isMuted)}

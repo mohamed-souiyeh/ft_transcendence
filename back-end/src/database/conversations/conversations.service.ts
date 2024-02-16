@@ -491,7 +491,7 @@ export class ConversationsService {
       throw new BadRequestException("Bad channel name, only aA0-zZ9 and _ allowed");
     }
 
-    const descriptionRegex: RegExp = /^[a-zA-Z0-9_]{0,100}$/;
+    const descriptionRegex: RegExp = /^[a-zA-Z0-9_ ]{0,100}$/;
 
     if (!descriptionRegex.test(channelFromBody.channelDescription)) {
       throw new BadRequestException("Bad channel descreption, no special chars are allowed.")

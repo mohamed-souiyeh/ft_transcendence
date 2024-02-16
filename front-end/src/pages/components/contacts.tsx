@@ -1,7 +1,8 @@
 import Icons from "./icons"
 import { useDmContext } from "../../contexts/chatContext.tsx"
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { UserContext } from "../../App.tsx";
 
 function Contacts(props) {
 
@@ -10,6 +11,7 @@ function Contacts(props) {
 
   const { user, dmInfo } = props;
   const [img, setImg] = useState('')
+  const User = useContext(UserContext).user;
 
   //NOTE - we need to add the status of the user from the back-end
   const clicked = () => {
@@ -33,26 +35,26 @@ function Contacts(props) {
     //       setStatus(res.data);
     //     }).catch(() => { })
     // });
-  
+
     // return () => {
     //   clearInterval(intervalId);
     // }
   }, [])
 
-return (
-  <div className={` ${dm.id === dmInfo.id ? 'bg-purple-sh-0' : 'bg-transparent'} flex border border-transparent border-b-purple-sh-0 p-4`} onClick={() => clicked()}>
-    <div className='flex basis-11/12 hover:cursor-pointer' >
-      <img src={img} className="rounded-full h-12 w-12" />
-      <div className="grid px-2">
-        <p className="text-xl font-bold text-purple-tone-2"> {user.username} </p>
-        {/* <p className="text-sm text-impure-white/40  truncate"> {status} </p> */}
+  return (
+    <div className={` ${dm.id === dmInfo.id ? 'bg-purple-sh-0' : 'bg-transparent'} flex border border-transparent border-b-purple-sh-0 p-4`} onClick={() => clicked()}>
+      <div className='flex basis-11/12 hover:cursor-pointer' >
+        <img src={img} className="rounded-full h-12 w-12" />
+        <div className="grid px-2">
+          <p className="text-xl font-bold text-purple-tone-2"> {user.username} </p>
+          {/* <p className="text-sm text-impure-white/40  truncate"> {status} </p> */}
+        </div>
+      </div>
+      <div className='flex flex-row-reverse basis-1/12 self-center'>
+        <Icons user={user} />
       </div>
     </div>
-    <div className='flex flex-row-reverse basis-1/12 self-center'>
-      <Icons user={user} />
-    </div>
-  </div>
-)
+  )
 }
 
 export default Contacts

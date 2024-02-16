@@ -38,8 +38,7 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
 
     eventBus.on('newNotification', sendNotification);
 
-    eventBus.on('privateGame', async (senderID: number, guestID: number, roomID: number) =>
-    {
+    eventBus.on('privateGame', async (senderID: number, guestID: number, roomID: number) => {
       const user = await this.usersService.findUserById(senderID);
       console.log("user in private game => ", user);
       server.to(`${guestID}`).emit('private',
@@ -78,18 +77,20 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
 
     const payload: JwtPayload = await this.jwtAuthService.decodetoken(jwt);
 
-    scheduledLogoutMap.set(payload.id, setTimeout(() => {
-      
-      Logger.debug('setting user ofline', 'disconnect function');
-      this.usersService.setOfflineStatus(payload.id)
-      .then(() => {
-        // console.log("client is offline now")
-      })
-      .catch(err => {
-        // console.log("error happened in handel disconnect of the main gateway in set offline" ,err);
-      });
-    }, LOGOUT_TIMEOUT));
+    if (!scheduledLogoutMap.has(payload.id) && await this.usersService.getStatus(payload.id) === UserStatus.online) {
+      scheduledLogoutMap.set(payload.id, setTimeout(() => {
 
+        Logger.debug('setting user ofline', 'disconnect function');
+        this.usersService.setOfflineStatus(payload.id)
+          .then(() => {
+            // console.log("client is offline now")
+          })
+          .catch(err => {
+            // console.log("error happened in handel disconnect of the main gateway in set offline" ,err);
+          });
+      }, LOGOUT_TIMEOUT));
+
+    }
     // console.log("client is going to be offline in 5 minutes");
   }
 
@@ -102,6 +103,8 @@ export class MainNameSpaceGateway implements OnGatewayConnection, OnGatewayDisco
     if (scheduledLogoutMap.has(payload.id)) {
       clearTimeout(scheduledLogoutMap.get(payload.id));
       scheduledLogoutMap.delete(payload.id);
+      if (await this.usersService.getStatus(payload.id) === UserStatus.offline)
+        this.usersService.setOnlineStatus(payload.id);
     }
   }
 
