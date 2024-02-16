@@ -485,7 +485,7 @@ export class ConversationsService {
       throw new BadRequestException("channelPassword is required for protected channels");
     }
 
-    const nameRegex: RegExp = /^[a-zA-Z0-9_]{3,13}$/;
+    const nameRegex: RegExp = /^[a-zA-Z0-9][a-zA-Z0-9_]{2,12}$/;
 
     if (!nameRegex.test(channelFromBody.channelName)) {
       throw new BadRequestException("Bad channel name, only aA0-zZ9 and _ allowed");

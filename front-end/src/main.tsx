@@ -9,14 +9,10 @@ import { AvatarProvider } from './contexts/avatar.tsx'
 import { NotificationProvider } from './contexts/notificationContext.tsx'
 
 
-const interceptorData: {
-  tobeRefreshed: any[],
-  failedRequests: any[],
+export const interceptorData: {
   refreshPromise: null | Promise<any>,
   isRefreshing: boolean,
 } = {
-  tobeRefreshed: [],
-  failedRequests: [],
   refreshPromise: null,
   isRefreshing: false,
 }
@@ -44,12 +40,10 @@ axios.interceptors.response.use(
 
 
     // console.log("isRefreshRequest :", isRefreshRequest);
-    if (error.response && error.response.status === 401 && !originalRequest._retry ) {
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      interceptorData.tobeRefreshed.push(originalRequest);
-      
-      if (interceptorData.isRefreshing){
+      if (interceptorData.isRefreshing) {
         console.log("isRefreshing, pushing to failedRequests");
         console.log("interceptorData :", interceptorData);
         return interceptorData.refreshPromise!.then(() => {
@@ -57,7 +51,7 @@ axios.interceptors.response.use(
         });
       }
 
-      
+
       // Trying to refresh the Token:
       console.log("Trying to refresh Token..")
       interceptorData.refreshPromise = axios.get(`${process.env.REACT_URL}:1337/auth/refresh`, {
@@ -69,14 +63,17 @@ axios.interceptors.response.use(
         return axios(originalRequest);
       }).catch((err) => {
         console.log("my sad shit, an err occured, it's :", err);
-        
-        const isRefresh = error.request.responseURL === `${process.env.REACT_URL}:1337/auth/refresh`;
 
+        const isRefresh = err.request.responseURL === `${process.env.REACT_URL}:1337/auth/refresh`;
+
+        console.log("isRefresh: ", isRefresh);
         if (!isRefresh) {
           return Promise.reject(error);
         }
 
         eventBus.emit('unauthorized');
+        interceptorData.isRefreshing = false;
+        console.log("we are suposed to kick him");
         return Promise.reject(error);
       });
       interceptorData.isRefreshing = true;

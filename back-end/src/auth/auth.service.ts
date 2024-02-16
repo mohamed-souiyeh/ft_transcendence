@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { HttpRedirectResponse, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpRedirectResponse, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtAuthService } from './jwt/jwt.service';
 import { Response } from 'express';
 import { UsersService } from 'src/database/users/users.service';
@@ -55,6 +55,7 @@ export class AuthService {
       await this.addTokenToCookie(req.res, '', process.env.ACCESS_TOKEN_KEY);
       await this.addTokenToCookie(req.res, '', process.env.REFRESH_TOKEN_KEY);
 
+      Logger.debug("setting user ofline", "refresh function");
       await this.userService.setOfflineStatus(req.user.id);
       throw new UnauthorizedException('1 refresh token is not valid');
     }
@@ -157,6 +158,7 @@ export class AuthService {
     //reset refresh token in db
     await this.userService.replaceRefreshToken(req.user.id, null);
 
+    Logger.debug("setting user ofline", "logout function");
     await this.userService.setOfflineStatus(req.user.id);
 
     await this.userService.setAuthenticated(req.user.id, false);

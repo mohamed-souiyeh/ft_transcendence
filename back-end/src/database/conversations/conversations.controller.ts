@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards, Query, Get, ParseIntPipe, Delete, HttpCode, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards, Query, Get, ParseIntPipe, HttpCode, BadRequestException, Logger } from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
 import { IRequestWithUser } from 'src/auth/Interfaces/IRequestWithUser';
@@ -56,6 +56,13 @@ export class ConversationsController {
   @UseGuards(JwtAuthGuard)
   @Get('search')
   async searchChannels(@Query('prefix') prefix: string): Promise<createChanneldto[]> {
+
+    const regex: RegExp = /^[a-zA-Z0-9][a-zA-Z0-9_]{0,12}$/;
+
+    Logger.debug('searching for channels', 'searchChannels');
+    if (!regex.test(prefix))
+      throw new BadRequestException('invalid prefix');
+
     const channels = await this.conversationService.searchChannels(prefix);
 
     return channels;
@@ -71,7 +78,7 @@ export class ConversationsController {
     @Body('channelId', ParseIntPipe) channelId: number,
     @Body('userId', ParseIntPipe) userId: number,
     @Body('password') password: string,
-  ): Promise<any> {
+  ) {
 
     // console.log("---------------------");
     // console.log(channelId);
@@ -91,7 +98,7 @@ export class ConversationsController {
   async leaveChannel(
     @Body('channelId', ParseIntPipe) channelId: number,
     @Body('userId', ParseIntPipe) userId: number,
-  ): Promise<any> {
+  ) {
     console.log("Je suis ici");
     const state = await this.conversationService.removeUserFromChannel(channelId, userId);
 

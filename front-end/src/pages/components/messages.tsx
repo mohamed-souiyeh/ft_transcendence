@@ -3,6 +3,7 @@ import { useDmContext } from "../../contexts/chatContext"
 import Icons from "./icons"
 import Bubble from "./bubble"
 import { UserContext } from "../../App"
+import axios from "axios"
 
 const dumy_msg = {
   authorInfo: {
@@ -93,6 +94,13 @@ function Messages(props: any) {
       }
     })
 
+    axios.get(`${process.env.REACT_URL}:1337/users/status/${dm.userId}`,
+      {
+        withCredentials: true,
+      }).then((res) => {
+        console.log("the status: ", res.data);
+        setStatus(res.data);
+      }).catch(() => { })
 
     user.chat.on('broadcast', (msg) => {
       console.log(msg);

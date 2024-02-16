@@ -14,7 +14,8 @@ import {
   Param, 
   NotFoundException, 
   ParseIntPipe,
-  Res
+  Res,
+  Logger
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt/guard/jwt-auth.guard';
@@ -109,6 +110,11 @@ export class UsersController {
     return true;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('status/:id')
+  async getUserStatus(@Param('id', ParseIntPipe) id: number): Promise<any> {
+    return this.userService.getStatus(id);
+  }
 
 
   @UseGuards(JwtAuthGuard)
@@ -150,6 +156,12 @@ export class UsersController {
   @Get('search')
   async searchUsersByUsernamePrefix(@Query('prefix') prefix: string, @Req() req: IRequestWithUser): Promise<any> {
 
+    const regex: RegExp = /^[a-zA-Z0-9][a-zA-Z0-9_]{0,14}$/;
+
+    Logger.debug('searching for channels', 'searchChannels');
+    if (!regex.test(prefix))
+      throw new BadRequestException('invalid prefix');
+
     console.log("prefix => ", prefix);
     const users = await this.userService.searchUsersByUsernamePrefix(prefix, req.user.id);
 
@@ -185,7 +197,7 @@ export class UsersController {
 
 
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('Public_data/:username')
   async getUserByUsername(@Param('username') username: string): Promise<any> { 
     try {

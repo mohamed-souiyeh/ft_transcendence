@@ -19,6 +19,8 @@ function Logout({open, onClose} : {open : boolean, onClose : () => any;})  {
           Cookies.remove('user')
           localStorage.removeItem('avatar');
           user.chat.disconnect();
+          user.ping.disconnect();
+          user.game_socket.disconnect();
           setUser({ data: {} })
           nav("/login")
         }

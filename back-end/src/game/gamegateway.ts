@@ -157,6 +157,10 @@ export class gameServer implements OnModuleInit {
 
   @SubscribeMessage('acceptPlayingInvite')
   async acceptMatchInvite(client: Socket, roomID: number) {
+    const user = await this.getUser(client);
+    if (await this.userService.getStatus(user.id) === "busy") {
+      return;
+    }
     console.log("Player accept invite ", roomID);
     let roomCheck = Array.from(this.roomsList.values())
       .find(room => room.id === roomID);
@@ -178,6 +182,8 @@ export class gameServer implements OnModuleInit {
         if (user)
           return user.id;
       });
+      await this.userService.setBusyStatus(roomCheck.user2ID);
+      await this.userService.setBusyStatus(roomCheck.user1ID);
       if (roomCheck.user1ID && roomCheck.user2ID) {
         console.log("User IDs ", roomCheck.user1ID, roomCheck.user2ID);
         this.server.to(`${roomCheck.id}`).emit("userIDs",
