@@ -7,6 +7,7 @@ import { useProtectedRoomContext } from "../contexts/ProtectedRoomContext";
 import axios from "axios";
 import { UserContext } from "../App";
 import Cookies from 'js-cookie';
+import { toast } from "react-toastify";
 
 
 function ManageGoups() {
@@ -24,6 +25,9 @@ function ManageGoups() {
   const [val, setVal] = useState("")
   const [state, setState] = useState(false)
   const menuRef = useRef(null);
+  const [groupData, setGroupData] = useState([]);
+  const [refreshGroups, setRefreshGroups] = useState(false);
+  const { setUser } = useContext(UserContext)
   const [confirmationPwd, setConfirmationPwd] = useState("")
   const [createdGroup, setCreatedGroup] = useState({
     name: "",
@@ -56,15 +60,10 @@ function ManageGoups() {
   const setPrivacy = (prv: string) => {
     setCreatedGroup({ ...createdGroup, privacy: prv })
     setState(false)
-
   }
 
-  const [groupData, setGroupData] = useState([]);
-  const [refreshGroups, setRefreshGroups] = useState(false);
-  const { setUser } = useContext(UserContext)
   useEffect(() => {
     if (!val) return setGroupData([]);
-
 
     axios.get(`${process.env.REACT_URL}:1337/conv/search?prefix=${val}`, {
       withCredentials: true,
@@ -75,14 +74,11 @@ function ManageGoups() {
       .catch(error => {
       });
     setRefreshGroups(false);
-
   }, [refreshGroups])
 
   const getGroups = (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!val) return setGroupData([]);
-
 
     axios.get(`${process.env.REACT_URL}:1337/conv/search?prefix=${val}`, {
       withCredentials: true,
@@ -93,6 +89,7 @@ function ManageGoups() {
       .catch(() => { });
   }
 
+  // useEffect()
 
   const openOptions = () => {
     setState(!state)
@@ -101,22 +98,31 @@ function ManageGoups() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    setBadInput((badInput) => ({ ...badInput,
+      badName: false,
+      badPwd: false,
+      badPrv: false,
+      badMembers: false,
+      badChars: false,
+      badChannel: false,
+    }))
+
     const regex: RegExp = /^[a-zA-Z0-9][a-zA-Z0-9_]*$/;
     if (!Object.keys(createdGroup.members).length) {
-      setBadInput({ ...badInput, badMembers: true })
+      setBadInput((badInput) => ({ ...badInput, badMembers: true }))
       return;
     }
 
     if (createdGroup.privacy === "protected" && (createdGroup.password != confirmationPwd || !createdGroup.password)) {
-      setBadInput({ ...badInput, badPwd: true })
+      setBadInput((badInput) => ({ ...badInput, badPwd: true }))
       return;
     }
     if (!createdGroup.privacy) {
-      setBadInput({ ...badInput, badPrv: true })
+      setBadInput((badInput) => ({ ...badInput, badPrv: true }))
       return;
     }
     if (createdGroup.name.length < 3 || !regex.test(createdGroup.name)) {
-      setBadInput({ ...badInput, badName: true })
+      setBadInput((badInput) => ({ ...badInput, badName: true }))
       return;
     }
 
@@ -126,7 +132,7 @@ function ManageGoups() {
 
 
     if (!regex.test(createdGroup.description) && createdGroup.description.length) {
-      setBadInput({ ...badInput, badChars: true })
+      setBadInput((badInput) => ({ ...badInput, badChars: true }))
       return;
     }
     axios.post(`${process.env.REACT_URL}:1337/conv/createChannel`, {
@@ -136,8 +142,8 @@ function ManageGoups() {
       channelPassword: createdGroup.password,
       members: createdGroup.members,
     }, {
-      withCredentials: true,
-    })
+        withCredentials: true,
+      })
       .then(() => {
         setCreatedGroup({
           name: "",
@@ -157,10 +163,16 @@ function ManageGoups() {
           .catch(() => {
           })
         setRefreshMembers(true)
+
+        toast(`Group Created Successfully ^.^ YaY!`, {
+          pauseOnHover: false,
+          pauseOnFocusLoss: false
+        });
+
       })
       .catch((err) => {
         console.log("error in creating a channel: ", err.response.data.message);
-        setBadInput({ ...badInput, badChannel: true });
+        setBadInput((badInput) => ({ ...badInput, badChannel: true }))
       });
   }
 
@@ -202,7 +214,7 @@ function ManageGoups() {
               <div className="flex-col h-full p-4 basis-1/2 " >
                 <p className="text-2xl" > Group Name: </p>
                 <input type="text" maxLength={nameMaxLength} name="name" value={createdGroup.name} onChange={handleInputChange} placeholder="group name" className="bg-purple-sh-0 rounded-lg w-72 placeholder:text-impure-white/30 focus:outline-none p-2" />
-                {badInput.badName && <p className="text-[#D9534F] font-bold text-sm" > Please Enter a valid name</p>}
+                {badInput.badName === true  && <p className="text-[#D9534F] font-bold text-sm" > Please Enter a valid name</p>}
 
                 <p className="text-2xl pt-3" > privacy: </p>
                 <div ref={menuRef} onClick={() => { openOptions() }} className=" bg-purple-sh-0 flex items-center rounded-lg p-2 hover:cursor-pointer w-72">
