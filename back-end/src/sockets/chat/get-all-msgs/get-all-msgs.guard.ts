@@ -71,6 +71,8 @@ export class GetAllMsgsGuard implements CanActivate {
       if (userState === undefined)
         throw new WsException({ error: 'Unauthorized operation', message: 'you are not in this channel' });
 
+      if (userState.state === UserState.banned)
+        throw new WsException({ error: 'Unauthorized operation', message: 'you are banned from this channel' });
     } else {
       throw new WsException({ error: 'Unauthorized operation', message: 'channel type is not valid: some kinky fuckery happened' });
     }

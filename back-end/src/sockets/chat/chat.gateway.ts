@@ -82,12 +82,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   async addToRooms(user: any, client: Socket) {
 
     for (const dm of user.dms) {
-      Logger.debug(dm, "dm");
+      // Logger.debug(dm, "dm");
       client.join(`dm.${dm.id}`);
     }
 
     for (const channel of user.channels) {
-      Logger.debug(channel, "channel");
+      // Logger.debug(channel, "channel");
       client.join(`channel.${channel.id}`);
     }
     await this.checkIfActiveAgain(user);
@@ -165,6 +165,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     msg.convId = Number(msg.convId);
   }
 
+  getUser = async (client: Socket) => {
+    const { jwt } = await this.chatService.getTokensFromSocket(client);
+
+    const payload = await this.jwtAuthService.decodetoken(jwt);
+
+    const user = await this.usersService.findUserById(payload.id);
+
+    return user;
+  }
 
   @UseGuards(ChannelGuard)
   @SubscribeMessage('channelmsg')
@@ -190,27 +199,64 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     const adapter = this.server.adapter as any;
     const room = adapter.rooms.get(`channel.${msg.convId}`);
 
+
+
     if (room && room.size > 0) {
+      // const clients = [...room];
+      // console.log("room", room);
+      // Logger.debug(typeof room.forEach, "room.forEach");
+      // Logger.debug(typeof room, "typeof room");
+      // console.log("-------------------------------------------------------------------------");
       const db_msg = {
         text: msg.message,
         senderId: user.id,
         channelId: msg.convId,
       }
       const toSend = await this.convService.createMessage(db_msg);
+      room.forEach(async (client) => {
+        console.log("client => ", client);
+        // Logger.debug(client, "client");
 
-      this.server.to(`channel.${msg.convId}`).emit('broadcast', {
-        id: toSend.id,
-        authorInfo: {
-          username: user.username,
-          id: user.id,
-          role: userState.role,
-          usersAuthorBlockedBy: user.blockedBy,
-        },
-        message: msg.message,
-        convType: msg.convType,
-        convId: msg.convId,
-        bannedUsers: bannedUsers,
-      });
+
+        const sockets = this.server.sockets as any;
+        // console.log("server => ", sockets.get(client));
+        const clientSocket = sockets.get(client);
+
+        if (!clientSocket) {
+          Logger.debug("clientSocket is undefined", "sending to client")
+          return;
+        }
+
+        const usertToSendTo = await this.getUser(clientSocket);
+
+        const isBlocked = await this.usersService.getBlockStatus(user.id, usertToSendTo.username);
+
+        Logger.debug('user to send to => ', usertToSendTo.username, " id: ", usertToSendTo.id, "sending to client");
+        Logger.debug(`isBlocked => ${isBlocked.isBlocked}`, "sending to client");
+        Logger.debug(`isBanned => ${bannedUsers.find(userState => userState.userId === usertToSendTo.id) }`, "sending to client");
+        // Logger.debug('user to send to => ', usertToSendTo, "sending to client")
+
+        if (isBlocked.isBlocked || bannedUsers.find(userState => userState.userId === usertToSendTo.id)) {
+          Logger.debug(`user ${usertToSendTo.username} is blocked or banned, not sending`, "sending to client")
+          return;
+        }
+
+        Logger.debug(`sending to ${usertToSendTo.username}`, "sending to client")
+
+        this.server.to(client).emit('broadcast', {
+          id: toSend.id,
+          authorInfo: {
+            username: user.username,
+            id: user.id,
+            role: userState.role,
+            usersAuthorBlockedBy: user.blockedBy,
+          },
+          message: msg.message,
+          convType: msg.convType,
+          convId: msg.convId,
+          bannedUsers: bannedUsers,
+        });
+      })
     }
   }
 
@@ -339,14 +385,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
 
     if (until.getTime() - now.getTime() < 5 * (1000 * 60 * 60)) {
-    //NOTE - only launch the timer if the time is less than 5 hours
-    setTimeout(() => {
-      this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.active);
-      this.server.to(`channel.${msg.convId}`).emit('update', {
-        message: 'a user unmuted',
-      });
-    }, until.getTime() - now.getTime() + (0.5 * 60000));
-  }
+      //NOTE - only launch the timer if the time is less than 5 hours
+      setTimeout(() => {
+        this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.active);
+        this.server.to(`channel.${msg.convId}`).emit('update', {
+          message: 'a user unmuted',
+        });
+      }, until.getTime() - now.getTime() + (0.5 * 60000));
+    }
 
 
     await this.convService.updateUserState(msg.convId, msg.targetedUserId, UserState.muted, until);
@@ -404,6 +450,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     msg.targetedUserId = Number(msg.targetedUserId);
 
     await this.convService.addUserToChannel(msg.convId, msg.targetedUserId);
+
+    eventBus.emit('reconnect', msg.targetedUserId);
 
     this.server.to(`channel.${msg.convId}`).emit('update', {
       message: 'a user added',
@@ -602,7 +650,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @UseGuards(GetAllMsgsGuard)
   @SubscribeMessage('getAllMessages')
-  async getAllMessages(@MessageBody() msg: any) {
+  async getAllMessages(@MessageBody() msg: any, @ConnectedSocket() client: Socket) {
     if (msg.convType === ChannelType.dm) {
       const conv = await this.convService.getDmMessages(msg.convId);
 
@@ -647,7 +695,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
         toAdd.convId = conv.id;
         toAdd.bannedUsers = conv.usersState.filter(userState => userState.state === UserState.banned);
 
-        messages.push(toAdd);
+        const user = await this.getUser(client);
+        const isBlocked = await this.usersService.getBlockStatus(toAdd.authorInfo.id, user.username);
+
+        if (isBlocked.isBlocked === false)
+          messages.push(toAdd);
       }
       // console.log("messages => ", messages);
       return messages;

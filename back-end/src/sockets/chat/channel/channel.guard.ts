@@ -61,7 +61,7 @@ export class ChannelGuard implements CanActivate {
     const isMuted = userState.state === UserState.muted;
 
     if (isBanned || isMuted)
-      throw new WsException({ error: 'Unauthorized operation', message: 'you are banned from this channel' });
+      throw new WsException({ error: 'Unauthorized operation', message: 'you are banned or muted from this channel' });
 
     return true;
   }
