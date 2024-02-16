@@ -3,6 +3,7 @@ import { useProtectedRoomContext } from "../../contexts/ProtectedRoomContext"
 import { UserContext } from "../../App";
 import axios from "axios";
 import Cookies from 'js-cookie';
+import { toast } from "react-toastify";
 
 
 
@@ -51,6 +52,11 @@ function Groups(props: any) {
             refreshGroups(true);
           })
           .catch(() => {})
+
+        toast(`Group Joined`, {
+          pauseOnHover: false,
+          pauseOnFocusLoss: false
+        });
       })
       .catch((error) => {
         setIncorrectPassword(error.response.data.message);
@@ -82,6 +88,11 @@ function Groups(props: any) {
             refreshGroups(true);
           })
           .catch(() => {})
+      
+        toast(`You left the group, Sayonara`, {
+          pauseOnHover: false,
+          pauseOnFocusLoss: false
+        });
       }).catch(() => {});
 
   }
