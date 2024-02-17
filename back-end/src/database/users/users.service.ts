@@ -39,29 +39,28 @@ export class UsersService {
 
   //SECTION - CREATE OPERATIONS
 
- 
-  async createAchievement(userId: number, achievementName: string):Promise<any>
-  {
+
+  async createAchievement(userId: number, achievementName: string): Promise<any> {
     console.log("User ", userId);
     const achievement = await this.prismaService.achievement.findUnique({
       where: { name: achievementName },
     });
-    
+
     if (!achievement) {
       throw new Error(`Achievement with name ${achievementName} does not exist`);
       return null;
     }
-    
+
     const user = await this.prismaService.user.update({
       where: {
         id: userId,
       },
       data: {
-        achievements:{
-        connect:{
-          id: achievement.id
+        achievements: {
+          connect: {
+            id: achievement.id
+          }
         }
-       }
       }
     });
 
@@ -122,7 +121,7 @@ export class UsersService {
 
 
 
-  
+
   async getScore(id: number) {
     const user = await this.prismaService.user.findUnique({
       where: {
@@ -175,7 +174,7 @@ export class UsersService {
       }
     });
 
-    if (user === null) null;
+    if (user === null) return null;
 
     this.updatefriendRequests(userId, false);
 
@@ -197,7 +196,7 @@ export class UsersService {
       }
     });
 
-    if (friends === null) null;
+    if (friends === null) return null;
 
     return friends;
   }
@@ -217,7 +216,7 @@ export class UsersService {
       }
     });
 
-    if (user === null) null;
+    if (user === null) return null;
 
     return user;
   }
@@ -254,7 +253,7 @@ export class UsersService {
       }
     });
 
-    if (userData === null) null;
+    if (userData === null) return null;
 
     const user = {
       ...userData,
@@ -295,7 +294,7 @@ export class UsersService {
       }
     });
 
-    if (user === null) null;
+    if (user === null) return null;
 
     return user.status;
   }
@@ -405,7 +404,7 @@ export class UsersService {
           id: notification.id,
         }
       });
-    
+
     const otherNotification = await this.prismaService.notification.findFirst({
       where: {
         senderId: userId,
@@ -680,7 +679,7 @@ export class UsersService {
       where: {
         username: {
           startsWith: prefix,
-        },  
+        },
 
         blockedBy: {
           none: {
@@ -698,7 +697,7 @@ export class UsersService {
   async getUserAvatar(userId: number): Promise<string> {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
-      select: { 
+      select: {
         avatar: true
       },
     });
@@ -713,7 +712,7 @@ export class UsersService {
 
   async getUserData(username: string): Promise<any> {
 
-  
+
     const user = await this.prismaService.user.findUnique({
       where: { username },
       select: {
@@ -727,23 +726,23 @@ export class UsersService {
         achievements: true,
         wonMatches: {
           include: {
-          winner: {
+            winner: {
               select: {
                 username: true,
                 id: true,
 
+              },
             },
-          },
-          loser: {
-            select: {
-              username: true,
-              id: true,
+            loser: {
+              select: {
+                username: true,
+                id: true,
+              },
             },
+
           },
-          
-        } ,
-      },
-        lostMatches:{
+        },
+        lostMatches: {
           include: {
             winner: {
               select: {
@@ -773,7 +772,7 @@ export class UsersService {
     const allMatches = [...user.wonMatches, ...user.lostMatches].sort((a, b) => {
       return new Date(b.endedAt).getTime() - new Date(a.endedAt).getTime();
     });
-    
+
 
     return {
       id: user.id,
@@ -792,9 +791,9 @@ export class UsersService {
 
   async getLeaderboard(): Promise<any> {
     const leaderboard = await this.prismaService.user.findMany({
-      take: 10, 
+      take: 10,
       orderBy: {
-        score: 'desc', 
+        score: 'desc',
       },
       where: {
         matchesPlayed: {
@@ -819,7 +818,7 @@ export class UsersService {
       where: {
         senderId,
         receiverId,
-      },  
+      },
     });
 
     const friendship = await this.prismaService.user.findFirst({
@@ -832,12 +831,12 @@ export class UsersService {
         },
       },
     });
-  
+
     return {
       isPending: !!notification,
       Notification: notification,
       isFriend: !!friendship,
-      }; 
+    };
   }
 
 
@@ -865,13 +864,13 @@ export class UsersService {
         ],
       },
     });
-  
+
     return {
       isBlocked: !!hasBlocked
     };
 
   }
-  
+
 
   // !
 }

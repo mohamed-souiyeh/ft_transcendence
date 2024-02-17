@@ -2,7 +2,7 @@
 
 source ~/.bashrc
 
-cd /root/shared/transandance/back-end/
+cd /root/shared/back-end/
 
 nvm install --lts node $NODE_VERSION
 

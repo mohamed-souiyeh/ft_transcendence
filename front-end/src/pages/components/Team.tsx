@@ -15,8 +15,8 @@ const people = [
     role: "Front-End Developer",
     imageUrl: laila,
 
-    githubUrl: "#",
-    linkedinUrl: "#",
+    githubUrl: "https://github.com/laila-chk",
+    linkedinUrl: "https://www.linkedin.com/in/laila-chokri-1a1794250/",
   },
   {
     name: "Malika Aamer",
@@ -29,22 +29,22 @@ const people = [
     name: "Jawaher Chennak",
     role: "Back-End Developer",
     imageUrl: jawaher,
-    githubUrl: "#",
-    linkedinUrl: "#",
+    githubUrl: "https://github.com/thejewels00",
+    linkedinUrl: "https://www.linkedin.com/in/jawaher-chennak-38305b160/",
   },
   {
     name: "Mohamed Souiyeh",
     role: "Back-End Developer",
     imageUrl: souiyeh,
-    githubUrl: "#",
-    linkedinUrl: "#",
+    githubUrl: "https://github.com/mohamed-souiyeh",
+    linkedinUrl: "https://www.linkedin.com/in/m-souiyeh/",
   },
   {
     name: "Mounir Sabiri",
     role: "Full-Stack Developer",
     imageUrl: mounir,
-    githubUrl: "#",
-    linkedinUrl: "#",
+    githubUrl: "https://github.com/Leonidasabiri",
+    linkedinUrl: "https://www.linkedin.com/in/mounir-sabiri-1b6723198/",
   },
 ];
 

@@ -43,14 +43,14 @@ export class gameServer implements OnModuleInit {
 
   async handleConnection(client: Socket) {
 
-    console.log("Client connected to gamegateway", client.id);
+    // console.log("Client connected to gamegateway", client.id);
     const user = await this.gameService.chatService.getUserFromSocket(client);
     if (user == null)
       return;
     const userStatus: string = await this.userService.getStatus(user.id);
-    console.log("Status ", userStatus);
+    // console.log("Status ", userStatus);
     if (userStatus == "busy") {
-      console.log("Already queuing");
+      // console.log("Already queuing");
       return;
     }
   }
@@ -74,13 +74,13 @@ export class gameServer implements OnModuleInit {
       user1 = await this.getUser(roomCheck.firstClient);
     if (roomCheck && roomCheck.secondClient)
       user2 = await this.getUser(roomCheck.secondClient);
-    console.log("Leave room from disconnect");
+    // console.log("Leave room from disconnect");
     if (user1) {
-      console.log("User1 ", user1.id);
+      // console.log("User1 ", user1.id);
       await this.userService.setOnlineStatus(user1.id);
     }
     if (user2) {
-      console.log("User2 ", user2.id);
+      // console.log("User2 ", user2.id);
       await this.userService.setOnlineStatus(user2.id);
     }
     if (roomCheck) {
@@ -97,7 +97,7 @@ export class gameServer implements OnModuleInit {
 
     let userStatus: string = await this.userService.getStatus(user.id);
     if (userStatus == "busy") {
-      console.log("Already queuing");
+      // console.log("Already queuing");
       return;
     }
     await this.userService.setBusyStatus(user.id);
@@ -129,14 +129,14 @@ export class gameServer implements OnModuleInit {
       return;
     }
     await this.userService.setBusyStatus(user.id);
-    console.log("Invite player");
+    // console.log("Invite player");
     let room_ = new room();
     room_.id = this.roomID;
     this.roomID++;
     room_.firstClient = client;
     room_.gameMode = "private";
     room_.roomState = "invite";
-    console.log("Invite player to room ", room_.id);
+    // console.log("Invite player to room ", room_.id);
     client.join(`${room_.id}`);
     this.roomsList.set(room_.id, room_);
     eventBus.emit("privateGame", user.id, invitedUserID, room_.id);
@@ -149,7 +149,7 @@ export class gameServer implements OnModuleInit {
         await this.userService.setOnlineStatus(user.id);
         if (room_) {
           this.roomsList.delete(room_.id);
-          console.log("Invite declined");
+          // console.log("Invite declined");
         }
       }
     }, 6000);
@@ -161,7 +161,7 @@ export class gameServer implements OnModuleInit {
     if (await this.userService.getStatus(user.id) === "busy") {
       return;
     }
-    console.log("Player accept invite ", roomID);
+    // console.log("Player accept invite ", roomID);
     let roomCheck = Array.from(this.roomsList.values())
       .find(room => room.id === roomID);
     if (roomCheck) {
@@ -185,7 +185,7 @@ export class gameServer implements OnModuleInit {
       await this.userService.setBusyStatus(roomCheck.user2ID);
       await this.userService.setBusyStatus(roomCheck.user1ID);
       if (roomCheck.user1ID && roomCheck.user2ID) {
-        console.log("User IDs ", roomCheck.user1ID, roomCheck.user2ID);
+        // console.log("User IDs ", roomCheck.user1ID, roomCheck.user2ID);
         this.server.to(`${roomCheck.id}`).emit("userIDs",
           roomCheck.user1ID,
           roomCheck.user2ID);
@@ -194,7 +194,7 @@ export class gameServer implements OnModuleInit {
   }
   @SubscribeMessage('declinePlayingInvite')
   async declineMatchInvite(client: Socket, roomID: number) {
-    console.log("Player decline invite ", roomID);
+    // console.log("Player decline invite ", roomID);
     let roomCheck = Array.from(this.roomsList.values())
       .find(room => room.id === roomID);
     let user = await this.getUser(roomCheck.firstClient);
@@ -211,12 +211,12 @@ export class gameServer implements OnModuleInit {
     let roomCheck = Array.from(this.roomsList.values())
       .find(room => room.firstClient === client
         || room.secondClient === client);
-    console.log("Leave room");
+    // console.log("Leave room");
     if (roomCheck && roomCheck.roomState != "gameOver") {
       if (this.roomsList.has(roomCheck.id)) {
 
         this.roomsList.get(roomCheck.id).roomState = "gameOver";
-        console.log("Set game over now !!");
+        // console.log("Set game over now !!");
       }
       let user1, user2;
       if (roomCheck.firstClient)
@@ -256,29 +256,37 @@ export class gameServer implements OnModuleInit {
         if (match.winnerId && match.loserId)
           this.gameService.matchesService.create(match);
       }
-      if (user1) {
-        const playedMatches = (await this.userService.getUserDataForHome(user1.id)).matchesPlayed + 1;
-        const wonMatches = (await this.userService.getUserDataForHome(user1.id)).wins;
-        if (playedMatches == 1)
-          await this.userService.createAchievement(user1.id, "newComer");
-        if (playedMatches == 5)
-          await this.userService.createAchievement(user1.id, "Player");
-        if (playedMatches > 5 && wonMatches == 5)
-          await this.userService.createAchievement(user1.id, "Veteran");
-        console.log("Played matches user1: " + playedMatches);
+      if (user1)
         await this.userService.setOnlineStatus(user1.id);
-      }
-      if (user2) {
-        const playedMatches = (await this.userService.getUserDataForHome(user2.id)).matchesPlayed + 1;
-        const wonMatches = (await this.userService.getUserDataForHome(user2.id)).wins;
-        if (playedMatches == 1)
-          await this.userService.createAchievement(user2.id, "newComer");
-        if (playedMatches >= 5)
-          await this.userService.createAchievement(user2.id, "Player");
-        if (playedMatches > 5 && wonMatches >= 5)
-          await this.userService.createAchievement(user2.id, "Veteran");
-        console.log("Played matches user2: " + playedMatches);
+      if (user2)
         await this.userService.setOnlineStatus(user2.id);
+
+      if (user1 && user2)
+      {
+        if (user1) {
+          const playedMatches = (await this.userService.getUserDataForHome(user1.id)).matchesPlayed + 1;
+          const wonMatches = (await this.userService.getUserDataForHome(user1.id)).wins;
+          if (playedMatches == 1)
+            await this.userService.createAchievement(user1.id, "newComer");
+          if (playedMatches == 5)
+            await this.userService.createAchievement(user1.id, "Player");
+          if (playedMatches > 5 && wonMatches == 5)
+            await this.userService.createAchievement(user1.id, "Veteran");
+          // console.log("Played matches user1: " + playedMatches);
+          await this.userService.setOnlineStatus(user1.id);
+        }
+        if (user2) {
+          const playedMatches = (await this.userService.getUserDataForHome(user2.id)).matchesPlayed + 1;
+          const wonMatches = (await this.userService.getUserDataForHome(user2.id)).wins;
+          if (playedMatches == 1)
+            await this.userService.createAchievement(user2.id, "newComer");
+          if (playedMatches >= 5)
+            await this.userService.createAchievement(user2.id, "Player");
+          if (playedMatches > 5 && wonMatches >= 5)
+            await this.userService.createAchievement(user2.id, "Veteran");
+          // console.log("Played matches user2: " + playedMatches);
+          await this.userService.setOnlineStatus(user2.id);
+        }
       }
       this.roomsList.delete(roomCheck.id);
     }
@@ -286,14 +294,14 @@ export class gameServer implements OnModuleInit {
   @SubscribeMessage('gameOver')
   async gameOver(client: Socket) {
     let match = new MatchDto();
-    console.log("Game over");
+    // console.log("Game over");
     let roomCheck = Array.from(this.roomsList.values()).find(room => room.secondClient === client ||
       room.firstClient === client);
     if (roomCheck && roomCheck.roomState != "gameOver") {
       if (this.roomsList.has(roomCheck.id)) {
 
         this.roomsList.get(roomCheck.id).roomState = "gameOver";
-        console.log("Set game over now !!");
+        // console.log("Set game over now !!");
       }
       if (roomCheck.gameMode != "robot") {
         let user1, user2;
@@ -302,7 +310,7 @@ export class gameServer implements OnModuleInit {
         if (roomCheck.secondClient)
           user2 = await this.getUser(roomCheck.secondClient);
         if (roomCheck.score1 > roomCheck.score2) {
-          console.log("Right");
+          // console.log("Right");
           match.winnerId = roomCheck.user2ID;
           match.loserId = roomCheck.user1ID;
           match.endedAt = roomCheck.endTime;
@@ -317,7 +325,7 @@ export class gameServer implements OnModuleInit {
           };
           this.userService.findUserById(roomCheck.user2ID).then((user) => {
             this.userService.setScore(user.id, user.score + (roomCheck.score1 - roomCheck.score2));
-            console.log("Score ", (roomCheck.score1 - roomCheck.score2));
+            // console.log("Score ", (roomCheck.score1 - roomCheck.score2));
           });
           this.server.to(`${roomCheck.firstClient.id}`).emit("winner", false);
           let user = await this.getUser(roomCheck.firstClient);
@@ -325,7 +333,7 @@ export class gameServer implements OnModuleInit {
             return;
         }
         else if (roomCheck.score1 < roomCheck.score2) {
-          console.log("Left");
+          // console.log("Left");
           match.winnerId = roomCheck.user1ID;
           match.loserId = roomCheck.user2ID;
           match.mode = roomCheck.gameMode;
@@ -334,7 +342,7 @@ export class gameServer implements OnModuleInit {
           match.loserStats = { score: roomCheck.score1, name: roomCheck.firstName };
           this.userService.findUserById(roomCheck.user1ID).then(async (user) => {
             await this.userService.setScore(user.id, user.score + (roomCheck.score2 - roomCheck.score1));
-            console.log("Score ", (roomCheck.score2 - roomCheck.score1));
+            // console.log("Score ", (roomCheck.score2 - roomCheck.score1));
           });
           this.server.to(`${roomCheck.secondClient.id}`).emit("winner", false);
           let user = await this.getUser(roomCheck.secondClient);
@@ -351,7 +359,7 @@ export class gameServer implements OnModuleInit {
             await this.userService.createAchievement(user1.id, "Player");
           if (playedMatches > 5 && wonMatches == 5)
             await this.userService.createAchievement(user1.id, "Veteran");
-          console.log("Played matches user1: " + playedMatches);
+          // console.log("Played matches user1: " + playedMatches);
           await this.userService.setOnlineStatus(user1.id);
         }
         if (user2) {
@@ -363,7 +371,7 @@ export class gameServer implements OnModuleInit {
             await this.userService.createAchievement(user2.id, "Player");
           if (playedMatches > 5 && wonMatches >= 5)
             await this.userService.createAchievement(user2.id, "Veteran");
-          console.log("Played matches user2: " + playedMatches);
+          // console.log("Played matches user2: " + playedMatches);
           await this.userService.setOnlineStatus(user2.id);
         }
 
@@ -375,25 +383,25 @@ export class gameServer implements OnModuleInit {
 
   @SubscribeMessage('queuing')
   async waitingForRandomOponent(client: Socket) {
-    console.log("Player queuing");
+    // console.log("Player queuing");
 
     const user = await this.getUser(client);
     if (!user)
       return;
     const userStatus: string = await this.userService.getStatus(user.id);
-    console.log("Status ", userStatus);
+    // console.log("Status ", userStatus);
     const roomInvitationCheck =
       Array.from(this.roomsList.values()).
         find(room => (room.firstClient === client ||
           room.secondClient === client));
 
     if (roomInvitationCheck && roomInvitationCheck.gameMode == "private") {
-      console.log('Player reserved ');
+      // console.log('Player reserved ');
       return;
     }
 
     if (userStatus == "busy") {
-      console.log("Already queuing");
+      // console.log("Already queuing");
       this.server.to(`${client.id}`).emit("alreadyQueuing");
       return;
     }
@@ -412,7 +420,7 @@ export class gameServer implements OnModuleInit {
           room.firstClient = client;
           room.firstName = user.username;
           room.user1ID = user.id;
-          console.log("player " + room.user1ID + "here");
+          // console.log("player " + room.user1ID + "here");
           return;
         }
         else if (!room.secondClient) {
@@ -430,7 +438,7 @@ export class gameServer implements OnModuleInit {
           room.roomState = "ready";
           room.secondName = user.username;
           room.user2ID = user.id;
-          console.log("player " + room.user2ID + "here");
+          // console.log("player " + room.user2ID + "here");
           this.server.to(`${room.id}`).emit("matchFound", true);
           this.server.to(`${room.id}`).emit("gameStart");
           this.server.to(`${room.id}`).emit("userIDs",
@@ -449,14 +457,14 @@ export class gameServer implements OnModuleInit {
     this.roomsList.set(room_.id, room_);
     room_.firstName = user.username;
     room_.user1ID = user.id;
-    console.log("player " + room_.user1ID + "here");
-    console.log("Rooms count ", this.roomsList.size);
+    // console.log("player " + room_.user1ID + "here");
+    // console.log("Rooms count ", this.roomsList.size);
   }
   @SubscribeMessage('left')
   async leftMove(client: Socket, vel: number) {
     let room = Array.from(this.roomsList.values()).find(room => room.firstClient === client);
     if (room) {
-      console.log("LEFT to room ", room.id);
+      // console.log("LEFT to room ", room.id);
       room.firstvelocity = vel;
     }
   }
@@ -464,7 +472,7 @@ export class gameServer implements OnModuleInit {
   async rightMove(client: Socket, vel: number) {
     const room = Array.from(this.roomsList.values()).find(room => room.secondClient === client);
     if (room) {
-      console.log("RIGHT to room ", room.id);
+      // console.log("RIGHT to room ", room.id);
       room.secondvelocity = vel;
     }
   }
@@ -474,11 +482,11 @@ export class gameServer implements OnModuleInit {
       room.firstClient === client);
     if (room) {
       if (room.firstPlayerHaveTheBall && client == room.firstClient) {
-        console.log("One");
+        // console.log("One");
         room.ballLaunched = launched;
       }
       if (room.secondPlayerHaveTheBall && client == room.secondClient) {
-        console.log("Two");
+        // console.log("Two");
         room.ballLaunched = launched;
       }
     }

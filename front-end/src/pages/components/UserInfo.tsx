@@ -12,6 +12,7 @@ export default function UserInfo() {
   const [isFriendPending, setIsFriendPending] = useState(false);
   const [imagePath, setImagePath] = useState('');
   const [userData, setUserData] = useState('');
+  const [status, setStatus] = useState('offline');
   const navigate = useNavigate();
   const { username } = useParams();
   const { user } = useContext(UserContext);
@@ -23,7 +24,9 @@ export default function UserInfo() {
       axios.get(`${process.env.REACT_URL}:1337/users/Public_data/${username}`,
         { withCredentials: true }
       ).then((response) => {
+        console.log("response", response.data);
         setUserData(response.data);
+        setStatus(response.data.status);
         const id = response.data['id'];
         axios.get(`${process.env.REACT_URL}:1337/users/check_notification?receiverId=${id}`, {
           withCredentials: true
@@ -151,8 +154,12 @@ export default function UserInfo() {
       <div className=" bg-purple-sh-2 rounded-full h-48 w-48 grid place-content-center ml-6 mt-6 ">
         <div className="relative inline-block">
           <img className="rounded-full h-44 w-44  " src={imagePath} alt="Profile" />
-          {isFriendAdded && (
+          {status === 'online' ? (
             <span className="w-8 h-8 rounded-full bg-green absolute bottom-0.5 right-0.5"></span>
+          ) : status === 'busy' ? (
+            <span className="w-8 h-8 rounded-full bg-orange-800 absolute bottom-0.5 right-0.5"></span>
+          ) : (
+            <span className="w-8 h-8 rounded-full bg-gray absolute bottom-0.5 right-0.5"></span>
           )}
         </div>
 

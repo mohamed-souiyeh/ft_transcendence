@@ -3,6 +3,8 @@ services:
     image: front-end-dev
     restart: always
     build: ./front-end-dev/
+    env_file:
+      - .env
     container_name: front-end-dev
     ports:
       - "1339:1339"
@@ -11,7 +13,7 @@ services:
       - sharedv:/root/shared
     depends_on:
       - back-end-dev
-      - studio
+      # - studio
     networks:
       - front-end-network
     environment:
@@ -21,6 +23,8 @@ services:
     image: back-end-dev
     restart: always
     build: ./back-end-dev/
+    env_file:
+      - .env
     container_name: back-end-dev
     ports:
       - "8080:8080"
@@ -66,6 +70,8 @@ services:
     restart: always
     build: ./studio/
     container_name: studio
+    env_file:
+      - .env
     ports:
       - "5555:5555"
     volumes:
@@ -87,6 +93,8 @@ services:
     image: postgres
     restart: always
     container_name: postgres
+    env_file:
+      - .env
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
@@ -116,11 +124,11 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: "$PWD/.."
+      device: "$PWD"
   postgres:
     name: postgres
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: "$PWD/dev-ops/volumes/database"
+      device: "$PWD/volumes/database"
