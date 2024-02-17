@@ -1,4 +1,4 @@
-build:
+build: volumes
 	@docker compose up --build
 
 # install:
