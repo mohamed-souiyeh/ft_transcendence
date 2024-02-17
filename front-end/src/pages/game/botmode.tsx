@@ -320,17 +320,14 @@ function BotMode() {
           </h1>
         </div>)
       }
-      <div style={{ textAlign: "center", marginTop: "120px" }}>
+      <div style={{ textAlign: "center", marginTop: "30px" }}>
+        <h2 style={{ fontSize: "25px", color: "rgb(255, 170, 255)" }}>This is just a training mode so this match won't be
+          saved in your profile, play with W - A</h2>
         <button
           onClick={leaveGame}
           style={{ color: "white", background: "#DFA7FC", width: 60, height: 60, border: "none", padding: 0 }}>
           <img src={quitButton} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Quit Button" />
         </button>
-      </div>
-      <div style={{ textAlign: "center" }}>
-        <h2 style={{ fontSize: "30px", color: "rgb(255, 170, 255)" }}>This is just a training mode so this match won't be
-          saved in your profile.</h2>
-        <h2>QWERTY use W - A to move AZERTY use Z - A</h2>
       </div>
     </div>
   </>

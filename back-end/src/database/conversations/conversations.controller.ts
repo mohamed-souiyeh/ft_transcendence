@@ -54,6 +54,10 @@ export class ConversationsController {
 
     for (const user of channelData.members) {
       await this.conversationService.addUserToChannel(createdChannel.id, user.id);
+      eventBus.emit('channelCreated', {
+        channelId: createdChannel.id,
+        userId: user.id,
+      });
     }
     eventBus.emit('channelCreated', {
       channelId: channelData.id,
@@ -99,6 +103,9 @@ export class ConversationsController {
 
 
     await this.conversationService.joinChannel(channelId, userId, password);
+
+    eventBus.emit('reconnect', userId);
+
 
     return { message: 'user joined the channel successfully' };
   }
