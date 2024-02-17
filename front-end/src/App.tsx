@@ -216,11 +216,12 @@ function SetupSockets() {
 
     // console.log("the user context is in setup sockets :", user);
     return () => {
-      // ping_socket.disconnect();
+      ping_socket.disconnect();
       ping_socket.off();
-      // chat_socket.disconnect();
+      chat_socket.disconnect();
       chat_socket.off();
-      // game_socket.disconnect();
+      game_socket.disconnect();
+      // game_socket.emit("leaveRoom");
       game_socket.off();
       clearInterval(setIntervalId);
     };

@@ -27,7 +27,7 @@ export class Cube
 
     constructor(gl:WebGLRenderingContext | null, width:number, height:number, depth:number)
     { 
-      console.log("Cube created");
+      // console.log("Cube created");
       const normals:number[] = 
         [
             0.0,  0.0,   -1.0,
