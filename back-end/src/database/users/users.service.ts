@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { UserDto } from './User_DTO/User.dto';
 import * as crypto from 'crypto';
 import { MemoryStoredFile } from 'nestjs-form-data';
@@ -663,6 +663,8 @@ export class UsersService {
 
     if (user === null)
       throw new NotFoundException('User not found');
+
+    
 
     if (user.activeRefreshToken !== refreshToken) return null;
 

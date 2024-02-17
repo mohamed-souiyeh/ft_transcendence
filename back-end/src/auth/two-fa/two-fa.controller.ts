@@ -57,7 +57,7 @@ export class TwoFaController {
         req.user.id,
       );
 
-    // console.log('code => ', code.code);
+    console.log('code => ', code.code);
 
     if (!isVerified) throw new BadRequestException('code is not valid');
 

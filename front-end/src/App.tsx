@@ -222,7 +222,6 @@ function SetupSockets() {
       chat_socket.off();
       // game_socket.disconnect();
       game_socket.off();
-      console.log("sockets disconnected");
       clearInterval(setIntervalId);
     };
   }, []);
@@ -261,30 +260,16 @@ function App() {
 
     const userData = Cookies.get('user');
 
-
     if (userData) {
       //prevUser => ({...prevUser, data: resp.data})
       // console.log("we are in the app useeffect and we have the user data");
       setUser(prevUser => ({ ...prevUser, data: JSON.parse(userData) }));
     }
 
-    const intervalId = setInterval(() => {
-      axios.get(`${process.env.REACT_URL}:1337/auth/hello`, {
-        withCredentials: true
-      }).then(() => {
-      }).catch(() => {
-      });
-    }, 1000 * 60);
-
     const userAvatar = localStorage.getItem('avatar')
     if (userAvatar) {
       setAvatar(userAvatar)
     }
-
-    return () => {
-      clearInterval(intervalId);
-    };
-
   }, []);
 
   useEffect(() => {

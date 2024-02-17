@@ -49,6 +49,9 @@ export class AuthService {
     if (!user || user.activeRefreshToken !== req.cookies[process.env.REFRESH_TOKEN_KEY]) {
       if (user) await this.userService.replaceRefreshToken(user.id, null);
 
+      console.log('refresh token is not valid');
+      console.log('user.activeRefreshToken =>', user.activeRefreshToken);
+      console.log('req.cookies[process.env.REFRESH_TOKEN_KEY] =>', req.cookies[process.env.REFRESH_TOKEN_KEY]);
       await this.userService.setAuthenticated(req.user.id, false);
       await this.addTokenToCookie(req.res, '', process.env.ACCESS_TOKEN_KEY);
       await this.addTokenToCookie(req.res, '', process.env.REFRESH_TOKEN_KEY);

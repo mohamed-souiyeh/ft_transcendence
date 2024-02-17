@@ -73,6 +73,7 @@ axios.interceptors.response.use(
 
         eventBus.emit('unauthorized');
         interceptorData.isRefreshing = false;
+        
         console.log("we are suposed to kick him");
         return Promise.reject(error);
       });

@@ -51,10 +51,14 @@ export class TwoFaService {
 
     if (!user.TFASecret)
       throw new UnauthorizedException('User does not have 2FA enabled');
-    const isVerified = authenticator.check(TFAcode, user.TFASecret);
-    // console.log('user => ', user);
-    // console.log('TFAcode => ', TFAcode);
-    // console.log('isVerified => ', isVerified);
+
+    console.log('user.TFASecret => ', user.TFASecret);
+    const isVerified = authenticator.verify({
+      token: TFAcode,
+      secret: user.TFASecret});
+    console.log('user => ', user);
+    console.log('TFAcode => ', TFAcode);
+    console.log('isVerified => ', isVerified);
 
     return isVerified;
   }

@@ -85,6 +85,7 @@ export class gameServer implements OnModuleInit {
     }
     if (roomCheck) {
       this.server.to(`${roomCheck.id}`).emit("leaveGame");
+      client.leave(`${roomCheck.id}`);
       this.roomsList.delete(roomCheck.id);
     }
   }
@@ -288,6 +289,7 @@ export class gameServer implements OnModuleInit {
           await this.userService.setOnlineStatus(user2.id);
         }
       }
+      client.leave(`${roomCheck.id}`);
       this.roomsList.delete(roomCheck.id);
     }
   }
@@ -377,6 +379,7 @@ export class gameServer implements OnModuleInit {
 
         this.gameService.matchesService.create(match);
       }
+      client.leave(`${roomCheck.id}`);
       this.roomsList.delete(roomCheck.id);
     }
   }

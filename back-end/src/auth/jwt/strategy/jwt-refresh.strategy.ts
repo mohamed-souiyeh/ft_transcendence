@@ -33,13 +33,14 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
 
     const refreshTokenIsValid = await this.userService.validatRefreshToken(payload.id, refreshToken);
 
+    Logger.debug(`refresh token is valid ${refreshTokenIsValid}`, 'validate function');
     // console.log("refreshtokenuisvalid => ", refreshTokenIsValid);
     //NOTE - check if refresh token is valid
     if (!refreshTokenIsValid) {
       await this.userService.replaceRefreshToken(payload.id, null);
       await this.userService.setAuthenticated(payload.id, false);
 
-      Logger.debug('setting user ofline', 'refresh function');
+      Logger.debug('setting user ofline', 'validate function');
       await this.userService.setOfflineStatus(payload.id);
       throw new UnauthorizedException('3 refresh token is not valid');
     }
